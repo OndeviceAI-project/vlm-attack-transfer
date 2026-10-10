@@ -53,7 +53,7 @@
 | case | ref / rtn-V-4 / bnb-V-8 … | rtn-V-4 |
 | image_id | COCO id 12자리 | 000000001425 |
 | input | clean / noise / adv | adv |
-| n_tokens | 생성한 토큰 수 | 512 |
+| n_tokens | 생성한 토큰 수. 답이 스스로 끝났으면 종료 토큰도 센다(generate가 새로 낸 토큰 전부) | 512 |
 | hit_cap | 종료 토큰 없이 512에 닿았는가 | True |
 | latency_s | 생성 시간(초) | 18.2 |
 | text | 답 전문 | … |

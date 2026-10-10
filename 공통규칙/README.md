@@ -27,7 +27,7 @@
 | 답 생성 | greedy, 상한 512 토큰 (`settings.GEN_KWARGS`를 그대로 넘긴다) |
 | 종료 토큰 | 모델 generation_config의 eos 목록 전부 (Qwen은 2개) |
 | 노이즈 상한 | 8/255 |
-| 사진 | `image_list.csv`의 eval 후보 중 확정된 30장(`eval_v1.txt`). 모델 입력 크기 정사각형(SmolVLM 512, Qwen 448)으로 리사이즈, PNG 저장 |
+| 사진 | `image_list.csv`의 eval 후보 중 확정된 30장(`eval_v1.txt`, A팀이 10/14 확정. 그 전에는 dev 5장으로만). 모델 입력 크기 정사각형(SmolVLM 512, Qwen 448)으로 리사이즈, PNG 저장 |
 | 입력 3종 | 원본(clean) / 무작위 노이즈(noise: 픽셀마다 ±8, 시드 `[2026, COCO id]`) / 공격(adv) |
 | 기준 모델 | bf16 원본 = 경우 `ref` |
 | 양자화 | 비전 인코더의 Linear weight만. 비트 8·6·5·4·3은 `quant_rtn.apply_rtn`, 더해서 bitsandbytes 8·4 (`settings.PRESETS["phase1"]`) |

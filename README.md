@@ -24,14 +24,16 @@
 1. **사진 준비** — `공통/image_list.csv`의 사진을 받아 모델 입력 크기 정사각형으로 리사이즈해 PNG로 저장. 원본(clean)과 무작위 노이즈 대조군(noise)을 만든다.
 2. **공격 사진 생성** — 원본 모델로 공격 사진(adv) 30장을 만든다. `이미지생성/attack_smolvlm.py`. B팀은 모델에 맞게 고쳐 쓴다.
 3. **전이 실험** — 경우(ref, rtn-V-8, rtn-V-6, rtn-V-5, rtn-V-4, rtn-V-3, bnb-V-8, bnb-V-4)마다 모델을 올리고, 같은 사진 30장 × 입력 3종(clean, noise, adv)을 넣어 답 길이를 잰다.
-4. **분석** — 두 팀 CSV를 모아 전이율 그림을 그린다. 한 사람이 한 코드로.
+4. **분석** — 두 팀 CSV를 모아 경우마다 전이율(유효 사진 수와 함께)을 내고 그림을 그린다. 한 사람이 한 코드로.
+
+시작할 때 필요한 것: bf16이 되는 GPU, `torch`, `transformers`(5.x), `bitsandbytes`, `pillow`, `numpy`. 전이 실험 코드는 `참고/예비실험/2_…ipynb`(모델 올리기, bnb 설정, census, 답 길이 재기)를 출발점으로 써도 되고 직접 짜도 된다.
 
 ## 반드시 지킬 것
 
 값은 전부 `공통/settings.py`에 있다. import해서 쓰면 틀릴 일이 없다. 바꿔야 하면 두 팀이 합의하고 버전을 올린다.
 
 1. **질문·생성 설정.** "Describe this image in one sentence.", greedy, 상한 512 (`settings.GEN_KWARGS` 그대로). 종료 토큰은 모델 generation_config의 목록 전부(Qwen은 2개).
-2. **사진.** `image_list.csv`의 eval 30장. SmolVLM 512×512, Qwen 448×448로 바로 리사이즈(자르지 않음). 저장은 무손실 PNG만 — JPEG는 노이즈를 지운다. dev 5장은 코드 확인·공격 설정 조정용, eval 30장으로는 조정하지 않는다.
+2. **사진.** `image_list.csv`의 eval 30장(COCO val2017). SmolVLM 512×512, Qwen 448×448로 바로 리사이즈(자르지 않음). 저장은 무손실 PNG만 — JPEG는 노이즈를 지운다. dev 5장은 코드 확인·공격 설정 조정용이고 eval 30장으로는 조정하지 않는다. extra 13장은 여분, pilot 3장은 예비 실험에 쓴 것이라 쓰지 않는다.
 3. **노이즈 대조군.** 원본 사진의 픽셀마다 ±8을 더한다. 부호는 `numpy.random.default_rng([2026, coco_id]).choice([-1, 1], size=arr.shape)`.
 4. **공격 사진.** 노이즈 상한 8/255, 반복 300(최대 500), 나머지 설정도 `settings` 값. **원본 모델로 한 번 만들고 고정**한다. 만든 뒤 PNG를 다시 읽어 원본과의 최대 차이가 8 이하인지, 원본 모델에서 답이 길어지는지 확인하고 로그에 남긴다. 다시 만들어야 하면 새 폴더로.
 5. **공격이 보는 사진 = 평가가 보는 사진.** 공격 코드가 모델에 넣는 pixel_values와 프로세서가 같은 PNG로 만드는 값의 차이가 0이어야 한다. (SmolVLM은 프로세서에 `size={"longest_edge": 512}`를 줘야 한다. 기본값이면 사진을 키웠다 줄여 픽셀이 바뀐다.)
@@ -56,7 +58,7 @@
 | latency_s | 생성 시간(초) | 18.2 |
 | text | 답 전문 | … |
 
-같은 이름의 `.json`(또는 CSV 옆 메모)에 `settings.SETTINGS_VERSION`, GPU, 패키지 버전, 경우별 census 결과를 남긴다. 공격 사진은 `<팀>/adv/`에 PNG 30장 + 로그 + `SHA256SUMS`.
+1차가 끝나면 모델당 경우 8 × 사진 30 × 입력 3 = **720줄**이 된다. 같은 이름의 `.json`(또는 CSV 옆 메모)에 `settings.SETTINGS_VERSION`, GPU, 패키지 버전, 경우별 census 결과를 남긴다. 공격 사진은 `<팀>/adv/`에 PNG 30장 + 로그 + `SHA256SUMS`.
 
 ## 폴더
 

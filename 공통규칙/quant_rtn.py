@@ -1,16 +1,17 @@
 """가짜 양자화(rtn) 참고 구현. 두 팀이 이 함수를 그대로 가져다 써야 비트 스윕이 같은 방식이 된다.
 
-규칙(docs/02 A):
+규칙(공통규칙/README.md 2절):
 - 대상은 Linear 층의 weight뿐이다. bias·LayerNorm·Conv·임베딩은 원본 그대로.
 - 가중치 행렬(출력 × 입력)을 입력 방향으로 group개씩 묶고, 묶음마다 최솟값·최댓값 사이를 2^bits − 1 칸으로
   나눈 눈금에 반올림한 뒤 다시 실수로 풀어 둔다(MLX의 affine 그룹 양자화와 같은 계열).
 - 계산 결과는 실제 압축 모델과 같지만 속도·메모리 이득은 없다. 시간 비교에는 쓰지 않는다.
 
-쓰는 법 (노트북 2번의 load_case 안에서):
+쓰는 법 (평가 노트북의 모델 올리는 부분):
     model = AutoModelForImageTextToText.from_pretrained(MID, dtype=torch.bfloat16).to(dev).eval()
-    change = apply_rtn(model, PARTS, targets="V", bits=4)      # {'V': 7.9} 처럼 부품별 가중치 변화(%)
-    check_census(census(model, PARTS), targets="V", names=PART_NAMES)
-PARTS는 {"V": "model.vision_model", ...} 처럼 부품 글자 → 모듈 이름 앞부분.
+    change = apply_rtn(model, PARTS, targets="V", bits=4)      # {'V': 9.38} 처럼 부품별 가중치 변화(%)
+    check_census(census(model, PARTS), targets="V", names=settings.PART_NAMES)
+PARTS는 settings.MODEL_SPECIFIC[모델]["parts"] (부품 글자 → 모듈 이름 앞부분).
+확인된 값: SmolVLM 비전 인코더 8비트 0.57%, 4비트 9.38%, 전체(VCLH) 4비트 V 9.38 / C 9.00 / L 9.26 / H 11.35.
 """
 import torch
 

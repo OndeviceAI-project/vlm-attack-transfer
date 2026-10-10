@@ -1,5 +1,5 @@
 # 내려받은 원본·모델·환경
-data/coco_cache/
+*/data/coco_cache/
 *.safetensors
 *.gguf
 *.pt

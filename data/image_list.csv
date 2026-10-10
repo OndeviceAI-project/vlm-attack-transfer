@@ -1,0 +1,52 @@
+split,order,coco_id,url,note
+pilot,1,39769,http://images.cocodataset.org/val2017/000000039769.jpg,예비 실험(공격 설정 조정)에 쓴 사진. 공식 실험에서 제외
+pilot,2,139,http://images.cocodataset.org/val2017/000000000139.jpg,예비 실험(공격 설정 조정)에 쓴 사진. 공식 실험에서 제외
+pilot,3,285,http://images.cocodataset.org/val2017/000000000285.jpg,예비 실험(공격 설정 조정)에 쓴 사진. 공식 실험에서 제외
+dev,1,632,http://images.cocodataset.org/val2017/000000000632.jpg,개발·디버깅용
+dev,2,724,http://images.cocodataset.org/val2017/000000000724.jpg,개발·디버깅용
+dev,3,776,http://images.cocodataset.org/val2017/000000000776.jpg,개발·디버깅용
+dev,4,785,http://images.cocodataset.org/val2017/000000000785.jpg,개발·디버깅용
+dev,5,802,http://images.cocodataset.org/val2017/000000000802.jpg,개발·디버깅용
+eval,1,872,http://images.cocodataset.org/val2017/000000000872.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,2,885,http://images.cocodataset.org/val2017/000000000885.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,3,1000,http://images.cocodataset.org/val2017/000000001000.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,4,1268,http://images.cocodataset.org/val2017/000000001268.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,5,1296,http://images.cocodataset.org/val2017/000000001296.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,6,1353,http://images.cocodataset.org/val2017/000000001353.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,7,1425,http://images.cocodataset.org/val2017/000000001425.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,8,1490,http://images.cocodataset.org/val2017/000000001490.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,9,1503,http://images.cocodataset.org/val2017/000000001503.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,10,1532,http://images.cocodataset.org/val2017/000000001532.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,11,1584,http://images.cocodataset.org/val2017/000000001584.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,12,1675,http://images.cocodataset.org/val2017/000000001675.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,13,1761,http://images.cocodataset.org/val2017/000000001761.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,14,1818,http://images.cocodataset.org/val2017/000000001818.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,15,1993,http://images.cocodataset.org/val2017/000000001993.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,16,2006,http://images.cocodataset.org/val2017/000000002006.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,17,2149,http://images.cocodataset.org/val2017/000000002149.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,18,2153,http://images.cocodataset.org/val2017/000000002153.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,19,2157,http://images.cocodataset.org/val2017/000000002157.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,20,2261,http://images.cocodataset.org/val2017/000000002261.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,21,2299,http://images.cocodataset.org/val2017/000000002299.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,22,2431,http://images.cocodataset.org/val2017/000000002431.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,23,2473,http://images.cocodataset.org/val2017/000000002473.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,24,2532,http://images.cocodataset.org/val2017/000000002532.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,25,2587,http://images.cocodataset.org/val2017/000000002587.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,26,2592,http://images.cocodataset.org/val2017/000000002592.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,27,2685,http://images.cocodataset.org/val2017/000000002685.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,28,2923,http://images.cocodataset.org/val2017/000000002923.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,29,3156,http://images.cocodataset.org/val2017/000000003156.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,30,3255,http://images.cocodataset.org/val2017/000000003255.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,31,3501,http://images.cocodataset.org/val2017/000000003501.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,32,3553,http://images.cocodataset.org/val2017/000000003553.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,33,3661,http://images.cocodataset.org/val2017/000000003661.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,34,3845,http://images.cocodataset.org/val2017/000000003845.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,35,3934,http://images.cocodataset.org/val2017/000000003934.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,36,4134,http://images.cocodataset.org/val2017/000000004134.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,37,4395,http://images.cocodataset.org/val2017/000000004395.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,38,4495,http://images.cocodataset.org/val2017/000000004495.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,39,4765,http://images.cocodataset.org/val2017/000000004765.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,40,4795,http://images.cocodataset.org/val2017/000000004795.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,41,5001,http://images.cocodataset.org/val2017/000000005001.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,42,5037,http://images.cocodataset.org/val2017/000000005037.jpg,유효성 검사 후 앞에서부터 30장 사용
+eval,43,5060,http://images.cocodataset.org/val2017/000000005060.jpg,유효성 검사 후 앞에서부터 30장 사용

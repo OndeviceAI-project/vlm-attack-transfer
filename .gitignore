@@ -1,0 +1,18 @@
+# 내려받은 원본·모델·환경
+data/coco_cache/
+*.safetensors
+*.gguf
+*.pt
+*.pth
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# 노트북 임시 파일
+.ipynb_checkpoints/
+
+# 시스템
+.DS_Store
+Thumbs.db
+*.log

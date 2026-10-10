@@ -188,7 +188,7 @@ def main():
         return
 
     device = pick_device()
-    processor = AutoProcessor.from_pretrained(MODEL_ID)
+    processor = AutoProcessor.from_pretrained(MODEL_ID, size={"longest_edge": 512})
     processor.image_processor.do_image_splitting = False
     model = AutoModelForImageTextToText.from_pretrained(MODEL_ID, dtype=torch.float32).to(device).eval()
     mean = torch.tensor([0.5, 0.5, 0.5], device=device).view(3, 1, 1)

@@ -1,105 +1,99 @@
-# B팀 — Qwen2-VL 시각 인코더 양자화 실험
+# Qwen2-VL 공격 전이 실험 안내
 
-Qwen2-VL-2B-Instruct 원본 bf16 모델에서 만든 공격 PNG를 고정한 뒤, 같은 사진의 clean·noise·adv 입력을 원본과 시각 인코더(V) 양자화 모델 7종에 각각 넣은 **측정 기록과 실행 코드**다. 각 실험은 30장 × 8조건 × 3입력 = 720행이다. 성공·실패, ASR, 전이율은 아직 평가하지 않았다.
+B팀은 Qwen2-VL 원본 모델에서 만든 공격 이미지가 양자화한 모델에서도 긴 답변을 유도하는지 측정한다. 이 폴더에는 실험에 재사용하는 코드, 고정한 공격 이미지, 측정 결과와 보고서를 모은다.
 
-## 실험과 이미지 세트
+이 문서는 B팀 폴더의 사용·관리 안내다. **각 실험의 목적·설정·실행 환경·결과는 `reports/<실험 ID>/README.md`에 기록한다.**
 
-| 구분 | 공통 설정 | 확장 설정 |
-|---|---|---|
-| 실험 ID | `qwen2vl_vision_common_v1_r01` | `qwen2vl_vision_extended_v1_r01` |
-| 이미지 세트 ID | `qwen2vl_attack_common_v1_i300_cap512_s01` | `qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01` |
-| 출력 상한 | 512토큰 | 5,000토큰 |
-| 공격 갱신 | 최대 300회 | 500회 모두 수행 |
-| 후보 출력 확인 | 1, 21, …, 281회 및 마지막 300회 | 20, 40, …, 500회, 총 25회 |
-| 중단·채택 | EOS 없이 512토큰인 확인이 두 번 연속이면 중단. 관찰 후보 중 `(상한 도달, 토큰 수)`가 최대인 이미지를 저장 | 최초 출력 토큰 수가 많은 후보부터 재검사하고, 최초 대비 오차가 20% 이하인 첫 후보를 채택 |
-| 저장 확인 | PNG 재로딩 후 채택 후보와 토큰 수·상한 도달 여부 일치 확인 | 재검사 입력과 최종 PNG의 SHA-256 일치 확인 |
-| CSV | 공통 8열 | EOS·출력 제한을 분리한 9열 |
-
-`vision`은 이후 **시각 인코더 Linear만 양자화**했다는 뜻이다. 공격 생성은 원본 bf16에서 했으므로 이미지 세트 이름에는 양자화 대상을 넣지 않았다. 같은 세트를 다른 부품 양자화 실험에서도 재사용할 수 있다. `i300/i500`은 공격 반복 예산, `cap`은 출력 상한, `tol20`은 재검사 오차 20%, `s01`은 첫 이미지 세트다.
-
-`r01`은 해당 실험의 첫 독립 실행 번호다. 중단 후 이어 실행하면 같은 번호를 사용한다. 새 독립 실행은 `r02`, 과학적 설정 변경은 새 프로토콜 버전으로 구분한다. 버전이 같은 경우 코드 정리와 실험 설정 변경을 혼동하지 않도록 실행 때 코드 해시를 함께 남긴다.
-
-공통 설정은 저장소의 `공통/settings.py` v1, 이미지 목록, CSV 8열, V 전용 양자화 조건을 따른다. 다만 예시 공격 코드의 **500토큰 이상 중단·마지막 상태 저장**과 달리, B팀 실행은 **EOS 없는 정확한 512토큰 중단·최선 후보 저장**을 사용했다. 예시 구현과 완전히 같은 실험이라고 해석하면 안 된다. 실행 당시 세부 규칙은 `results/<실험 ID>/PROTOCOL.md`, 현재 이름과 원본 기록의 연결은 `reports/<실험 ID>/run_manifest.json`에 있다. 확장 설정은 팀 내 추가 측정이며 공통 설정 결과와 합쳐 하나의 지표로 계산하지 않는다.
-
-## 폴더 안내
+## 1. 폴더 구조
 
 ```text
 B팀/
-├─ README.md
-├─ requirements.in / requirements.lock.txt
-├─ .gitignore
-├─ src/       runtime.py, data.py, attack.py, evaluate.py, pipeline.py, report.py
-├─ scripts/   run.sh, worker.sh, check_status.sh
-├─ tests/     CPU 검사와 저장 결과 무결성 검사
+├─ README.md                         # 폴더 사용법과 공통 관리 규칙
+├─ requirements.in                   # 직접 사용하는 패키지 버전
+├─ requirements.lock.txt             # 측정 당시 전체 패키지 목록
+├─ .gitignore                        # 공유하지 않을 작업 파일 지정
+├─ src/                              # 여러 실험에서 재사용하는 코드
+├─ scripts/                          # 실행·상태 확인 도우미
+├─ tests/                            # 코드 동작·저장 결과 검사
 ├─ adv/
-│  ├─ qwen2vl_attack_common_v1_i300_cap512_s01/
-│  └─ qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01/
+│  └─ <이미지 세트 ID>/               # 채택 PNG·selection.json·SHA256SUMS·로그
 ├─ results/
-│  ├─ qwen2vl_vision_common_v1_r01.csv / .json
-│  ├─ qwen2vl_vision_extended_v1_r01.csv / .json
-│  ├─ input-manifest.json
-│  └─ <실험 ID>/  상세 기록, provenance
+│  ├─ input-manifest.json             # 공통 입력 목록과 해시
+│  ├─ <실험 ID>.csv                   # 응답별 측정값과 답변 전문
+│  ├─ <실험 ID>.json                  # 해당 실행의 설정·환경
+│  └─ <실험 ID>/                      # 상세 응답·검증·진행 기록
 └─ reports/
-   ├─ qwen2vl_vision_common_v1_r01/
-   ├─ qwen2vl_vision_extended_v1_r01/
-   ├─ experiment_history.md
-   └─ FILES.md
+   ├─ FILES.md                       # 파일별 용도·CSV/JSON 필드 설명
+   └─ <실험 ID>/
+      ├─ README.md                   # 실험 설명·환경·측정 요약·사진별 모델 비교
+      ├─ measurements-summary.json   # 요약표의 수치
+      └─ run_manifest.json           # 실험·이미지 세트·결과 파일의 연결
 ```
 
-- `src/`: 공통·확장 설정을 실행하는 실제 코드다. 코드 복사본을 실험마다 만들지 않고 공통 처리와 프로토콜 분기를 재사용한다.
-- `scripts/`: 환경을 읽고 tmux에서 명시적으로 시작하며, GPU 동시 사용을 잠금으로 막는다. 기본 동작은 점검이다.
-- `adv/<세트 ID>/`: 최종 PNG 30장, `selection.json`, `SHA256SUMS`. 공통 세트에는 `attack_log.csv`도 있다. 짧게 출력한 사진도 제거하지 않았다.
-- `results/`: CSV는 측정값, 같은 이름의 JSON은 실행 환경·설정·해시다. 실행 당시 JSON 내부의 예전 ID와 절대 경로는 원본 출처를 보존하려고 유지했다.
-- `reports/`: 사진별 모델 비교표, 기술 통계, 이름 매핑과 실험 진행 요약이다. 예비 실험 상세 파일은 서버에 별도 보관한다.
+`results/`의 CSV·JSON과 같은 이름의 폴더는 **한 실험의 자료 묶음**이다. CSV는 측정값, JSON은 설정, 폴더는 상세 근거를 담는다. `reports/`에는 이를 읽기 쉽게 설명한 문서와 표를 둔다.
 
-각 파일의 내용·필드·포함 이유는 [FILES.md](reports/FILES.md)를 참고한다.
+**실험 ID**는 측정 실행을, **이미지 세트 ID**는 고정한 공격 PNG 묶음을 식별한다. 한 세트를 여러 실험에서 재사용할 수 있으며, 어떤 세트를 썼는지는 `run_manifest.json`의 `image_set_id`로 찾는다.
 
-## 원격 실험 서버에서 실행
+## 2. 파일 추가와 이름 규칙
 
-Python 3.12, CUDA를 지원하는 PyTorch, bf16 GPU와 기존 모델 캐시가 필요하다. 측정 환경의 정확한 패키지 버전은 `requirements.lock.txt`에 있다. 모델은 `Qwen/Qwen2-VL-2B-Instruct`, revision `895c3a49bc3fa70a340399125c650a463535e71c`이다. 가중치와 데이터 캐시는 Git에 포함하지 않는다.
+### 이름 짓기
 
-- 저장소를 포함한 경로: `ONDEVICE_AI_REPO` (기본: `B팀/`의 상위 폴더).
-- 모델·데이터 경로: `ONDEVICE_AI_ROOT` (기본: 서버의 `$HOME/ondevice-ai`).
-- `$ONDEVICE_AI_ROOT/model.json`은 `model_id`, `revision`, `snapshot_path`를 가진다. `snapshot_path`에는 해당 revision의 로컬 모델 캐시를 지정한다.
-- 입력 파일은 `$ONDEVICE_AI_ROOT/data/qwen2vl/{dev,eval}/{clean,noise}/<12자리 ID>.png`, 입력 해시는 `data/manifest.json`에서 읽는다.
-- `src/data.py`는 기본적으로 기존 입력을 검사하기만 한다. `--download`를 명시하면 원격 서버에서 COCO 원본을 받아 준비하며, 기존의 다른 해시 파일은 덮어쓰지 않는다. 학습·가중치 다운로드는 이 코드가 자동 실행하지 않는다.
+영문 소문자·숫자·밑줄·하이픈을 사용하고 공백을 넣지 않는다.
 
-아래 명령은 **서버의 B팀 폴더에서** 사용한다. `r01`과 `s01`은 이미 완료한 자료이므로 새 실험에는 새 이름을 쓴다.
+```text
+실험: <모델>_<양자화대상>_<프로토콜>_v<버전>_r<실행번호>
+예시: qwen2vl_vision_common_v1_r01
 
-```bash
-# 검사만 수행 — 모델 추론·공격·tmux 시작 없음
-bash scripts/run.sh common_v1 qwen2vl_vision_common_v1_r02 qwen2vl_attack_common_v1_i300_cap512_s02 --check
-bash scripts/run.sh extended_v1 qwen2vl_vision_extended_v1_r02 qwen2vl_attack_extended_v1_i500_cap5000_tol20_s02 --check
-
-# 별도 실행을 결정한 뒤에만 사용 — 이미지 생성부터 720행 측정까지 tmux 실행
-bash scripts/run.sh common_v1 qwen2vl_vision_common_v1_r02 qwen2vl_attack_common_v1_i300_cap512_s02 --start
-bash scripts/run.sh extended_v1 qwen2vl_vision_extended_v1_r02 qwen2vl_attack_extended_v1_i500_cap5000_tol20_s02 --start
-
-# 이미 공개용으로 고정한 PNG를 다시 측정 — 새 결과 이름, 기존 이미지 세트
-bash scripts/run.sh extended_v1 qwen2vl_vision_extended_v1_r02 qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01 --check --measure-only
-# 위 검사를 확인하고 --check를 --start로 바꾸면 재측정 실행
-
-bash scripts/check_status.sh qwen2vl_vision_extended_v1_r02
-PYTHONPATH=src python -m unittest discover -s tests -v
-python src/report.py qwen2vl_vision_extended_v1_r01
+이미지 세트: <모델>_attack_<프로토콜>_v<버전>_i<반복예산>_cap<출력상한>[_tol<오차백분율>]_s<세트번호>
+예시: qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01
 ```
 
-확장 설정은 20회마다 delta·target·CPU/CUDA RNG·모델 RoPE 상태를 저장해 해당 체크포인트부터 이어 간다. 공통 설정은 완료 PNG 단위로 이어 간다. 같은 실행 이름으로 다른 코드·설정을 이어 쓰지 않는다. 원격 프로세스가 끊겨도 tmux의 실험은 계속되며, 중간 기록은 `results/<새 실행 ID>/status.json`, `pipeline.log`에서 확인한다.
+- `qwen2vl`은 현재 Qwen2-VL-2B-Instruct, `vision`은 시각 인코더 양자화, `common`·`extended`는 서로 다른 실험 규칙을 뜻한다. 다른 모델·양자화 대상은 구별되는 이름을 쓴다.
+- `v1`은 실험 규칙의 버전이다. 출력 상한·공격 방식·질문·전처리 등 비교 조건을 바꾸면 새 버전으로 구분한다.
+- `r01`은 같은 조건의 첫 측정 실행이다. 다시 측정하면 `r02`로 올리며, 중단된 실행을 그대로 이어갈 때는 유지한다.
+- `s01`은 같은 생성 규칙으로 만든 첫 이미지 세트다. 새로 생성하면 `s02`로 올린다. 재측정에서 기존 세트를 쓰면 `r`만 바뀌므로 `r`과 `s`는 같을 필요가 없다.
+- `i500`은 최대 공격 반복 500회, `cap5000`은 출력 상한 5,000토큰, `tol20`은 재검사 허용 오차 20%다. `tol`은 필요한 경우에만 쓰며 대괄호는 실제 이름에 넣지 않는다.
 
-## 입력·측정 해석
+이미지는 원본 모델에서 만들므로 세트 이름에 양자화 대상을 넣지 않는다. 이름에 담지 않은 모델 revision·seed·세부 설정은 메타데이터에 남긴다. 자세한 변경 기준은 [FILES.md](reports/FILES.md)에 있다.
 
-공통 이미지 목록의 dev 5장·eval 30장을 사용했다. RGB 448×448 직접 BICUBIC 리사이즈 후, noise는 seed `[2026, image_id]`로 각 채널에 ±8을 더하고 0…255로 제한했다. 공격도 채널별 변화량 최대 8, 즉 정규화 기준 `8/255`로 제한했다. 프로세서 전처리는 미분 가능한 경로와 일치하는지 확인했다.
+### 새 실험 추가하기
 
-프롬프트는 `Describe this image in one sentence.`이며 greedy 생성이다. 토큰 수에는 생성된 EOS가 있으면 포함한다. 두 EOS ID는 `151645`, `151643`이다. `latency_s`는 CUDA 동기화를 포함한 **생성 호출 시간**이며 모델 로딩·공격 이미지 최적화 시간은 제외한다. 입력별 상세 지연시간을 곧바로 토큰당 속도 우열로 해석하지 않는다.
+1. 바꿀 조건과 공통 지침과의 차이를 정하고, 실험 ID와 사용할 이미지 세트를 정한다.
+2. 기존 `src/`를 재사용하고 필요한 동작을 추가한다. 이름만 바꿔도 실행 설정이 바뀌는 것은 아니므로 실제 설정을 확인한다.
+3. 새 공격 세트는 `adv/`에 따로 저장한다. PNG 이름은 COCO 12자리 ID를 유지하고, 채택 정보·해시·검증 로그를 남긴다. 같은 비교에는 같은 PNG를 사용한다.
+4. `results/`에 CSV·메타 JSON·상세 기록을 저장한다. 완료된 결과와 이미지 세트는 덮어쓰지 않고, 입력 목록이 달라지면 해당 실행의 목록·해시를 따로 남긴다.
+5. `reports/<실험 ID>/README.md`에 **목적과 변경점 → 설정·채택 규칙 → 실행 환경 → 결과와 해석**을 적고, `run_manifest.json`으로 사용한 결과와 이미지를 연결한다. 아래 실험 진행 현황에도 내용·상태를 한 줄 추가하고 상세 보고서가 있으면 링크한다.
+6. 공유 전에는 예상 행 수·중복·누락·파일 해시를 확인한다. 측정 CSV는 손으로 고치지 않고, 새 분석은 `reports/`에 추가한다.
 
-RTN은 group 64의 양자화 값을 부동소수점 가중치로 되돌려 사용하는 모의 양자화다. bnb는 실제 8/4비트 모듈을 사용하며 4비트는 NF4다. 대상 부품을 census로 확인했다. 이 결과는 답변의 정확성, 실제 메모리 절감이나 공격 성공률을 증명하지 않는다.
+폴더 구성·이름은 B팀 규칙이다. 공통 값·고정 입력·양자화 대상·제출 CSV 형식은 [프로젝트 공동 지침](../README.md)을 따른다. 공동 설정 변경은 두 팀이 합의하고 버전을 올리며, 별도 확장 실험은 구분해서 기록한다.
 
-## 보존과 업로드 범위
+## 3. 공통 코드
 
-CSV 2개와 원본 메타 JSON 2개는 실행 원본과 바이트 단위로 같다. 확장 상세 응답 720개는 `responses.jsonl` 한 파일로 묶었으며 `source_file`에 예전 파일명을 남겼다. 공통 공격 기록 30개도 `attack-records.jsonl`로 묶었다. JSONL은 **한 줄에 JSON 객체 하나**인 보조 기록이며 CSV를 대체하지 않는다.
+| 파일 | 역할 |
+|---|---|
+| [src/data.py](src/data.py) | 원본·무작위 노이즈 입력 준비와 해시 검사 |
+| [src/runtime.py](src/runtime.py) | 모델 로딩, 전처리, 양자화, 토큰·생성 시간 측정 |
+| [src/attack.py](src/attack.py) | 공격 이미지 갱신, 후보 확인·채택, 상태 저장 |
+| [src/evaluate.py](src/evaluate.py) | 고정한 clean·noise·adv를 모델별로 측정하고 CSV 저장 |
+| [src/pipeline.py](src/pipeline.py) | 설정 선택, 단계 실행, 중단 후 재개, 기존 결과 보호 |
+| [src/report.py](src/report.py) | 저장된 CSV로 비교표와 요약 수치 생성 |
 
-750개 후보 PNG, GPU 체크포인트, 모델 가중치, 캐시, 전체 중간 후보 답변 중복본은 원격 서버에 보존하고 업로드 대상에서 제외했다. 후보 750회의 토큰 수·반복 위치 요약은 `candidate-measurements.json`에 남겼다. 실험 진행 과정과 재현성 점검 요약은 `reports/experiment_history.md`에 남겼다.
+실행·상태 확인 도우미는 `scripts/`, 동작과 저장 결과 검사는 `tests/`에 있다. B팀 `src/`는 저장소의 `공통/settings.py`와 `공통/quant_rtn.py`를 사용한다.
 
-실제 실행 당시 코드·설정 사본 20개와 예비 실험 상세 자료 16개는 업로드 대상에서 제외하고 원격 서버에 별도 보관했다. 현재 `src/`에는 공통·확장 설정의 실행 코드가 모두 남아 있다. 원본 메타데이터의 코드 해시와 과거 경로는 그대로 보존했다.
+현재 실행 코드는 `common_v1`·`extended_v1`과 시각 인코더 전용 8조건을 지원한다. 다른 모델·부품·프로토콜을 추가할 때는 그 동작과 검사를 먼저 구현한다.
 
-이 폴더는 본실험 코드·이미지·결과·보고서 104개 파일로 구성한다. 파일 정리 과정에서는 새 GPU 실험을 수행하지 않았다.
+## 4. 실험 진행 현황
+
+| 실험 | 내용 | 상태 |
+|---|---|---|
+| [시각 인코더 · 확장 설정 v1 · r01](reports/qwen2vl_vision_extended_v1_r01/README.md) | eval 30장, 500회·5,000토큰·±20% 재검사로 이미지 채택 후 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [시각 인코더 · 공통 설정 v1 · r01](reports/qwen2vl_vision_common_v1_r01/README.md) | eval 30장, 최대 300회·512토큰·조기 종료로 이미지 채택 후 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+
+본실험은 측정까지 완료했으며, 공격 성공률·전이율 평가는 아직 진행하지 않았다.
+
+### 참고자료
+
+- [파일·필드 상세 설명과 이름 변경 기준](reports/FILES.md)
+- [프로젝트 공동 지침](../README.md)
+
+패키지 목록은 환경 재구성의 참고 자료다. 각 실행에서 실제 사용한 GPU·패키지·모델 revision·코드 정보는 해당 실험의 메타데이터와 보고서에 남긴다. 가중치·캐시·중간 후보 전체는 공유 대상에서 제외한다.

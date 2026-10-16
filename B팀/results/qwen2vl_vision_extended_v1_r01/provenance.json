@@ -1,0 +1,13 @@
+{
+  "csv_sha256": "f5426efa791983e09f70ebc8abb6c24609949e4bd1ad1e13ee51da90c2320b4d",
+  "original_metadata_sha256": "2bb18ff838ebe41c575ffb2b0b4fea300ed071e25673e1106b888d3612e26ae8",
+  "original_attack_manifest_sha256": "f33591850394dd03c12d4498d1331bb2ec6805c93d6103941483e4185fcc2027",
+  "attack_fingerprint": null,
+  "source_metadata_unmodified": true,
+  "experiment": "qwen2vl_vision_extended_v1_r01",
+  "original_experiment": "eval30-i500-cap5000-tol20-det-v1",
+  "image_set_id": "qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01",
+  "csv_bytes_unchanged": true,
+  "metadata_bytes_unchanged": true,
+  "metadata_paths_are_historical": true
+}

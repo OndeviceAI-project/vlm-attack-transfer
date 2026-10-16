@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.pt
+*.pth
+*.safetensors
+*.gguf
+*.log
+*.tmp
+results/*/prepared.json
+results/*/exit.code
+results/*/adv/
+.candidate-cache/
+
+# Working candidates/checkpoints stay on the experiment server.
+adv/*/????????????/
+adv/*/????????????.json
+adv/*/job.json
+adv/*/adopted.json

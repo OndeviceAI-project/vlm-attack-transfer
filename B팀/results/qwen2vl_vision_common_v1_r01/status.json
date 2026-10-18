@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-10-15T07:48:12.678902+00:00",
+  "state": "complete",
+  "stage": "complete",
+  "pid": 1737515,
+  "started_at": "2026-10-15T06:51:20.903925+00:00",
+  "fingerprint": "2f8b3b7397d20912f456eab43a1342471a1d81fd5afdfb37d2b2be60deaee894",
+  "error": null,
+  "expected_images": 30,
+  "expected_rows": 720,
+  "adv_dir": "/home/multimodal/ondevice-ai/vlm-attack-transfer/B팀/adv/eval-official-v1-i300-cap512-20261015",
+  "csv": "/home/multimodal/ondevice-ai/vlm-attack-transfer/B팀/results/eval-official-v1-i300-cap512-20261015.csv",
+  "generated_images": 30,
+  "measurement_rows": 720,
+  "csv_sha256": "e06b8323bc951af6fb74ab144aa73bef8466c7016406fc5f95ceb4e07cecb362",
+  "completed_at": "2026-10-15T07:48:12.678860+00:00"
+}

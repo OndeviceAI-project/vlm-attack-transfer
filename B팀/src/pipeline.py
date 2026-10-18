@@ -12,6 +12,7 @@ from runtime import (ROOT,REPO,settings,sha256,write_json,save_csv,fingerprint,
     model_metadata,source_label,image_ids,input_path,read_image,load_case,load_processor,generate,check_preprocessing)
 import attack
 import evaluate
+from case_config import COMPONENTS, BACKENDS, DEFAULT_BACKEND, component_cases, profile
 from attack import generate_one,verify_record
 HERE=Path(__file__).resolve().parent
 BTEAM=HERE.parent
@@ -46,7 +47,7 @@ def validate_protocol():
    p=rt.input_path('eval',kind,iid);img=rt.read_image(p);sha=rt.sha256(p)
    assert sha==refs['eval',kind,iid]
    hashes[iid+'/'+kind]=sha;imgs[kind]=np.asarray(img).astype(np.int16)
-  assert int(np.abs(imgs['noise']-imgs['clean']).max())<=8
+  rt.verify_fixed_pixels(iid,imgs['clean'],imgs['noise'])
  assert rt.CSV_FIELDS==['model','case','image_id','input','n_tokens','hit_cap','latency_s','text']
  return ids,hashes
 
@@ -78,38 +79,40 @@ def configure_gpu():
     torch.backends.cudnn.benchmark=False
     torch.manual_seed(2026);np.random.seed(2026)
 
-def plan():
+def plan(component=None, backend=DEFAULT_BACKEND):
     if (settings.EPS,settings.STEP,settings.TARGET_LEN,settings.REFRESH,settings.W_UNC,settings.W_DIV)!=(8,1,128,20,.05,0):
         raise ValueError('Common attack objective settings changed')
     ids=image_ids('eval');manifest=json.loads((ROOT/'data/manifest.json').read_text())
     entries={(r['split'],r['input'],r['image_id']):r for r in manifest['records']}
     hashes={}
     for iid in ids:
-        clean=None
+        pixels={}
         for kind in ['clean','noise']:
             path=input_path('eval',kind,iid)
             actual=sha256(path)
             if actual!=entries[('eval',kind,iid)]['sha256']:raise ValueError(f'Input changed: {path}')
             image=read_image(path);arr=np.asarray(image).astype(np.int16)
-            if kind=='clean':clean=arr
-            elif np.abs(arr-clean).max()>8:raise ValueError('Random noise exceeded the pixel bound')
+            pixels[kind]=arr
             hashes[f'{iid}/{kind}']=actual
+        rt.verify_fixed_pixels(iid,pixels['clean'],pixels['noise'])
     model=model_metadata();snap=Path(model['snapshot_path'])
     index=json.loads((snap/'model.safetensors.index.json').read_text())
     shards=sorted(set(index['weight_map'].values()))
     sizes={name:(snap/name).stat().st_size for name in shards}
     if sizes.get('model-00001-of-00002.safetensors')!=3988609112 or sizes.get('model-00002-of-00002.safetensors')!=429441656:
         raise ValueError('Cached model shard sizes do not match the verified model')
-    code_paths=[HERE/n for n in ['runtime.py','data.py','attack.py','evaluate.py','pipeline.py','report.py']]+[BTEAM/'scripts/worker.sh',BTEAM/'scripts/run.sh']+[REPO/'공통/settings.py',REPO/'공통/quant_rtn.py']
+    code_paths=[HERE/n for n in ['runtime.py','data.py','attack.py','evaluate.py','pipeline.py','report.py','case_config.py','components.py']]+[BTEAM/'scripts/worker.sh',BTEAM/'scripts/run.sh']+[REPO/'공통/settings.py',REPO/'공통/quant_rtn.py']
     if len(settings.CASES_PHASE1)!=8:raise ValueError('Expected eight model cases')
+    cases=component_cases(component,backend) if component else settings.CASES_PHASE1
     return dict(protocol='b-measurement-i500-cap5000-tol20-det-v1',split='eval',image_ids=ids,
-        cases=settings.CASES_PHASE1,expected_rows=720,iters=500,checkpoint_iterations=list(range(20,501,20)),
+        cases=cases,expected_rows=len(cases)*len(ids)*3,iters=500,checkpoint_iterations=list(range(20,501,20)),
         max_new_tokens=5000,tolerance=.20,eps=8,step=1,target_len=128,target_refresh=20,w_unc=.05,w_div=0.,
         prompt=settings.PROMPT,generation_kwargs={**settings.GEN_KWARGS,'max_new_tokens':5000},
         seed=2026,deterministic_algorithms=True,cudnn_deterministic=True,cudnn_benchmark=False,
         cublas_workspace_config=':4096:8',early_stop_on_length=False,attack_success_assessed=False,
         selection='descending initial tokens; ties use earlier iteration; recheck relative difference <= .20',
-        model=model,input_sha256=hashes,model_shard_sizes=sizes,
+        model=model,input_sha256=hashes,model_shard_sizes=sizes,gpu=torch.cuda.get_device_name(0),
+        quantization_profile=profile(component,backend),
         packages={p:importlib.metadata.version(p) for p in ['torch','torchvision','transformers','bitsandbytes','accelerate','pillow','numpy']},
         code_sha256={source_label(p):sha256(p) for p in code_paths})
 
@@ -173,7 +176,7 @@ class Pipeline:
                 else:
                     raise ValueError('Configuration changed; use a separate run folder')
         else:
-            self.status = dict(fingerprint=self.id, config=cfg, state='ready', stage='not_started', generated_images=0, measurement_rows=0, expected_images=30, expected_rows=720, created_at=now(), completed=False)
+            self.status = dict(fingerprint=self.id, config=cfg, state='ready', stage='not_started', generated_images=0, measurement_rows=0, expected_images=len(self.ids), expected_rows=cfg['expected_rows'], created_at=now(), completed=False)
         self.update()
 
     def update(self, **values):
@@ -252,7 +255,15 @@ def main():
     actions.add_argument('--run',action='store_true')
     actions.add_argument('--status',action='store_true')
     parser.add_argument('--measure-only',action='store_true',help='Reuse an immutable published image set')
+    parser.add_argument('--component',choices=COMPONENTS)
+    parser.add_argument('--backend',choices=BACKENDS)
     args=parser.parse_args()
+    if args.backend is None:
+        args.backend=DEFAULT_BACKEND if args.component else 'rtn'
+    if args.component and not args.measure_only:
+        parser.error('Component experiments require --measure-only; reuse the fixed attack PNGs')
+    if not args.component and args.backend!='rtn':
+        parser.error('--backend requires --component')
     import re
     for value in [LABEL,ADV.name]:
         if value=='unset' or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,100}',value):
@@ -261,7 +272,9 @@ def main():
         value=json.loads(STATUS.read_text()) if STATUS.exists() else {'state':'not_started'}
         print(json.dumps(value,ensure_ascii=False,indent=2));return
     ids,_=validate_protocol()
-    cfg=plan() if args.protocol=='extended_v1' else None
+    cases=component_cases(args.component,args.backend) if args.component else settings.CASES_PHASE1
+    expected_rows=len(ids)*len(cases)*3
+    cfg=plan(args.component,args.backend) if args.protocol=='extended_v1' else None
     if cfg is not None:cfg.update(image_set_id=ADV.name)
     adopted=None
     if args.measure_only:
@@ -273,7 +286,11 @@ def main():
         if cfg is not None:
             cfg.update(mode='measure_only',image_set_id=ADV.name,image_set_sha256=sha256(ADV/'selection.json'))
     if args.check:
-        print('PREFLIGHT_OK',args.protocol,'images=30 inputs=60 rows=720 inference_started=False');return
+        if not torch.cuda.is_available() or not torch.cuda.is_bf16_supported():
+            raise RuntimeError('A bf16-capable CUDA GPU is required')
+        if args.measure_only and model_metadata()['revision']!=selection['source_revision']:
+            raise ValueError('Model revision differs from the fixed attack set')
+        print(f'PREFLIGHT_OK {args.protocol} component={args.component or "vision"} images=30 inputs=90 rows={expected_rows} inference_started=False');return
     record_path=BTEAM/'reports'/LABEL/'run_manifest.json'
     if record_path.exists() and json.loads(record_path.read_text()).get('published_record'):
         raise ValueError('This is a preserved historical run; choose a new run name')
@@ -282,18 +299,28 @@ def main():
         if CSV.exists() and not STATUS.exists():raise ValueError('Use a new run name for measurement')
     elif ((ADV/'selection.json').exists() and not STATUS.exists()) or (CSV.exists() and not STATUS.exists()):
         raise ValueError('Published files are immutable; use a new run/image-set name or --measure-only')
-    record=dict(experiment_id=LABEL,protocol=args.protocol,image_set_id=ADV.name,published_record=False,code_sha256={f.name:sha256(f) for f in HERE.glob('*.py')})
+    record=dict(experiment_id=LABEL,protocol=args.protocol,image_set_id=ADV.name,
+        cases=cases,n_images=len(ids),n_inputs=3,n_rows=expected_rows,
+        max_new_tokens=512 if args.protocol=='common_v1' else 5000,
+        quantization_profile=profile(args.component,args.backend),
+        published_record=False,code_sha256={f.name:sha256(f) for f in HERE.glob('*.py')})
     if record_path.exists():
-        if json.loads(record_path.read_text())!=record:raise ValueError('Existing run metadata changed; choose a new run name')
+        previous=json.loads(record_path.read_text())
+        if any(previous.get(key)!=value for key,value in record.items()):
+            raise ValueError('Existing run metadata changed; choose a new run name')
     else:write_json(record_path,record)
     configure_gpu()
     if args.protocol=='common_v1':
         if args.measure_only:
             RUN.mkdir(parents=True,exist_ok=True)
-            write_status(state='running',stage='measurement',image_set_id=ADV.name,pid=os.getpid())
+            write_status(state='running',stage='measurement',image_set_id=ADV.name,
+                expected_images=len(ids),expected_rows=expected_rows,pid=os.getpid())
             try:
-                evaluate.common_main(['--split','eval','--adv-dir',str(ADV),'--out',str(CSV)])
-                write_status(state='complete',stage='complete',measurement_rows=720,csv_sha256=sha256(CSV))
+                extra=['--component',args.component,'--backend',args.backend] if args.component else []
+                evaluate.common_main(['--split','eval','--adv-dir',str(ADV),'--out',str(CSV)]+extra,
+                    progress=lambda n:write_status(measurement_rows=n))
+                write_status(state='complete',stage='complete',measurement_rows=expected_rows,
+                    completed=True,csv_sha256=sha256(CSV),completed_at=now())
             except BaseException as error:
                 write_status(state='error',error=str(error));raise
         else:common_run()

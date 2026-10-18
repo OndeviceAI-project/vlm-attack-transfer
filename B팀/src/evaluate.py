@@ -4,11 +4,16 @@ from runtime import model_metadata
 import csv
 import gc
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 import torch
+from case_config import COMPONENTS, BACKENDS, DEFAULT_BACKEND, component_cases, profile
 from runtime import (ROOT, REPO, settings, CSV_FIELDS, image_ids, input_path,
     load_processor, read_image, check_preprocessing, load_case, generate,
-    write_json, save_csv, sha256, environment, fingerprint)
+    write_json, save_csv, sha256, environment, fingerprint, verify_fixed_pixels)
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
 
 def verify_inputs(split, ids, advdir):
     job = published_job(split, ids, advdir) if not (advdir / 'job.json').exists() else json.loads((advdir / 'job.json').read_text())
@@ -21,6 +26,8 @@ def verify_inputs(split, ids, advdir):
     images = {r['image_id']: r for r in job['images']}
     manifest = json.loads((ROOT / 'data/manifest.json').read_text())
     reference = {(r['split'], r['input'], r['image_id']): r for r in manifest['records']}
+    fixed = json.loads((Path(__file__).resolve().parents[1] / 'results/input-manifest.json').read_text())
+    frozen = {(r['split'], r['input'], r['image_id']): r['sha256'] for r in fixed['records']}
     hashes = {}
     for iid in ids:
         if iid not in images: raise ValueError(f'Missing attack image: {iid}')
@@ -29,29 +36,46 @@ def verify_inputs(split, ids, advdir):
             actual = sha256(path)
             expected = images[iid]['sha256'] if kind == 'adv' else reference[(split, kind, iid)]['sha256']
             if actual != expected: raise ValueError(f'Changed fixed input: {path}')
+            if kind != 'adv' and actual != frozen[(split, kind, iid)]:
+                raise ValueError(f'Server input differs from the frozen input manifest: {path}')
             hashes[f'{iid}/{kind}'] = actual
         if images[iid]['clean_sha256'] != hashes[f'{iid}/clean']:
             raise ValueError('Attack clean image differs from evaluation clean image')
-        if images[iid]['linf'] > settings.EPS:
-            raise ValueError('Attack image exceeded epsilon')
+        if images[iid].get('noise_sha256', hashes[f'{iid}/noise']) != hashes[f'{iid}/noise']:
+            raise ValueError('Attack noise image differs from evaluation noise image')
+        linf = verify_fixed_pixels(iid, read_image(input_path(split, 'clean', iid)),
+            read_image(input_path(split, 'noise', iid)), read_image(advdir / (iid + '.png')))
+        if linf != images[iid]['linf']:
+            raise ValueError(f'Actual attack PNG differs from the recorded epsilon: {iid}')
     return job, hashes
 
-def common_main(argv=None):
+def common_main(argv=None, progress=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', choices=['dev', 'eval'], default='dev')
     parser.add_argument('--limit', type=int)
     parser.add_argument('--cases', nargs='+', choices=settings.CASES_PHASE1)
+    parser.add_argument('--component', choices=COMPONENTS)
+    parser.add_argument('--backend', choices=BACKENDS)
     parser.add_argument('--adv-dir', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args(argv)
+    if args.backend is None:
+        args.backend = DEFAULT_BACKEND if args.component else 'rtn'
     ids = image_ids(args.split, args.limit)
-    cases = args.cases or settings.CASES_PHASE1
+    if args.component and args.cases:
+        parser.error('Use --component or --cases, not both')
+    if not args.component and args.backend != 'rtn':
+        parser.error('--backend requires --component')
+    cases = component_cases(args.component, args.backend) if args.component else (args.cases or settings.CASES_PHASE1)
     if len(set(cases)) != len(cases) or 'ref' not in cases:
         parser.error('Unique cases including ref are required')
-    if args.split == 'eval' and cases != settings.CASES_PHASE1:
+    if args.split == 'eval' and not args.component and cases != settings.CASES_PHASE1:
         parser.error('Eval requires all eight common cases in order')
     if args.out.suffix != '.csv': parser.error('Output must be .csv')
     advdir = args.adv_dir.resolve()
+    selection_path = advdir / 'selection.json'
+    if selection_path.exists() and json.loads(selection_path.read_text(encoding='utf-8'))['attack_protocol'] != 'common_v1':
+        raise ValueError('Common measurements require the common_v1 attack image set')
     attack, hashes = verify_inputs(args.split, ids, advdir)
     processor = load_processor()
     checks = {}
@@ -61,6 +85,8 @@ def common_main(argv=None):
             checks[f'{iid}/{kind}'] = check_preprocessing(processor, read_image(path))
     config = dict(split=args.split, image_ids=ids, cases=cases, inputs_sha256=hashes,
         attack_fingerprint=attack['fingerprint'], environment=environment(), gen_kwargs=settings.GEN_KWARGS)
+    if args.component:
+        config['quantization_profile'] = profile(args.component, args.backend)
     run_id = fingerprint(config)
     meta_path = args.out.with_suffix('.json')
     expected = {(case, iid, kind) for case in cases for iid in ids for kind in ['clean', 'noise', 'adv']}
@@ -107,6 +133,8 @@ def common_main(argv=None):
                 rows.append(row)
                 done.add(key)
                 save_csv(args.out, rows)
+                if progress is not None:
+                    progress(len(rows))
                 print(f'{case} {iid} {kind} n={row["n_tokens"]} cap={row["hit_cap"]}', flush=True)
         meta['cases'][case]['peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
         write_json(meta_path, meta)
@@ -132,10 +160,12 @@ def validate_measurement_rows(rows,ids,cases):
 EVAL_FIELDS=['model','case','image_id','input','n_tokens','ended_eos','output_limit_reached','latency_s','text']
 
 def measure_extended(self,adopted):
+        expected_rows=len(self.ids)*len(self.cfg['cases'])*3
+        split=self.cfg.get('split','eval')
         paths={};hashes={}
         for iid in self.ids:
             for kind in ['clean','noise','adv']:
-                path=self.advdir/(iid+'.png') if kind=='adv' else input_path('eval',kind,iid)
+                path=self.advdir/(iid+'.png') if kind=='adv' else input_path(split,kind,iid)
                 expected=adopted[iid]['selected']['sha256'] if kind=='adv' else self.cfg['input_sha256'][f'{iid}/{kind}']
                 if sha256(path)!=expected:raise ValueError('A fixed input changed before measurement')
                 paths[(iid,kind)]=path;hashes[f'{iid}/{kind}']=expected
@@ -167,7 +197,7 @@ def measure_extended(self,adopted):
             self.update(state='running',stage='measurement',current_case=case,measurement_rows=len(rows))
             gc.collect();torch.cuda.empty_cache();model,info=load_case(case)
             meta['cases'][case]=info;write_json(meta_path,meta)
-            generate(model,processor,read_image(input_path('eval','clean',self.ids[0])),{'max_new_tokens':1})
+            generate(model,processor,read_image(input_path(split,'clean',self.ids[0])),{'max_new_tokens':1})
             torch.cuda.reset_peak_memory_stats()
             for iid in self.ids:
                 for kind in ['clean','noise','adv']:
@@ -192,14 +222,14 @@ def measure_extended(self,adopted):
                     validate_measurement_rows(rows+[row],self.ids,self.cfg['cases'])
                     rows.append(row);done.add(key);save_csv(csv_path,rows,EVAL_FIELDS)
                     self.update(measurement_rows=len(rows))
-                    print(f'MEASUREMENT {len(rows)}/720 {case} {iid} {kind} tokens={row["n_tokens"]}',flush=True)
+                    print(f'MEASUREMENT {len(rows)}/{expected_rows} {case} {iid} {kind} tokens={row["n_tokens"]}',flush=True)
             meta['cases'][case]['peak_allocated_bytes']=torch.cuda.max_memory_allocated()
             write_json(meta_path,meta);del model;gc.collect();torch.cuda.empty_cache()
         done,expected=validate_measurement_rows(rows,self.ids,self.cfg['cases'])
-        if done!=expected or len(rows)!=720:raise ValueError('Expected complete paired 720-row measurements')
-        meta.update(completed=True,row_count=720,csv_sha256=sha256(csv_path));write_json(meta_path,meta)
-        self.update(state='complete',stage='complete',completed=True,measurement_rows=720,completed_at=now(),csv_sha256=sha256(csv_path))
-        print('PIPELINE_COMPLETE images=30 rows=720',flush=True)
+        if done!=expected or len(rows)!=expected_rows:raise ValueError('Expected complete paired measurements')
+        meta.update(completed=True,row_count=expected_rows,csv_sha256=sha256(csv_path));write_json(meta_path,meta)
+        self.update(state='complete',stage='complete',completed=True,measurement_rows=expected_rows,completed_at=now(),csv_sha256=sha256(csv_path))
+        print(f'PIPELINE_COMPLETE images={len(self.ids)} rows={expected_rows}',flush=True)
 
 
 def published_job(split, ids, advdir):

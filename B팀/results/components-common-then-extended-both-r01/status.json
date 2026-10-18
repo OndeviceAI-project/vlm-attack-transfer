@@ -1,0 +1,22 @@
+{
+  "state": "complete",
+  "current_protocol": "complete",
+  "completed_protocols": [
+    "common_v1",
+    "extended_v1"
+  ],
+  "protocols": [
+    "common_v1",
+    "extended_v1"
+  ],
+  "backend": "both",
+  "run_number": "r01",
+  "tmux_session": "bteam-components-512-then-5000-both-r01",
+  "pid": 1996911,
+  "expected_rows": 4320,
+  "expected_rows_per_protocol": 2160,
+  "updated_at": "2026-10-17T03:25:36.968932+00:00",
+  "started_at": "2026-10-16T16:18:04.106218+00:00",
+  "exit_code": 0,
+  "finished_at": "2026-10-17T03:25:36.968932+00:00"
+}

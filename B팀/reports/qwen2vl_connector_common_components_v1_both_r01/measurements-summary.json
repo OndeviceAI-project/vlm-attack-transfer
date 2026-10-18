@@ -1,0 +1,247 @@
+{
+  "experiment": "qwen2vl_connector_common_components_v1_both_r01",
+  "csv_sha256": "0852b609a1667529884007614d488cb6eeeb4da238c5635390881a6469127e69",
+  "attack_success_assessed": false,
+  "groups": [
+    {
+      "case": "ref",
+      "input": "clean",
+      "mean_tokens": 28.9,
+      "median_tokens": 26.5,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5786105516987542
+    },
+    {
+      "case": "ref",
+      "input": "noise",
+      "mean_tokens": 28.466666666666665,
+      "median_tokens": 23.5,
+      "min_tokens": 14,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5712417018483393
+    },
+    {
+      "case": "ref",
+      "input": "adv",
+      "mean_tokens": 262.1333333333333,
+      "median_tokens": 123.5,
+      "min_tokens": 33,
+      "max_tokens": 512,
+      "output_limit_count": 13,
+      "mean_seconds": 4.999314491384818
+    },
+    {
+      "case": "rtn-C-8",
+      "input": "clean",
+      "mean_tokens": 29.266666666666666,
+      "median_tokens": 27.0,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.584658111530977
+    },
+    {
+      "case": "rtn-C-8",
+      "input": "noise",
+      "mean_tokens": 29.5,
+      "median_tokens": 25.0,
+      "min_tokens": 14,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5893485254375264
+    },
+    {
+      "case": "rtn-C-8",
+      "input": "adv",
+      "mean_tokens": 213.5,
+      "median_tokens": 81.5,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 10,
+      "mean_seconds": 4.067675134182597
+    },
+    {
+      "case": "rtn-C-6",
+      "input": "clean",
+      "mean_tokens": 28.866666666666667,
+      "median_tokens": 26.5,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5791879134330278
+    },
+    {
+      "case": "rtn-C-6",
+      "input": "noise",
+      "mean_tokens": 27.933333333333334,
+      "median_tokens": 23.0,
+      "min_tokens": 14,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.56162466678846
+    },
+    {
+      "case": "rtn-C-6",
+      "input": "adv",
+      "mean_tokens": 229,
+      "median_tokens": 90.5,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 11,
+      "mean_seconds": 4.369144440131882
+    },
+    {
+      "case": "rtn-C-5",
+      "input": "clean",
+      "mean_tokens": 28.166666666666668,
+      "median_tokens": 26.5,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5670587343280203
+    },
+    {
+      "case": "rtn-C-5",
+      "input": "noise",
+      "mean_tokens": 28,
+      "median_tokens": 25.0,
+      "min_tokens": 9,
+      "max_tokens": 73,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5644454659040397
+    },
+    {
+      "case": "rtn-C-5",
+      "input": "adv",
+      "mean_tokens": 215.4,
+      "median_tokens": 97.5,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 10,
+      "mean_seconds": 4.114318748757554
+    },
+    {
+      "case": "rtn-C-4",
+      "input": "clean",
+      "mean_tokens": 28.433333333333334,
+      "median_tokens": 26.5,
+      "min_tokens": 15,
+      "max_tokens": 78,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5683011133301382
+    },
+    {
+      "case": "rtn-C-4",
+      "input": "noise",
+      "mean_tokens": 29.433333333333334,
+      "median_tokens": 25.5,
+      "min_tokens": 14,
+      "max_tokens": 63,
+      "output_limit_count": 0,
+      "mean_seconds": 0.587570924234266
+    },
+    {
+      "case": "rtn-C-4",
+      "input": "adv",
+      "mean_tokens": 182.13333333333333,
+      "median_tokens": 62.5,
+      "min_tokens": 28,
+      "max_tokens": 512,
+      "output_limit_count": 8,
+      "mean_seconds": 3.4731090001955938
+    },
+    {
+      "case": "rtn-C-3",
+      "input": "clean",
+      "mean_tokens": 29.333333333333332,
+      "median_tokens": 27.5,
+      "min_tokens": 15,
+      "max_tokens": 71,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5868001628783531
+    },
+    {
+      "case": "rtn-C-3",
+      "input": "noise",
+      "mean_tokens": 27.6,
+      "median_tokens": 24.0,
+      "min_tokens": 15,
+      "max_tokens": 57,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5545568814307141
+    },
+    {
+      "case": "rtn-C-3",
+      "input": "adv",
+      "mean_tokens": 115.8,
+      "median_tokens": 60.0,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 4,
+      "mean_seconds": 2.222492263081949
+    },
+    {
+      "case": "bnb-C-8",
+      "input": "clean",
+      "mean_tokens": 27.9,
+      "median_tokens": 26.5,
+      "min_tokens": 15,
+      "max_tokens": 55,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5591969217406586
+    },
+    {
+      "case": "bnb-C-8",
+      "input": "noise",
+      "mean_tokens": 27.666666666666668,
+      "median_tokens": 24.0,
+      "min_tokens": 15,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5544880376469034
+    },
+    {
+      "case": "bnb-C-8",
+      "input": "adv",
+      "mean_tokens": 197.46666666666667,
+      "median_tokens": 65.5,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 3.7641719493549317
+    },
+    {
+      "case": "bnb-C-4",
+      "input": "clean",
+      "mean_tokens": 28.733333333333334,
+      "median_tokens": 26.5,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.576020865739944
+    },
+    {
+      "case": "bnb-C-4",
+      "input": "noise",
+      "mean_tokens": 28.066666666666666,
+      "median_tokens": 22.0,
+      "min_tokens": 15,
+      "max_tokens": 81,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5639684704093573
+    },
+    {
+      "case": "bnb-C-4",
+      "input": "adv",
+      "mean_tokens": 197.5,
+      "median_tokens": 79.0,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 3.780271821162508
+    }
+  ]
+}

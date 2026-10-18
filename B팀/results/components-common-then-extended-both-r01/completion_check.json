@@ -1,0 +1,88 @@
+{
+  "checked_at": "2026-10-17T15:00:12.021269+09:00",
+  "state": "complete",
+  "started_at": "2026-10-16T16:18:04.106218+00:00",
+  "finished_at": "2026-10-17T03:25:36.968932+00:00",
+  "exit_code": 0,
+  "total_rows": 4320,
+  "experiments": [
+    {
+      "experiment_id": "qwen2vl_connector_common_components_v1_both_r01",
+      "max_new_tokens": 512,
+      "rows": 720,
+      "cases": 8,
+      "cohort_complete": true,
+      "no_duplicates": true,
+      "csv_sha256": "0852b609a1667529884007614d488cb6eeeb4da238c5635390881a6469127e69",
+      "metadata_hash_matches": true,
+      "census_verified": true,
+      "protected_weights_verified": true,
+      "report_complete": true
+    },
+    {
+      "experiment_id": "qwen2vl_language_common_components_v1_both_r01",
+      "max_new_tokens": 512,
+      "rows": 720,
+      "cases": 8,
+      "cohort_complete": true,
+      "no_duplicates": true,
+      "csv_sha256": "f44fba83d83140c5df7967d4aeec1558533b2c503b543d0b726d07dcddd63d73",
+      "metadata_hash_matches": true,
+      "census_verified": true,
+      "protected_weights_verified": true,
+      "report_complete": true
+    },
+    {
+      "experiment_id": "qwen2vl_vcl_common_components_v1_both_r01",
+      "max_new_tokens": 512,
+      "rows": 720,
+      "cases": 8,
+      "cohort_complete": true,
+      "no_duplicates": true,
+      "csv_sha256": "81c4c4dfe52b3d3dc029f89286764392636e2c8e1b668b594beca40265c310ec",
+      "metadata_hash_matches": true,
+      "census_verified": true,
+      "protected_weights_verified": true,
+      "report_complete": true
+    },
+    {
+      "experiment_id": "qwen2vl_connector_extended_components_v1_both_r01",
+      "max_new_tokens": 5000,
+      "rows": 720,
+      "cases": 8,
+      "cohort_complete": true,
+      "no_duplicates": true,
+      "csv_sha256": "a3f12912477607db19dfdf2040692db9156f167d4cb0ea53c45482744609c170",
+      "metadata_hash_matches": true,
+      "census_verified": true,
+      "protected_weights_verified": true,
+      "report_complete": true
+    },
+    {
+      "experiment_id": "qwen2vl_language_extended_components_v1_both_r01",
+      "max_new_tokens": 5000,
+      "rows": 720,
+      "cases": 8,
+      "cohort_complete": true,
+      "no_duplicates": true,
+      "csv_sha256": "e8a98efddef6835a254a5917afcbf8fa9ac28a85dc38b54e32b2530899a971e5",
+      "metadata_hash_matches": true,
+      "census_verified": true,
+      "protected_weights_verified": true,
+      "report_complete": true
+    },
+    {
+      "experiment_id": "qwen2vl_vcl_extended_components_v1_both_r01",
+      "max_new_tokens": 5000,
+      "rows": 720,
+      "cases": 8,
+      "cohort_complete": true,
+      "no_duplicates": true,
+      "csv_sha256": "5293b0036dde382b0c02e9a81145636d7255a7c41abd0e310f3313ec7298166c",
+      "metadata_hash_matches": true,
+      "census_verified": true,
+      "protected_weights_verified": true,
+      "report_complete": true
+    }
+  ]
+}

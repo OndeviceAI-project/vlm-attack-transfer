@@ -1,0 +1,1312 @@
+{
+  "common_v1": {
+    "setup_version": "components_v1",
+    "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+    "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "protocol": "common_v1",
+    "max_new_tokens": 512,
+    "backend": "both",
+    "prompt": "Describe this image in one sentence.",
+    "generation": {
+      "do_sample": false,
+      "num_beams": 1,
+      "repetition_penalty": 1.0,
+      "max_new_tokens": 512,
+      "temperature": null,
+      "top_p": null,
+      "top_k": null,
+      "eos_token_ids": [
+        151645,
+        151643
+      ]
+    },
+    "image_size": [
+      448,
+      448
+    ],
+    "seed": 2026,
+    "attack_regeneration": false,
+    "bundle": {
+      "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+      "selection_sha256": "0d1c51bd7c1bb3f6430e8f746c9fb809a5f343bcfd9920ed2f3992c9d6e9599c",
+      "input_manifest_sha256": "2d093756ed6a76c6f97c0578807fed1b8ece2d662b379281cb20251c2a01fa90",
+      "image_ids": [
+        "000000000872",
+        "000000000885",
+        "000000001000",
+        "000000001268",
+        "000000001296",
+        "000000001353",
+        "000000001425",
+        "000000001490",
+        "000000001503",
+        "000000001532",
+        "000000001584",
+        "000000001675",
+        "000000001761",
+        "000000001818",
+        "000000001993",
+        "000000002006",
+        "000000002149",
+        "000000002153",
+        "000000002157",
+        "000000002261",
+        "000000002299",
+        "000000002431",
+        "000000002473",
+        "000000002532",
+        "000000002587",
+        "000000002592",
+        "000000002685",
+        "000000002923",
+        "000000003156",
+        "000000003255"
+      ],
+      "verified_attack_pngs": 30
+    },
+    "experiments": [
+      {
+        "experiment_id": "qwen2vl_connector_common_components_v1_both_r01",
+        "component": "connector",
+        "quantization_profile": {
+          "version": "components_v1",
+          "component": "connector",
+          "targets": "C",
+          "backend": "both",
+          "cases": [
+            "ref",
+            "rtn-C-8",
+            "rtn-C-6",
+            "rtn-C-5",
+            "rtn-C-4",
+            "rtn-C-3",
+            "bnb-C-8",
+            "bnb-C-4"
+          ],
+          "group_size": 64,
+          "parameter_scope": "Linear.weight",
+          "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+          "preserved": [
+            "lm_head",
+            "input_embeddings",
+            "bias",
+            "normalization",
+            "patch_embed"
+          ],
+          "preserve_embedding_head_tie": true
+        },
+        "cases": [
+          "ref",
+          "rtn-C-8",
+          "rtn-C-6",
+          "rtn-C-5",
+          "rtn-C-4",
+          "rtn-C-3",
+          "bnb-C-8",
+          "bnb-C-4"
+        ],
+        "expected_census": {
+          "ref": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-6": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-5": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-3": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-C-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-C-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          }
+        },
+        "n_images": 30,
+        "inputs": [
+          "clean",
+          "noise",
+          "adv"
+        ],
+        "expected_rows": 720,
+        "output_csv": "B팀/results/qwen2vl_connector_common_components_v1_both_r01.csv"
+      },
+      {
+        "experiment_id": "qwen2vl_language_common_components_v1_both_r01",
+        "component": "language",
+        "quantization_profile": {
+          "version": "components_v1",
+          "component": "language",
+          "targets": "L",
+          "backend": "both",
+          "cases": [
+            "ref",
+            "rtn-L-8",
+            "rtn-L-6",
+            "rtn-L-5",
+            "rtn-L-4",
+            "rtn-L-3",
+            "bnb-L-8",
+            "bnb-L-4"
+          ],
+          "group_size": 64,
+          "parameter_scope": "Linear.weight",
+          "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+          "preserved": [
+            "lm_head",
+            "input_embeddings",
+            "bias",
+            "normalization",
+            "patch_embed"
+          ],
+          "preserve_embedding_head_tie": true
+        },
+        "cases": [
+          "ref",
+          "rtn-L-8",
+          "rtn-L-6",
+          "rtn-L-5",
+          "rtn-L-4",
+          "rtn-L-3",
+          "bnb-L-8",
+          "bnb-L-4"
+        ],
+        "expected_census": {
+          "ref": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-6": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-5": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-3": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-L-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-L-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          }
+        },
+        "n_images": 30,
+        "inputs": [
+          "clean",
+          "noise",
+          "adv"
+        ],
+        "expected_rows": 720,
+        "output_csv": "B팀/results/qwen2vl_language_common_components_v1_both_r01.csv"
+      },
+      {
+        "experiment_id": "qwen2vl_vcl_common_components_v1_both_r01",
+        "component": "vcl",
+        "quantization_profile": {
+          "version": "components_v1",
+          "component": "vcl",
+          "targets": "VCL",
+          "backend": "both",
+          "cases": [
+            "ref",
+            "rtn-VCL-8",
+            "rtn-VCL-6",
+            "rtn-VCL-5",
+            "rtn-VCL-4",
+            "rtn-VCL-3",
+            "bnb-VCL-8",
+            "bnb-VCL-4"
+          ],
+          "group_size": 64,
+          "parameter_scope": "Linear.weight",
+          "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+          "preserved": [
+            "lm_head",
+            "input_embeddings",
+            "bias",
+            "normalization",
+            "patch_embed"
+          ],
+          "preserve_embedding_head_tie": true
+        },
+        "cases": [
+          "ref",
+          "rtn-VCL-8",
+          "rtn-VCL-6",
+          "rtn-VCL-5",
+          "rtn-VCL-4",
+          "rtn-VCL-3",
+          "bnb-VCL-8",
+          "bnb-VCL-4"
+        ],
+        "expected_census": {
+          "ref": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-8": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-6": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-5": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-4": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-3": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-VCL-8": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-VCL-4": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          }
+        },
+        "n_images": 30,
+        "inputs": [
+          "clean",
+          "noise",
+          "adv"
+        ],
+        "expected_rows": 720,
+        "output_csv": "B팀/results/qwen2vl_vcl_common_components_v1_both_r01.csv"
+      }
+    ],
+    "total_expected_rows": 2160,
+    "inference_started": false
+  },
+  "extended_v1": {
+    "setup_version": "components_v1",
+    "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+    "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "protocol": "extended_v1",
+    "max_new_tokens": 5000,
+    "backend": "both",
+    "prompt": "Describe this image in one sentence.",
+    "generation": {
+      "do_sample": false,
+      "num_beams": 1,
+      "repetition_penalty": 1.0,
+      "max_new_tokens": 5000,
+      "temperature": null,
+      "top_p": null,
+      "top_k": null,
+      "eos_token_ids": [
+        151645,
+        151643
+      ]
+    },
+    "image_size": [
+      448,
+      448
+    ],
+    "seed": 2026,
+    "attack_regeneration": false,
+    "bundle": {
+      "image_set_id": "qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01",
+      "selection_sha256": "f12ba6baa0d5b7436c807aa5b71b5a44756ddc3b4c3f8a71b8bdd55ce4c5f96d",
+      "input_manifest_sha256": "2d093756ed6a76c6f97c0578807fed1b8ece2d662b379281cb20251c2a01fa90",
+      "image_ids": [
+        "000000000872",
+        "000000000885",
+        "000000001000",
+        "000000001268",
+        "000000001296",
+        "000000001353",
+        "000000001425",
+        "000000001490",
+        "000000001503",
+        "000000001532",
+        "000000001584",
+        "000000001675",
+        "000000001761",
+        "000000001818",
+        "000000001993",
+        "000000002006",
+        "000000002149",
+        "000000002153",
+        "000000002157",
+        "000000002261",
+        "000000002299",
+        "000000002431",
+        "000000002473",
+        "000000002532",
+        "000000002587",
+        "000000002592",
+        "000000002685",
+        "000000002923",
+        "000000003156",
+        "000000003255"
+      ],
+      "verified_attack_pngs": 30
+    },
+    "experiments": [
+      {
+        "experiment_id": "qwen2vl_connector_extended_components_v1_both_r01",
+        "component": "connector",
+        "quantization_profile": {
+          "version": "components_v1",
+          "component": "connector",
+          "targets": "C",
+          "backend": "both",
+          "cases": [
+            "ref",
+            "rtn-C-8",
+            "rtn-C-6",
+            "rtn-C-5",
+            "rtn-C-4",
+            "rtn-C-3",
+            "bnb-C-8",
+            "bnb-C-4"
+          ],
+          "group_size": 64,
+          "parameter_scope": "Linear.weight",
+          "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+          "preserved": [
+            "lm_head",
+            "input_embeddings",
+            "bias",
+            "normalization",
+            "patch_embed"
+          ],
+          "preserve_embedding_head_tie": true
+        },
+        "cases": [
+          "ref",
+          "rtn-C-8",
+          "rtn-C-6",
+          "rtn-C-5",
+          "rtn-C-4",
+          "rtn-C-3",
+          "bnb-C-8",
+          "bnb-C-4"
+        ],
+        "expected_census": {
+          "ref": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-6": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-5": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-C-3": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-C-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-C-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          }
+        },
+        "n_images": 30,
+        "inputs": [
+          "clean",
+          "noise",
+          "adv"
+        ],
+        "expected_rows": 720,
+        "output_csv": "B팀/results/qwen2vl_connector_extended_components_v1_both_r01.csv"
+      },
+      {
+        "experiment_id": "qwen2vl_language_extended_components_v1_both_r01",
+        "component": "language",
+        "quantization_profile": {
+          "version": "components_v1",
+          "component": "language",
+          "targets": "L",
+          "backend": "both",
+          "cases": [
+            "ref",
+            "rtn-L-8",
+            "rtn-L-6",
+            "rtn-L-5",
+            "rtn-L-4",
+            "rtn-L-3",
+            "bnb-L-8",
+            "bnb-L-4"
+          ],
+          "group_size": 64,
+          "parameter_scope": "Linear.weight",
+          "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+          "preserved": [
+            "lm_head",
+            "input_embeddings",
+            "bias",
+            "normalization",
+            "patch_embed"
+          ],
+          "preserve_embedding_head_tie": true
+        },
+        "cases": [
+          "ref",
+          "rtn-L-8",
+          "rtn-L-6",
+          "rtn-L-5",
+          "rtn-L-4",
+          "rtn-L-3",
+          "bnb-L-8",
+          "bnb-L-4"
+        ],
+        "expected_census": {
+          "ref": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-6": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-5": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-L-3": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-L-8": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-L-4": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          }
+        },
+        "n_images": 30,
+        "inputs": [
+          "clean",
+          "noise",
+          "adv"
+        ],
+        "expected_rows": 720,
+        "output_csv": "B팀/results/qwen2vl_language_extended_components_v1_both_r01.csv"
+      },
+      {
+        "experiment_id": "qwen2vl_vcl_extended_components_v1_both_r01",
+        "component": "vcl",
+        "quantization_profile": {
+          "version": "components_v1",
+          "component": "vcl",
+          "targets": "VCL",
+          "backend": "both",
+          "cases": [
+            "ref",
+            "rtn-VCL-8",
+            "rtn-VCL-6",
+            "rtn-VCL-5",
+            "rtn-VCL-4",
+            "rtn-VCL-3",
+            "bnb-VCL-8",
+            "bnb-VCL-4"
+          ],
+          "group_size": 64,
+          "parameter_scope": "Linear.weight",
+          "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+          "preserved": [
+            "lm_head",
+            "input_embeddings",
+            "bias",
+            "normalization",
+            "patch_embed"
+          ],
+          "preserve_embedding_head_tie": true
+        },
+        "cases": [
+          "ref",
+          "rtn-VCL-8",
+          "rtn-VCL-6",
+          "rtn-VCL-5",
+          "rtn-VCL-4",
+          "rtn-VCL-3",
+          "bnb-VCL-8",
+          "bnb-VCL-4"
+        ],
+        "expected_census": {
+          "ref": {
+            "V": [
+              0,
+              128
+            ],
+            "C": [
+              0,
+              2
+            ],
+            "L": [
+              0,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-8": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-6": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-5": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-4": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "rtn-VCL-3": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-VCL-8": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          },
+          "bnb-VCL-4": {
+            "V": [
+              128,
+              128
+            ],
+            "C": [
+              2,
+              2
+            ],
+            "L": [
+              196,
+              196
+            ],
+            "H": [
+              0,
+              1
+            ]
+          }
+        },
+        "n_images": 30,
+        "inputs": [
+          "clean",
+          "noise",
+          "adv"
+        ],
+        "expected_rows": 720,
+        "output_csv": "B팀/results/qwen2vl_vcl_extended_components_v1_both_r01.csv"
+      }
+    ],
+    "total_expected_rows": 2160,
+    "inference_started": false
+  }
+}

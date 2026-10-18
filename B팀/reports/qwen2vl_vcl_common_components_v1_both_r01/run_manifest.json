@@ -1,0 +1,61 @@
+{
+  "experiment_id": "qwen2vl_vcl_common_components_v1_both_r01",
+  "protocol": "common_v1",
+  "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+  "cases": [
+    "ref",
+    "rtn-VCL-8",
+    "rtn-VCL-6",
+    "rtn-VCL-5",
+    "rtn-VCL-4",
+    "rtn-VCL-3",
+    "bnb-VCL-8",
+    "bnb-VCL-4"
+  ],
+  "n_images": 30,
+  "n_inputs": 3,
+  "n_rows": 720,
+  "max_new_tokens": 512,
+  "quantization_profile": {
+    "version": "components_v1",
+    "component": "vcl",
+    "targets": "VCL",
+    "backend": "both",
+    "cases": [
+      "ref",
+      "rtn-VCL-8",
+      "rtn-VCL-6",
+      "rtn-VCL-5",
+      "rtn-VCL-4",
+      "rtn-VCL-3",
+      "bnb-VCL-8",
+      "bnb-VCL-4"
+    ],
+    "group_size": 64,
+    "parameter_scope": "Linear.weight",
+    "activation_quantization": "backend_defined: LLM.int8 dynamic; NF4 bf16 compute",
+    "preserved": [
+      "lm_head",
+      "input_embeddings",
+      "bias",
+      "normalization",
+      "patch_embed"
+    ],
+    "preserve_embedding_head_tie": true
+  },
+  "published_record": false,
+  "code_sha256": {
+    "check_extended_gpu.py": "ea91fc4055da728c7183cff7f78eb990f03074716f983290b1e8fca0229bc226",
+    "evaluate.py": "ba5dbd11be4d0e21e4c9056293dc44c4b17489e5cd022df0b235a5a5c08e6150",
+    "pipeline.py": "2a1ddde87c809f36854e24c8847b46dd01f3f6cd3ab8ed47b666c87e8841b1ad",
+    "components.py": "e587013fdf3d1e7130e8e3fc7e1e0365ad7d0d1f30c9e0b6f09eef5a1775eee6",
+    "runtime.py": "667b1896064924387c4af8df3e89076a5e8e4a7b20128991b52b7b195599aafa",
+    "case_config.py": "1b400d2627a5ebf79d122f035229138f02e95e099ea0754df9553940dad11554",
+    "data.py": "9230b6f4a5cf828058c6da9296bebf4e1bc8a41ec6605ad6417e5c76d6900f77",
+    "report.py": "0330ad4610d3d294e41d1fc503abdfb7f10584b455b83e8d91192f63dba2d4ed",
+    "attack.py": "e2df5ed5c4c3a11ef0b8cb4c00e4f1d3700f5ccc7d7e95089dbb36e1aedc4875"
+  },
+  "csv_sha256": "81c4c4dfe52b3d3dc029f89286764392636e2c8e1b668b594beca40265c310ec",
+  "metadata_sha256": "f8a95bda56b36b3df07d3e6a5be1f14693669456857b2f81ed9554ed56f60ba5",
+  "completed": true
+}

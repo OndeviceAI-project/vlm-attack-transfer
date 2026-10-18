@@ -77,10 +77,15 @@ B팀/
 | [src/evaluate.py](src/evaluate.py) | 고정한 clean·noise·adv를 모델별로 측정하고 CSV 저장 |
 | [src/pipeline.py](src/pipeline.py) | 설정 선택, 단계 실행, 중단 후 재개, 기존 결과 보호 |
 | [src/report.py](src/report.py) | 저장된 CSV로 비교표와 요약 수치 생성 |
+| [src/case_config.py](src/case_config.py) | C·L·VCL 대상·비트·예상 census·프로토콜 정의 |
+| [src/components.py](src/components.py) | 부품 실험 계획·공격 세트 검증·서버 준비 검사·순차 측정 |
+| [src/check_extended_gpu.py](src/check_extended_gpu.py) | GPU 서버에서 개발 입력으로 5,000토큰 생성·저장·재개 경로 확인 |
 
 실행·상태 확인 도우미는 `scripts/`, 동작과 저장 결과 검사는 `tests/`에 있다. B팀 `src/`는 저장소의 `공통/settings.py`와 `공통/quant_rtn.py`를 사용한다.
 
-현재 실행 코드는 `common_v1`·`extended_v1`과 시각 인코더 전용 8조건을 지원한다. 다른 모델·부품·프로토콜을 추가할 때는 그 동작과 검사를 먼저 구현한다.
+현재 실행 코드는 기존 시각 인코더 8조건과, 출력층·임베딩을 bf16으로 유지하는 **C·L·VCL 부품 실험**을 지원한다. 부품 실험은 `components_v1`으로 구분하며 기본 조건은 V 실험과 같은 **ref + RTN 8·6·5·4·3비트 + bnb 8·4비트**의 8조건이다. 공통·확장 프로토콜 모두 고정 공격 PNG를 재사용한다.
+
+설정·실행 준비 검사·시작·재개 방법은 [부품 실험 안내](experiments/README.md)에 있다. `src/components.py`와 `scripts/run_components.sh`는 기본적으로 계획 확인만 하며, 명시적으로 시작해야 측정한다.
 
 ## 4. 실험 진행 현황
 
@@ -88,11 +93,18 @@ B팀/
 |---|---|---|
 | [시각 인코더 · 확장 설정 v1 · r01](reports/qwen2vl_vision_extended_v1_r01/README.md) | eval 30장, 500회·5,000토큰·±20% 재검사로 이미지 채택 후 8모델 조건 × 3입력 = 720행 측정 | 완료 |
 | [시각 인코더 · 공통 설정 v1 · r01](reports/qwen2vl_vision_common_v1_r01/README.md) | eval 30장, 최대 300회·512토큰·조기 종료로 이미지 채택 후 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [연결부 C · 공통 설정 v1 · r01](reports/qwen2vl_connector_common_components_v1_both_r01/README.md) | eval 30장, 기존 공통 공격 PNG 재사용·상한 512토큰, C 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [연결부 C · 확장 설정 v1 · r01](reports/qwen2vl_connector_extended_components_v1_both_r01/README.md) | eval 30장, 기존 확장 공격 PNG 재사용·상한 5,000토큰, C 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [언어모델 L · 공통 설정 v1 · r01](reports/qwen2vl_language_common_components_v1_both_r01/README.md) | eval 30장, 기존 공통 공격 PNG 재사용·상한 512토큰, L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [언어모델 L · 확장 설정 v1 · r01](reports/qwen2vl_language_extended_components_v1_both_r01/README.md) | eval 30장, 기존 확장 공격 PNG 재사용·상한 5,000토큰, L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [VCL · 공통 설정 v1 · r01](reports/qwen2vl_vcl_common_components_v1_both_r01/README.md) | eval 30장, 기존 공통 공격 PNG 재사용·상한 512토큰, V+C+L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [VCL · 확장 설정 v1 · r01](reports/qwen2vl_vcl_extended_components_v1_both_r01/README.md) | eval 30장, 기존 확장 공격 PNG 재사용·상한 5,000토큰, V+C+L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
 
-본실험은 측정까지 완료했으며, 공격 성공률·전이율 평가는 아직 진행하지 않았다.
+총 8개 실험·5,760행의 측정을 완료했으며, 공격 성공률·전이율 평가는 아직 진행하지 않았다. 각 행에서 해당 실험의 설정·환경·측정 요약·사진별 비교 보고서로 이동할 수 있다. 부품 실험의 준비 검증은 [5,000토큰 준비 결과](experiments/extended_v1_ready.md), 본측정 과정은 [순차 실행 기록](experiments/sequence_run_20261017.md), 최종 상태와 무결성 확인은 [완료 기록](experiments/sequence_completion_20261017.md)에 기록했다.
 
 ### 참고자료
 
+- [V·C·L·VCL 양자화 결과 비교 — 512·5,000토큰](reports/quantization_components_comparison_v1/README.md)
 - [파일·필드 상세 설명과 이름 변경 기준](reports/FILES.md)
 - [프로젝트 공동 지침](../README.md)
 

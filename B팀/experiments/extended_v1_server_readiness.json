@@ -1,0 +1,109 @@
+{
+  "checked_at": "2026-10-16T16:08:44.097264+00:00",
+  "state": "ready",
+  "protocol": "extended_v1",
+  "max_new_tokens": 5000,
+  "main_experiment_started": false,
+  "eval_inference_started": false,
+  "server_checkout": "/home/multimodal/ondevice-ai/experiments/vlm-components-v1-20261017",
+  "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+  "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "transformers": "5.19.0",
+    "bitsandbytes": "0.50.0",
+    "accelerate": "1.15.0",
+    "pillow": "11.2.1",
+    "numpy": "2.2.6"
+  },
+  "preprocessing_inputs": 90,
+  "preprocessing_max_abs": 0,
+  "model_conditions_passed": 24,
+  "dev_generations": 48,
+  "dev_pipeline_rows": [
+    {
+      "input": "clean",
+      "n_tokens": "29",
+      "ended_eos": "True",
+      "output_limit_reached": "False"
+    },
+    {
+      "input": "noise",
+      "n_tokens": "29",
+      "ended_eos": "True",
+      "output_limit_reached": "False"
+    },
+    {
+      "input": "adv",
+      "n_tokens": "5000",
+      "ended_eos": "False",
+      "output_limit_reached": "True"
+    }
+  ],
+  "resume_preserved_first_response": true,
+  "completed_rerun_preserved_csv": true,
+  "server_code_tests": 14,
+  "server_artifact_tests": 3,
+  "shell_syntax_files": 5,
+  "experiments": [
+    {
+      "experiment_id": "qwen2vl_connector_extended_components_v1_both_r01",
+      "cases": [
+        "ref",
+        "rtn-C-8",
+        "rtn-C-6",
+        "rtn-C-5",
+        "rtn-C-4",
+        "rtn-C-3",
+        "bnb-C-8",
+        "bnb-C-4"
+      ],
+      "rows": 720
+    },
+    {
+      "experiment_id": "qwen2vl_language_extended_components_v1_both_r01",
+      "cases": [
+        "ref",
+        "rtn-L-8",
+        "rtn-L-6",
+        "rtn-L-5",
+        "rtn-L-4",
+        "rtn-L-3",
+        "bnb-L-8",
+        "bnb-L-4"
+      ],
+      "rows": 720
+    },
+    {
+      "experiment_id": "qwen2vl_vcl_extended_components_v1_both_r01",
+      "cases": [
+        "ref",
+        "rtn-VCL-8",
+        "rtn-VCL-6",
+        "rtn-VCL-5",
+        "rtn-VCL-4",
+        "rtn-VCL-3",
+        "bnb-VCL-8",
+        "bnb-VCL-4"
+      ],
+      "rows": 720
+    }
+  ],
+  "total_expected_rows": 2160,
+  "source_commit": "8dcae69ce9adafd2fed24c2bbd057df1644a4128",
+  "code_sha256": {
+    "B팀/src/check_extended_gpu.py": "ea91fc4055da728c7183cff7f78eb990f03074716f983290b1e8fca0229bc226",
+    "B팀/src/evaluate.py": "ba5dbd11be4d0e21e4c9056293dc44c4b17489e5cd022df0b235a5a5c08e6150",
+    "B팀/src/pipeline.py": "2a1ddde87c809f36854e24c8847b46dd01f3f6cd3ab8ed47b666c87e8841b1ad",
+    "B팀/src/components.py": "e587013fdf3d1e7130e8e3fc7e1e0365ad7d0d1f30c9e0b6f09eef5a1775eee6",
+    "B팀/src/runtime.py": "667b1896064924387c4af8df3e89076a5e8e4a7b20128991b52b7b195599aafa",
+    "B팀/src/case_config.py": "1b400d2627a5ebf79d122f035229138f02e95e099ea0754df9553940dad11554",
+    "B팀/src/data.py": "9230b6f4a5cf828058c6da9296bebf4e1bc8a41ec6605ad6417e5c76d6900f77",
+    "B팀/src/report.py": "0330ad4610d3d294e41d1fc503abdfb7f10584b455b83e8d91192f63dba2d4ed",
+    "B팀/src/attack.py": "e2df5ed5c4c3a11ef0b8cb4c00e4f1d3700f5ccc7d7e95089dbb36e1aedc4875",
+    "공통/settings.py": "f6eec82a386c7b8448d0d73189217458aea7be43f94e9d3f355526a3c722d2b1",
+    "공통/quant_rtn.py": "8bb5c4976126ecdc37c1a5c0230a3e14ed4c1df54b19b96b5b807842a31e0d2e"
+  }
+}

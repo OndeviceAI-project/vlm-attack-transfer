@@ -1,0 +1,25 @@
+{
+  "started_at": "2026-10-16T16:18:04.106218+00:00",
+  "observed_at": "2026-10-16T16:20:19.408604+00:00",
+  "tmux_session": "bteam-components-512-then-5000-both-r01",
+  "backend": "both",
+  "run_number": "r01",
+  "protocols": [
+    "common_v1",
+    "extended_v1"
+  ],
+  "expected_rows": 4320,
+  "worker_sha256": "a812517b8c75b4d56443bad58c5e82d7dbd7e492be505e1a03b0b3d86d3f8835",
+  "initial_observation": {
+    "updated_at": "2026-10-16T16:20:10.603718+00:00",
+    "state": "running",
+    "stage": "measurement",
+    "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+    "expected_images": 30,
+    "expected_rows": 720,
+    "pid": 1997009,
+    "measurement_rows": 53
+  },
+  "source_matches_gpu_readiness": true,
+  "followup": "Check server progress when the user asks; no scheduled notification was created."
+}

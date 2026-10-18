@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image
 import torch
 from transformers import AutoModelForImageTextToText, AutoProcessor, BitsAndBytesConfig
+from case_config import parse_case, expected_census
 
 ROOT = Path(os.environ.get('ONDEVICE_AI_ROOT', Path.home() / 'ondevice-ai')).resolve()
 BTEAM = Path(__file__).resolve().parents[1]
@@ -68,6 +69,26 @@ def read_image(path):
         if image.size != (SPEC['img_size'], SPEC['img_size']):
             raise ValueError(f'Expected 448x448 prepared PNG: {path}')
         return image.copy()
+
+def verify_fixed_pixels(iid, clean, noise, adv=None):
+    """Reconstruct the common noise and check the actual saved attack pixels."""
+    original = np.asarray(clean).astype(np.int16)
+    noisy = np.asarray(noise).astype(np.int16)
+    if noisy.shape != original.shape:
+        raise ValueError(f'Noise image shape differs: {iid}')
+    signs = np.random.default_rng([settings.NOISE_SEED, int(iid)]).choice([-1, 1], size=original.shape)
+    expected = np.clip(original + settings.EPS * signs, 0, 255).astype(np.uint8)
+    if not np.array_equal(noisy, expected):
+        raise ValueError(f'Noise pixels do not match the fixed seed/pattern: {iid}')
+    if adv is None:
+        return None
+    attacked = np.asarray(adv).astype(np.int16)
+    if attacked.shape != original.shape:
+        raise ValueError(f'Attack image shape differs: {iid}')
+    linf = int(np.abs(attacked - original).max())
+    if linf > settings.EPS:
+        raise ValueError(f'Actual attack PNG exceeded epsilon: {iid}, linf={linf}')
+    return linf
 
 def raw_pixels(image, device='cpu'):
     return torch.from_numpy(np.asarray(image).copy()).permute(2, 0, 1).float().to(device)
@@ -139,17 +160,30 @@ def extend_answer(base, target):
             out[key] = torch.cat([base[key], torch.zeros_like(suffix)], dim=1)
     return out
 
+def protected_weights(model):
+    """Keep the original bf16 embedding/head and their shared storage."""
+    weights = [model.get_input_embeddings().weight, model.get_output_embeddings().weight]
+    if any(weight.dtype != torch.bfloat16 for weight in weights):
+        raise ValueError('Input embeddings and lm_head must remain bf16')
+    if weights[0].data_ptr() != weights[1].data_ptr():
+        raise ValueError('Expected the original Qwen2-VL-2B embedding/head weight tie')
+    return tuple((id(weight), weight.data_ptr(), weight._version, str(weight.dtype))
+                 for weight in weights)
+
+
 def load_case(case, attack=False):
+    spec = parse_case(case)
+    if attack and case != 'ref':
+        raise ValueError('Attack generation must use ref')
     if not torch.cuda.is_available() or not torch.cuda.is_bf16_supported():
         raise RuntimeError('A bf16-capable CUDA GPU is required')
-    if case not in settings.CASES_PHASE1:
-        raise ValueError(f'Unknown case: {case}')
     kwargs = dict(dtype=torch.bfloat16, attn_implementation='sdpa', local_files_only=True)
     path = model_metadata()['snapshot_path']
     change = None
-    if case.startswith('bnb'):
-        bits = int(case.split('-')[-1])
-        skip = [prefix for part, prefix in SPEC['parts'].items() if part != 'V']
+    protected_before = None
+    if spec['method'] == 'bnb':
+        bits = spec['bits']
+        skip = [prefix for part, prefix in SPEC['parts'].items() if part not in spec['targets']]
         if bits == 8:
             cfg = BitsAndBytesConfig(load_in_8bit=True, llm_int8_skip_modules=skip)
         else:
@@ -159,18 +193,28 @@ def load_case(case, attack=False):
             quantization_config=cfg, device_map={'': 0}, **kwargs).eval()
     else:
         model = AutoModelForImageTextToText.from_pretrained(path, **kwargs).to('cuda').eval()
-        if case.startswith('rtn'):
-            change = quant_rtn.apply_rtn(model, SPEC['parts'], targets='V',
-                bits=int(case.split('-')[-1]), group=settings.QUANT_GROUP)
+        protected_before = protected_weights(model)
+        if spec['method'] == 'rtn':
+            change = quant_rtn.apply_rtn(model, SPEC['parts'], targets=spec['targets'],
+                bits=spec['bits'], group=settings.QUANT_GROUP)
+    protected_after = protected_weights(model)
+    if protected_before is not None and protected_before != protected_after:
+        raise ValueError('Quantization changed the protected embedding/head parameters')
     count = quant_rtn.census(model, SPEC['parts'])
     if not all(total > 0 for _, total in count.values()):
         raise ValueError('Missing expected model components')
-    quant_rtn.check_census(count, targets='' if case == 'ref' else 'V', names=settings.PART_NAMES)
+    quant_rtn.check_census(count, targets=spec['targets'], names=settings.PART_NAMES)
+    if count != expected_census(case):
+        raise ValueError(f'Model Linear census differs from the verified Qwen revision: {count}')
     if attack:
-        if case != 'ref': raise ValueError('Attack generation must use ref')
         model.requires_grad_(False)
     return model, dict(census=count, weight_change_pct=change,
-        eos_token_ids=eos_ids(model), attention='sdpa', dtype='bfloat16')
+        eos_token_ids=eos_ids(model), attention='sdpa', dtype='bfloat16',
+        model_footprint_bytes=model.get_memory_footprint(),
+        storage='simulated_bf16' if spec['method']=='rtn' else ('bnb_packed' if spec['method']=='bnb' else 'bf16'),
+        quantization=spec, protected_weights=dict(embeddings_dtype='bfloat16',
+            head_dtype='bfloat16', embedding_head_tied=True,
+            unchanged_after_rtn=protected_before is not None))
 
 def image_ids(split, limit=None):
     if split not in ('dev', 'eval'): raise ValueError('Only dev/eval splits are allowed')

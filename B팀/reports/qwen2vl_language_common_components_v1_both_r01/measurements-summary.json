@@ -1,0 +1,247 @@
+{
+  "experiment": "qwen2vl_language_common_components_v1_both_r01",
+  "csv_sha256": "f44fba83d83140c5df7967d4aeec1558533b2c503b543d0b726d07dcddd63d73",
+  "attack_success_assessed": false,
+  "groups": [
+    {
+      "case": "ref",
+      "input": "clean",
+      "mean_tokens": 28.9,
+      "median_tokens": 26.5,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5856788799011459
+    },
+    {
+      "case": "ref",
+      "input": "noise",
+      "mean_tokens": 28.466666666666665,
+      "median_tokens": 23.5,
+      "min_tokens": 14,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.577081734345605
+    },
+    {
+      "case": "ref",
+      "input": "adv",
+      "mean_tokens": 262.1333333333333,
+      "median_tokens": 123.5,
+      "min_tokens": 33,
+      "max_tokens": 512,
+      "output_limit_count": 13,
+      "mean_seconds": 5.045736295256453
+    },
+    {
+      "case": "rtn-L-8",
+      "input": "clean",
+      "mean_tokens": 27.733333333333334,
+      "median_tokens": 26.0,
+      "min_tokens": 15,
+      "max_tokens": 55,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5629150910031361
+    },
+    {
+      "case": "rtn-L-8",
+      "input": "noise",
+      "mean_tokens": 28.666666666666668,
+      "median_tokens": 25.0,
+      "min_tokens": 9,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5799023284111172
+    },
+    {
+      "case": "rtn-L-8",
+      "input": "adv",
+      "mean_tokens": 227.8,
+      "median_tokens": 83.0,
+      "min_tokens": 24,
+      "max_tokens": 512,
+      "output_limit_count": 11,
+      "mean_seconds": 4.387040201613369
+    },
+    {
+      "case": "rtn-L-6",
+      "input": "clean",
+      "mean_tokens": 30.4,
+      "median_tokens": 28.0,
+      "min_tokens": 17,
+      "max_tokens": 83,
+      "output_limit_count": 0,
+      "mean_seconds": 0.6112899222023164
+    },
+    {
+      "case": "rtn-L-6",
+      "input": "noise",
+      "mean_tokens": 29.8,
+      "median_tokens": 26.5,
+      "min_tokens": 15,
+      "max_tokens": 59,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5998224932622785
+    },
+    {
+      "case": "rtn-L-6",
+      "input": "adv",
+      "mean_tokens": 207.73333333333332,
+      "median_tokens": 68.0,
+      "min_tokens": 25,
+      "max_tokens": 512,
+      "output_limit_count": 10,
+      "mean_seconds": 3.9906148352699042
+    },
+    {
+      "case": "rtn-L-5",
+      "input": "clean",
+      "mean_tokens": 25.9,
+      "median_tokens": 23.0,
+      "min_tokens": 9,
+      "max_tokens": 61,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5243962733346659
+    },
+    {
+      "case": "rtn-L-5",
+      "input": "noise",
+      "mean_tokens": 25.9,
+      "median_tokens": 22.0,
+      "min_tokens": 9,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5243538260188264
+    },
+    {
+      "case": "rtn-L-5",
+      "input": "adv",
+      "mean_tokens": 199.06666666666666,
+      "median_tokens": 78.5,
+      "min_tokens": 18,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 3.822304912726395
+    },
+    {
+      "case": "rtn-L-4",
+      "input": "clean",
+      "mean_tokens": 25.766666666666666,
+      "median_tokens": 24.5,
+      "min_tokens": 15,
+      "max_tokens": 54,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5219738865581651
+    },
+    {
+      "case": "rtn-L-4",
+      "input": "noise",
+      "mean_tokens": 23.2,
+      "median_tokens": 21.5,
+      "min_tokens": 9,
+      "max_tokens": 45,
+      "output_limit_count": 0,
+      "mean_seconds": 0.47302255645627156
+    },
+    {
+      "case": "rtn-L-4",
+      "input": "adv",
+      "mean_tokens": 138.6,
+      "median_tokens": 53.5,
+      "min_tokens": 15,
+      "max_tokens": 512,
+      "output_limit_count": 5,
+      "mean_seconds": 2.6739107129125235
+    },
+    {
+      "case": "rtn-L-3",
+      "input": "clean",
+      "mean_tokens": 28.433333333333334,
+      "median_tokens": 20.0,
+      "min_tokens": 15,
+      "max_tokens": 68,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5732030849709796
+    },
+    {
+      "case": "rtn-L-3",
+      "input": "noise",
+      "mean_tokens": 47.733333333333334,
+      "median_tokens": 24.0,
+      "min_tokens": 13,
+      "max_tokens": 512,
+      "output_limit_count": 1,
+      "mean_seconds": 0.9410511831015659
+    },
+    {
+      "case": "rtn-L-3",
+      "input": "adv",
+      "mean_tokens": 192.5,
+      "median_tokens": 74.0,
+      "min_tokens": 21,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 3.7002489374019207
+    },
+    {
+      "case": "bnb-L-8",
+      "input": "clean",
+      "mean_tokens": 31.3,
+      "median_tokens": 27.5,
+      "min_tokens": 17,
+      "max_tokens": 89,
+      "output_limit_count": 0,
+      "mean_seconds": 2.435198777359134
+    },
+    {
+      "case": "bnb-L-8",
+      "input": "noise",
+      "mean_tokens": 31.166666666666668,
+      "median_tokens": 26.5,
+      "min_tokens": 14,
+      "max_tokens": 80,
+      "output_limit_count": 0,
+      "mean_seconds": 2.429184960469138
+    },
+    {
+      "case": "bnb-L-8",
+      "input": "adv",
+      "mean_tokens": 200.36666666666667,
+      "median_tokens": 77.5,
+      "min_tokens": 18,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 15.71308976453729
+    },
+    {
+      "case": "bnb-L-4",
+      "input": "clean",
+      "mean_tokens": 24.8,
+      "median_tokens": 23.0,
+      "min_tokens": 9,
+      "max_tokens": 88,
+      "output_limit_count": 0,
+      "mean_seconds": 0.4246176496186915
+    },
+    {
+      "case": "bnb-L-4",
+      "input": "noise",
+      "mean_tokens": 21.633333333333333,
+      "median_tokens": 20.0,
+      "min_tokens": 8,
+      "max_tokens": 33,
+      "output_limit_count": 0,
+      "mean_seconds": 0.3763132105775488
+    },
+    {
+      "case": "bnb-L-4",
+      "input": "adv",
+      "mean_tokens": 91.33333333333333,
+      "median_tokens": 43.5,
+      "min_tokens": 13,
+      "max_tokens": 512,
+      "output_limit_count": 3,
+      "mean_seconds": 1.4355024983252709
+    }
+  ]
+}

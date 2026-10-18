@@ -93,9 +93,14 @@ B팀/
 |---|---|---|
 | [시각 인코더 · 확장 설정 v1 · r01](reports/qwen2vl_vision_extended_v1_r01/README.md) | eval 30장, 500회·5,000토큰·±20% 재검사로 이미지 채택 후 8모델 조건 × 3입력 = 720행 측정 | 완료 |
 | [시각 인코더 · 공통 설정 v1 · r01](reports/qwen2vl_vision_common_v1_r01/README.md) | eval 30장, 최대 300회·512토큰·조기 종료로 이미지 채택 후 8모델 조건 × 3입력 = 720행 측정 | 완료 |
-| [연결부·언어모델·VCL · components v1](experiments/README.md) | 각 부품 ref + RTN 8·6·5·4·3 + bnb 8·4의 8조건·720행, 기존 공격 PNG 재사용, 출력층·임베딩 유지. 공통·확장 프로토콜 지원 | 512·5,000 본측정 완료, V 포함 비교 요약 작성 |
+| [연결부 C · 공통 설정 v1 · r01](reports/qwen2vl_connector_common_components_v1_both_r01/README.md) | eval 30장, 기존 공통 공격 PNG 재사용·상한 512토큰, C 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [연결부 C · 확장 설정 v1 · r01](reports/qwen2vl_connector_extended_components_v1_both_r01/README.md) | eval 30장, 기존 확장 공격 PNG 재사용·상한 5,000토큰, C 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [언어모델 L · 공통 설정 v1 · r01](reports/qwen2vl_language_common_components_v1_both_r01/README.md) | eval 30장, 기존 공통 공격 PNG 재사용·상한 512토큰, L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [언어모델 L · 확장 설정 v1 · r01](reports/qwen2vl_language_extended_components_v1_both_r01/README.md) | eval 30장, 기존 확장 공격 PNG 재사용·상한 5,000토큰, L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [VCL · 공통 설정 v1 · r01](reports/qwen2vl_vcl_common_components_v1_both_r01/README.md) | eval 30장, 기존 공통 공격 PNG 재사용·상한 512토큰, V+C+L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
+| [VCL · 확장 설정 v1 · r01](reports/qwen2vl_vcl_extended_components_v1_both_r01/README.md) | eval 30장, 기존 확장 공격 PNG 재사용·상한 5,000토큰, V+C+L 양자화 8모델 조건 × 3입력 = 720행 측정 | 완료 |
 
-시각 인코더 본실험은 측정까지 완료했으며, 공격 성공률·전이율 평가는 아직 진행하지 않았다. 부품 실험의 준비 검증은 [5,000토큰 준비 결과](experiments/extended_v1_ready.md), 이후 본측정 시작과 상태 확인 방법은 [순차 실행 기록](experiments/sequence_run_20261017.md)에 기록했다.
+총 8개 실험·5,760행의 측정을 완료했으며, 공격 성공률·전이율 평가는 아직 진행하지 않았다. 각 행에서 해당 실험의 설정·환경·측정 요약·사진별 비교 보고서로 이동할 수 있다. 부품 실험의 준비 검증은 [5,000토큰 준비 결과](experiments/extended_v1_ready.md), 본측정 과정은 [순차 실행 기록](experiments/sequence_run_20261017.md), 최종 상태와 무결성 확인은 [완료 기록](experiments/sequence_completion_20261017.md)에 기록했다.
 
 ### 참고자료
 

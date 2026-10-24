@@ -1,0 +1,232 @@
+{
+  "cases": {
+    "ref": {
+      "census": {
+        "V": [
+          0,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": null,
+      "seconds": 460.0
+    },
+    "rtn-V-8": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": {
+        "V": 0.5733912963375144
+      },
+      "seconds": 515.1
+    },
+    "rtn-V-6": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": {
+        "V": 2.236819819344723
+      },
+      "seconds": 542.4
+    },
+    "rtn-V-5": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": {
+        "V": 4.538662305510228
+      },
+      "seconds": 554.4
+    },
+    "rtn-V-4": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": {
+        "V": 9.376807996198103
+      },
+      "seconds": 289.3
+    },
+    "rtn-V-3": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": {
+        "V": 20.103401894834025
+      },
+      "seconds": 104.3
+    },
+    "bnb-V-8": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": null,
+      "seconds": 579.2
+    },
+    "bnb-V-4": {
+      "census": {
+        "V": [
+          72,
+          72
+        ],
+        "C": [
+          0,
+          1
+        ],
+        "L": [
+          0,
+          210
+        ],
+        "H": [
+          0,
+          1
+        ]
+      },
+      "weight_change_pct": null,
+      "seconds": 353.8
+    }
+  },
+  "settings_version": "v1",
+  "model": "smolvlm",
+  "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "split": "eval",
+  "n_images": 30,
+  "inputs": [
+    "clean",
+    "noise",
+    "adv"
+  ],
+  "prompt": "Describe this image in one sentence.",
+  "gen_kwargs": {
+    "do_sample": false,
+    "num_beams": 1,
+    "max_new_tokens": 512,
+    "repetition_penalty": 1.0,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null
+  },
+  "eos_token_ids": [
+    49279
+  ],
+  "processor_kwargs": {
+    "do_image_splitting": false,
+    "size": {
+      "longest_edge": 512
+    }
+  },
+  "quant_group": 64,
+  "adv_dir": "A팀/adv",
+  "adv_check": "SHA256SUMS와 일치",
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.19.0",
+    "pillow": "11.2.1",
+    "numpy": "2.5.2",
+    "bitsandbytes": "0.50.2"
+  },
+  "n_rows": 720
+}

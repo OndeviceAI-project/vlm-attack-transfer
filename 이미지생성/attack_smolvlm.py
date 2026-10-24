@@ -72,10 +72,12 @@ def make_pixel_values(x, delta, mean, std, n_tiles):
 
 
 @torch.no_grad()
-def natural_len_of(model, processor, x, delta, prompt, device):
+def natural_answer(model, processor, x, delta, prompt, device, eos_ids):
+    """(답 토큰 수, 종료 토큰 없이 512에 닿았는가). 뒤의 것이 README 결과 표의 hit_cap이다."""
     enc = processor(text=prompt, images=[_pil_from(x, delta)], return_tensors="pt").to(device)
     gen = model.generate(**enc, do_sample=False, max_new_tokens=512)
-    return gen.shape[1] - enc["input_ids"].shape[1]
+    new = gen[0, enc["input_ids"].shape[1]:].tolist()
+    return len(new), len(new) == 512 and not any(t in eos_ids for t in new)
 
 
 def losses(model, base, pixel_values, answer_start, eos_ids, use_div):
@@ -117,13 +119,21 @@ def attack_one(model, processor, path, args, device, mean, std, eos_ids):
             new = gen[0, enc["input_ids"].shape[1]:]
             return processor.tokenizer.decode(new, skip_special_tokens=True).strip() or "This"
 
-    target = long_target()
-    print(f"[{name}] 시작 자연 답 길이: {natural_len_of(model, processor, x, delta, prompt, device)} 토큰")
+    def tag(cap):
+        return " (종료 없이 512)" if cap else ""
 
-    best_delta = delta.detach().clone()
+    start_len, start_cap = natural_answer(model, processor, x, delta, prompt, device, eos_ids)
+    print(f"[{name}] 시작 자연 답 길이: {start_len} 토큰{tag(start_cap)}")
+
+    # 저장할 사진: 확인한 시점(원본 포함) 중 (종료 없이 512, 답 길이)가 가장 큰 것. 같으면 앞의 것
+    best, best_delta, best_it = (start_cap, start_len), delta.detach().clone(), None
     hits = 0
-    for it in range(args.iter):
-        if it > 0 and it % args.refresh == 0:
+    n_iter = args.iter
+    if start_len >= 512:   # 이미 512면 어느 걸음도 원본보다 높지 않으므로 공격하지 않는다(B팀 코드와 같음)
+        print(f"[{name}] 시작부터 512 → 공격하지 않고 원본 그대로 저장")
+        n_iter = 0
+    for it in range(n_iter):
+        if it % args.refresh == 0:
             target = long_target()
         base = processor(text=prompt + target, images=[_pil_from(x, delta.detach())],
                          return_tensors="pt").to(device)
@@ -137,25 +147,30 @@ def attack_one(model, processor, path, args, device, mean, std, eos_ids):
         delta.grad = None
         loss.backward()
         if torch.isnan(loss) or torch.isnan(delta.grad).any():
-            print(f"[{name}] it {it}: nan 발생 → 직전 정상 상태로 저장하고 중단")
+            print(f"[{name}] it {it}: nan 발생 → 그때까지 고른 사진을 저장하고 중단")
             break
         with torch.no_grad():
             delta -= step * delta.grad.sign()
             delta.clamp_(-eps, eps)
             delta.copy_(torch.clamp(x + delta, 0, 1) - x)
-            best_delta = delta.detach().clone()
-        if it % args.refresh == 0:
-            nl = natural_len_of(model, processor, x, delta, prompt, device)
-            print(f"[{name}] it {it:4d} | eos_logit {l_eos.item():+.3f} | 자연 답 길이 {nl} 토큰")
-            hits = hits + 1 if nl >= 500 else 0
+        if it % args.refresh == 0 or it + 1 == n_iter:   # 마지막 걸음도 확인한다
+            nl, cap = natural_answer(model, processor, x, delta, prompt, device, eos_ids)
+            print(f"[{name}] it {it:4d} | eos_logit {l_eos.item():+.3f} | 자연 답 길이 {nl} 토큰{tag(cap)}")
+            if (cap, nl) > best:
+                best, best_delta, best_it = (cap, nl), delta.detach().clone(), it
+            hits = hits + 1 if cap else 0
             if hits >= 2:
                 print(f"[{name}] 512 도달 → 조기 종료")
                 break
 
+    print(f"[{name}] 고른 사진: " + ("원본 그대로" if best_it is None else f"it {best_it:4d}")
+          + f" | 답 길이 {best[1]} 토큰{tag(best[0])}")
     out_path = os.path.join(args.out, os.path.splitext(name)[0] + ".png")   # 무손실 PNG로 저장
     _save_png(torch.clamp(x + best_delta, 0, 1), out_path)
-    saved = natural_len_of(model, processor, x, best_delta, prompt, device)
-    print(f"[{name}] 저장본 실제 답 길이: {saved} 토큰  →  {out_path}")
+    saved, saved_cap = natural_answer(model, processor, x, best_delta, prompt, device, eos_ids)
+    print(f"[{name}] 저장본 실제 답 길이: {saved} 토큰{tag(saved_cap)}  →  {out_path}")
+    if (saved_cap, saved) != best:
+        print(f"[{name}] 주의: 저장본 답 길이가 고를 때와 다르다 → 이 사진은 확인 필요")
 
 
 def main():

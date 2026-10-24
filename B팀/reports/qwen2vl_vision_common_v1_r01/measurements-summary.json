@@ -1,0 +1,247 @@
+{
+  "experiment": "qwen2vl_vision_common_v1_r01",
+  "csv_sha256": "e06b8323bc951af6fb74ab144aa73bef8466c7016406fc5f95ceb4e07cecb362",
+  "attack_success_assessed": false,
+  "groups": [
+    {
+      "case": "ref",
+      "input": "clean",
+      "mean_tokens": 28.9,
+      "median_tokens": 26.5,
+      "min_tokens": 17,
+      "max_tokens": 64,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5663079440632525
+    },
+    {
+      "case": "ref",
+      "input": "noise",
+      "mean_tokens": 28.466666666666665,
+      "median_tokens": 23.5,
+      "min_tokens": 14,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5591138536071715
+    },
+    {
+      "case": "ref",
+      "input": "adv",
+      "mean_tokens": 262.1333333333333,
+      "median_tokens": 123.5,
+      "min_tokens": 33,
+      "max_tokens": 512,
+      "output_limit_count": 13,
+      "mean_seconds": 4.885622599802446
+    },
+    {
+      "case": "rtn-V-8",
+      "input": "clean",
+      "mean_tokens": 29.633333333333333,
+      "median_tokens": 27.0,
+      "min_tokens": 15,
+      "max_tokens": 83,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5813278617531371
+    },
+    {
+      "case": "rtn-V-8",
+      "input": "noise",
+      "mean_tokens": 27.866666666666667,
+      "median_tokens": 22.0,
+      "min_tokens": 14,
+      "max_tokens": 74,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5485544706733587
+    },
+    {
+      "case": "rtn-V-8",
+      "input": "adv",
+      "mean_tokens": 200.26666666666668,
+      "median_tokens": 79.0,
+      "min_tokens": 27,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 3.7510077999477898
+    },
+    {
+      "case": "rtn-V-6",
+      "input": "clean",
+      "mean_tokens": 30.466666666666665,
+      "median_tokens": 26.5,
+      "min_tokens": 15,
+      "max_tokens": 84,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5981013705216659
+    },
+    {
+      "case": "rtn-V-6",
+      "input": "noise",
+      "mean_tokens": 27.8,
+      "median_tokens": 23.0,
+      "min_tokens": 14,
+      "max_tokens": 73,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5494249615080965
+    },
+    {
+      "case": "rtn-V-6",
+      "input": "adv",
+      "mean_tokens": 196.93333333333334,
+      "median_tokens": 76.5,
+      "min_tokens": 20,
+      "max_tokens": 512,
+      "output_limit_count": 9,
+      "mean_seconds": 3.686807907077794
+    },
+    {
+      "case": "rtn-V-5",
+      "input": "clean",
+      "mean_tokens": 31.266666666666666,
+      "median_tokens": 28.0,
+      "min_tokens": 15,
+      "max_tokens": 90,
+      "output_limit_count": 0,
+      "mean_seconds": 0.6110794562109125
+    },
+    {
+      "case": "rtn-V-5",
+      "input": "noise",
+      "mean_tokens": 27.666666666666668,
+      "median_tokens": 24.0,
+      "min_tokens": 14,
+      "max_tokens": 78,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5447098456012706
+    },
+    {
+      "case": "rtn-V-5",
+      "input": "adv",
+      "mean_tokens": 117.23333333333333,
+      "median_tokens": 57.0,
+      "min_tokens": 17,
+      "max_tokens": 512,
+      "output_limit_count": 4,
+      "mean_seconds": 2.206734471116215
+    },
+    {
+      "case": "rtn-V-4",
+      "input": "clean",
+      "mean_tokens": 31.3,
+      "median_tokens": 26.0,
+      "min_tokens": 15,
+      "max_tokens": 80,
+      "output_limit_count": 0,
+      "mean_seconds": 0.6126937309008402
+    },
+    {
+      "case": "rtn-V-4",
+      "input": "noise",
+      "mean_tokens": 26.933333333333334,
+      "median_tokens": 22.5,
+      "min_tokens": 15,
+      "max_tokens": 77,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5314171889331192
+    },
+    {
+      "case": "rtn-V-4",
+      "input": "adv",
+      "mean_tokens": 121.26666666666667,
+      "median_tokens": 38.5,
+      "min_tokens": 16,
+      "max_tokens": 512,
+      "output_limit_count": 5,
+      "mean_seconds": 2.280949685458715
+    },
+    {
+      "case": "rtn-V-3",
+      "input": "clean",
+      "mean_tokens": 31.133333333333333,
+      "median_tokens": 26.0,
+      "min_tokens": 15,
+      "max_tokens": 69,
+      "output_limit_count": 0,
+      "mean_seconds": 0.6090284932404757
+    },
+    {
+      "case": "rtn-V-3",
+      "input": "noise",
+      "mean_tokens": 28.466666666666665,
+      "median_tokens": 24.5,
+      "min_tokens": 15,
+      "max_tokens": 76,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5602729636322086
+    },
+    {
+      "case": "rtn-V-3",
+      "input": "adv",
+      "mean_tokens": 33.733333333333334,
+      "median_tokens": 26.0,
+      "min_tokens": 13,
+      "max_tokens": 108,
+      "output_limit_count": 0,
+      "mean_seconds": 0.6571844545891509
+    },
+    {
+      "case": "bnb-V-8",
+      "input": "clean",
+      "mean_tokens": 29.633333333333333,
+      "median_tokens": 27.5,
+      "min_tokens": 15,
+      "max_tokens": 79,
+      "output_limit_count": 0,
+      "mean_seconds": 0.6239204374297211
+    },
+    {
+      "case": "bnb-V-8",
+      "input": "noise",
+      "mean_tokens": 27.7,
+      "median_tokens": 24.5,
+      "min_tokens": 14,
+      "max_tokens": 79,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5872922500246205
+    },
+    {
+      "case": "bnb-V-8",
+      "input": "adv",
+      "mean_tokens": 132.9,
+      "median_tokens": 62.0,
+      "min_tokens": 28,
+      "max_tokens": 512,
+      "output_limit_count": 5,
+      "mean_seconds": 2.544670025224332
+    },
+    {
+      "case": "bnb-V-4",
+      "input": "clean",
+      "mean_tokens": 28.466666666666665,
+      "median_tokens": 26.0,
+      "min_tokens": 14,
+      "max_tokens": 80,
+      "output_limit_count": 0,
+      "mean_seconds": 0.5686579345337426
+    },
+    {
+      "case": "bnb-V-4",
+      "input": "noise",
+      "mean_tokens": 30.5,
+      "median_tokens": 26.0,
+      "min_tokens": 14,
+      "max_tokens": 79,
+      "output_limit_count": 0,
+      "mean_seconds": 0.606695466193681
+    },
+    {
+      "case": "bnb-V-4",
+      "input": "adv",
+      "mean_tokens": 56.9,
+      "median_tokens": 35.5,
+      "min_tokens": 16,
+      "max_tokens": 512,
+      "output_limit_count": 1,
+      "mean_seconds": 1.097768297775959
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "settings_version": "v1",
+  "model": "smolvlm",
+  "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "split": "eval",
+  "attack_dtype": "float32",
+  "processor_kwargs": {
+    "do_image_splitting": false,
+    "size": {
+      "longest_edge": 512
+    }
+  },
+  "args": {
+    "iter": 300,
+    "eps": 8,
+    "step": 1,
+    "target_len": 128,
+    "refresh": 20,
+    "w_unc": 0.05,
+    "w_div": 0.0,
+    "out": "/home/user/ondivice_project/attack_smolvlm/workspace/A팀/adv"
+  },
+  "attack_code": "이미지생성/attack_smolvlm.py의 attack_one (잰 시점 중 가장 높은 사진 저장)",
+  "attack_code_sha256": "28b958ba43d9781520e4d9ac5df1a333e0ca2bf0dcbafa03e4faf9050658f7d8",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.19.0",
+    "pillow": "11.2.1",
+    "numpy": "2.5.2"
+  }
+}

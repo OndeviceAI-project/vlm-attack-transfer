@@ -1,6 +1,8 @@
 # 업로드 파일 안내와 필드 미리보기
 
-이 문서에서 `<실험 ID>`는 `qwen2vl_vision_common_v1_r01` 또는 `qwen2vl_vision_extended_v1_r01`이다. 파일명은 현재 이름이며, 원본 메타데이터 내부의 이전 이름은 보존했다.
+부품 비교 요약은 [quantization_components_comparison_v1/README.md](quantization_components_comparison_v1/README.md)에 있다. 기존 V와 새 C·L·VCL의 5,760행을 서버에서 집계했다. 같은 폴더의 `group_stats.csv`는 192개 조건·입력별 통계, `timing_memory.csv`는 64개 조건별 시간·메모리 보조값, `summary.json`은 대조군 예외·ref 일치 확인, `sources.json`은 원본 해시·환경을 담는다. `build.py`가 원시 CSV를 바꾸지 않고 이 파일들을 재생성한다. 상한 도달 횟수와 공격 성공률·전이율은 구분한다.
+
+아래 기존 V 파일 설명에서 `<실험 ID>`는 `qwen2vl_vision_common_v1_r01` 또는 `qwen2vl_vision_extended_v1_r01`이다. 파일명은 현재 이름이며, 원본 메타데이터 내부의 이전 이름은 보존했다. 새 부품 실험의 추가 파일은 별도 표와 [GitHub 업로드 범위](../experiments/github_upload.md)에 설명한다.
 
 ## 파일별 목적과 포함 근거
 
@@ -10,7 +12,7 @@
 | `requirements.in` | 직접 사용하는 패키지의 고정 버전 | 환경 재구성 |
 | `requirements.lock.txt` | 측정 당시 패키지 버전 전체 | 당시 환경 추적 |
 | `.gitignore` | 가중치·체크포인트·후보 작업물 제외 | 실험 산출물과 대용량 작업 파일 구분 |
-| `src/runtime.py` | 로컬 모델 캐시 로딩, 전처리, EOS, V 양자화, 생성 시간 | 공통 설정의 입력·EOS·대상 부품·시간 규칙 |
+| `src/runtime.py` | 서버 모델 캐시 로딩, 전처리, EOS, V/C/L/VCL 양자화, 생성 시간 | 공통 설정의 입력·EOS·대상 부품·시간 규칙 |
 | `src/data.py` | 이미지 준비·해시 검사, 명시적 다운로드 옵션 | 공통 이미지 목록·448 PNG·고정 noise 재현 |
 | `src/attack.py` | 공통 최선 후보 저장, 확장 25후보·20% 재검사, 상태 저장 | 실제 사용한 두 공격 방식의 실행 구현 |
 | `src/evaluate.py` | 고정 clean/noise/adv 측정, CSV 저장, 기존 세트 재사용 | 공통 결과 형식과 쌍 비교 |
@@ -41,6 +43,22 @@
 
 공통 지침이 파일별로 이 폴더 구조나 JSONL 형식까지 강제한 것은 아니다. 제출 CSV·메타데이터·고정 입력·로그 규칙을 충족하면서 이후 실험에서 재사용하기 위해 B팀에서 정리한 구조다.
 
+## 부품 실험 추가 파일
+
+| 위치 | 내용 |
+|---|---|
+| `src/case_config.py`, `src/components.py` | C·L·VCL의 8조건 구성, 고정 공격 세트·모델·입력 확인 및 측정 실행 |
+| `src/check_extended_gpu.py` | GPU 서버에서 실제 모델의 양자화·보호 층·전처리·개발 입력 확인 |
+| `scripts/run_components.sh`, `component_worker.sh`, `run_component_sequence.sh` | tmux와 GPU 잠금을 사용한 부품별 실행 및 512→5,000 순차 실행 |
+| `tests/test_components.py` | 부품 선택·보호 층·재개·보고서의 검사 코드. GPU 서버에서 실행 |
+| `results/qwen2vl_<connector/language/vcl>_<common/extended>_components_v1_both_r01.csv` 및 `.json` | 6개 실험 각각 720행의 답변 전문과 원본 메타데이터 |
+| `results/components-common-then-extended-both-r01/` | 시작 기록·최종 상태·서버 완료 확인 |
+| `reports/<부품 실험 ID>/` | 실험별 README·측정 요약·run manifest |
+| `reports/quantization_components_comparison_v1/` | V/C/L/VCL 비교 보고서와 집계 자료·출처·재생성 코드 |
+| `experiments/` | 설정 계획·공통 규칙 대조·GPU 서버 준비·실행·완료·업로드 범위 안내 |
+
+부품 실험의 응답별 토큰 ID·전처리 상세 파일과 전체 실행 로그는 서버에 보관한다. 기존 V의 `responses.jsonl`과 동일한 추가 파일을 이번에 내려받아 포함한 것은 아니다. 여섯 원본 CSV에는 답변 전문이 들어 있으며 수집·서버 확인 범위는 [완료 기록](../experiments/sequence_completion_20261017.md)에 명시했다.
+
 ## 실험·이미지 세트 이름의 변경 기준
 
 이름의 기본 형식은 [B팀 README](../README.md)에 있다. 아래는 기존 기록을 덮어쓰지 않고 후속 실험을 추가하기 위한 B팀 규칙이다.
@@ -57,7 +75,7 @@
 
 `r`과 `s`는 최소 두 자리로 쓴다. 예를 들어 `qwen2vl_vision_extended_v1_r02`가 기존 `qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01`을 재사용할 수 있다.
 
-현재 `qwen2vl`은 Qwen2-VL-2B-Instruct를 뜻한다. 다른 크기·변형의 모델은 구별되는 이름을 정하고 정확한 모델 ID·revision을 메타데이터에 남긴다. 부품 이름은 `vision`(V), `connector`(C), `language`(L), `head`(H), `full`(VCLH)로 구분한다. 현재 러너는 V 전용 조건만 지원하므로 이름을 바꾸는 것만으로 다른 부품을 실행할 수는 없다.
+현재 `qwen2vl`은 Qwen2-VL-2B-Instruct를 뜻한다. 다른 크기·변형의 모델은 구별되는 이름을 정하고 정확한 모델 ID·revision을 메타데이터에 남긴다. 부품 이름은 `vision`(V), `connector`(C), `language`(L), `head`(H), `full`(VCLH)로 구분한다. 별도 `components_v1` 러너는 `connector`·`language`·`vcl`을 지원하며, `vcl`은 **출력층을 제외한 V+C+L**이다. H·VCLH 양자화는 이 러너에서 허용하지 않는다. 부품 실험 이름은 `qwen2vl_<부품>_<common/extended>_components_v1_<rtn/bnb/both>_r01`이며, 조건과 행 수는 해당 실행의 메타데이터에 기록한다. 자세한 설정은 [부품 실험 안내](../experiments/README.md)에 있다.
 
 이름의 `v`는 B팀 프로토콜 버전이다. 공동 설정의 `SETTINGS_VERSION`은 별도 메타데이터로 남기며, 공동 설정 파일 변경은 두 팀 합의가 필요하다. B팀 확장 설정은 공통 설정을 덮어쓰지 않고 별도로 관리한다.
 
@@ -129,4 +147,4 @@
 
 두 결과 CSV와 메타 JSON은 바이트를 보존했다. JSONL로 합친 각 `record`도 원본 객체와 같다. 실행 당시 코드·설정 사본 20개와 예비 실험 상세 파일 16개는 업로드 대상에서 제외하고 서버에 별도 보관했다. 과거 경로·모듈명·코드 해시는 원본 메타데이터에 그대로 남아 있다. 실행에는 현재 `src/`와 `scripts/`를 사용하며 공통·확장 본실험 결과는 모두 포함한다.
 
-현재 코드 정리 후 CPU 검증·저장 파일 검사·실행 전 점검을 수행했다. 정리한 코드로 GPU 전체 실험을 다시 돌려 동일 결과를 얻었다고 주장하지 않는다.
+기존 V 자료를 처음 정리했을 때 CPU 코드 검사·저장 파일 검사·실행 전 점검을 수행했다. 이후 사용자 지시에 따라 검사는 GPU 서버에서만 수행했다. 새 부품 실험은 서버에서 검사와 4,320행 본측정을 마쳤으며 기존 V 1,440행을 재측정한 것은 아니다. 이번 공개 자료 정리에서는 파일·문서·Git 목록만 확인했다.

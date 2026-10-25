@@ -1,0 +1,270 @@
+{
+  "build_script_sha256": "b3462bda90baa80d205c8101ff46c5c9f3028a75117002d76d092204d9f75350",
+  "source_runs": [
+    {
+      "protocol": "common",
+      "part": "V",
+      "experiment_id": "qwen2vl_vision_common_v1_r01",
+      "csv_path": "results/qwen2vl_vision_common_v1_r01.csv",
+      "csv_sha256": "e06b8323bc951af6fb74ab144aa73bef8466c7016406fc5f95ceb4e07cecb362",
+      "metadata_sha256": "1e301879aef51405e7f5607704452b8fb730c2294db57bd7a808c5c0037244e5",
+      "report_manifest_sha256": "32ad431a84029ac3d6af8c2a00a6326dcac37e4aea28a373ccef7c906969af6d",
+      "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+      "selection_sha256": "0d1c51bd7c1bb3f6430e8f746c9fb809a5f343bcfd9920ed2f3992c9d6e9599c",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 512,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "common",
+      "part": "C",
+      "experiment_id": "qwen2vl_connector_common_components_v1_both_r01",
+      "csv_path": "results/qwen2vl_connector_common_components_v1_both_r01.csv",
+      "csv_sha256": "0852b609a1667529884007614d488cb6eeeb4da238c5635390881a6469127e69",
+      "metadata_sha256": "535f6cc7ff8fa4478a08d8cf1acea243d0255a3088e846cba216c90f924910cf",
+      "report_manifest_sha256": "cb000e6125a478726a4cc929e37cc8e4bf1f7b01d30620646aeae8c1f2580e62",
+      "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+      "selection_sha256": "0d1c51bd7c1bb3f6430e8f746c9fb809a5f343bcfd9920ed2f3992c9d6e9599c",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 512,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "common",
+      "part": "L",
+      "experiment_id": "qwen2vl_language_common_components_v1_both_r01",
+      "csv_path": "results/qwen2vl_language_common_components_v1_both_r01.csv",
+      "csv_sha256": "f44fba83d83140c5df7967d4aeec1558533b2c503b543d0b726d07dcddd63d73",
+      "metadata_sha256": "e34de34d1138ce779192dd32bb98c855f600a5c3b78d076fa556adbafda02da9",
+      "report_manifest_sha256": "9b9a445a489dd62c996edfa22d97fd39d5d41fee7a3c8d1ddf22ae6e62009f9c",
+      "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+      "selection_sha256": "0d1c51bd7c1bb3f6430e8f746c9fb809a5f343bcfd9920ed2f3992c9d6e9599c",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 512,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "common",
+      "part": "VCL",
+      "experiment_id": "qwen2vl_vcl_common_components_v1_both_r01",
+      "csv_path": "results/qwen2vl_vcl_common_components_v1_both_r01.csv",
+      "csv_sha256": "81c4c4dfe52b3d3dc029f89286764392636e2c8e1b668b594beca40265c310ec",
+      "metadata_sha256": "f8a95bda56b36b3df07d3e6a5be1f14693669456857b2f81ed9554ed56f60ba5",
+      "report_manifest_sha256": "ed109d587ee1273d3341de0b6f09b2a8ef451103237807919e849f5650d865c2",
+      "image_set_id": "qwen2vl_attack_common_v1_i300_cap512_s01",
+      "selection_sha256": "0d1c51bd7c1bb3f6430e8f746c9fb809a5f343bcfd9920ed2f3992c9d6e9599c",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 512,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "extended",
+      "part": "V",
+      "experiment_id": "qwen2vl_vision_extended_v1_r01",
+      "csv_path": "results/qwen2vl_vision_extended_v1_r01.csv",
+      "csv_sha256": "f5426efa791983e09f70ebc8abb6c24609949e4bd1ad1e13ee51da90c2320b4d",
+      "metadata_sha256": "2bb18ff838ebe41c575ffb2b0b4fea300ed071e25673e1106b888d3612e26ae8",
+      "report_manifest_sha256": "e6a9c8f124162d9d53d63633c3b0239e4dad600a4c4eb4af547693323925fc97",
+      "image_set_id": "qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01",
+      "selection_sha256": "f12ba6baa0d5b7436c807aa5b71b5a44756ddc3b4c3f8a71b8bdd55ce4c5f96d",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 5000,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "extended",
+      "part": "C",
+      "experiment_id": "qwen2vl_connector_extended_components_v1_both_r01",
+      "csv_path": "results/qwen2vl_connector_extended_components_v1_both_r01.csv",
+      "csv_sha256": "a3f12912477607db19dfdf2040692db9156f167d4cb0ea53c45482744609c170",
+      "metadata_sha256": "c6ab906e6b912aa1f8cb26f286eccfa43121c1f6ea447bb64051a0f9d8e531ea",
+      "report_manifest_sha256": "5c864cc4aa81700c2c31481ca9ee23b540104c8be0307c2c51db6fcfe75484dd",
+      "image_set_id": "qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01",
+      "selection_sha256": "f12ba6baa0d5b7436c807aa5b71b5a44756ddc3b4c3f8a71b8bdd55ce4c5f96d",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 5000,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "extended",
+      "part": "L",
+      "experiment_id": "qwen2vl_language_extended_components_v1_both_r01",
+      "csv_path": "results/qwen2vl_language_extended_components_v1_both_r01.csv",
+      "csv_sha256": "e8a98efddef6835a254a5917afcbf8fa9ac28a85dc38b54e32b2530899a971e5",
+      "metadata_sha256": "0ba8178028600bf09ef6ee3575c8cda12f15990be650520359ae51da82f48614",
+      "report_manifest_sha256": "c19b91b2f88dcfb63a519673d874b7e07de6ec9880a1efa4b25f0e92faa7e37e",
+      "image_set_id": "qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01",
+      "selection_sha256": "f12ba6baa0d5b7436c807aa5b71b5a44756ddc3b4c3f8a71b8bdd55ce4c5f96d",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 5000,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    },
+    {
+      "protocol": "extended",
+      "part": "VCL",
+      "experiment_id": "qwen2vl_vcl_extended_components_v1_both_r01",
+      "csv_path": "results/qwen2vl_vcl_extended_components_v1_both_r01.csv",
+      "csv_sha256": "5293b0036dde382b0c02e9a81145636d7255a7c41abd0e310f3313ec7298166c",
+      "metadata_sha256": "d089a926c21df2bf80a7a57e0bdfdb2774d01408e3797108c11fba49640a2d43",
+      "report_manifest_sha256": "e8d544d5ceaa70c98f253a125ec516d3edd98e7bd78a7267d94516df34f33ce9",
+      "image_set_id": "qwen2vl_attack_extended_v1_i500_cap5000_tol20_s01",
+      "selection_sha256": "f12ba6baa0d5b7436c807aa5b71b5a44756ddc3b4c3f8a71b8bdd55ce4c5f96d",
+      "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+      "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+      "packages": {
+        "torch": "2.11.0+cu128",
+        "torchvision": "0.26.0+cu128",
+        "transformers": "5.19.0",
+        "bitsandbytes": "0.50.0",
+        "accelerate": "1.15.0",
+        "pillow": "11.2.1",
+        "numpy": "2.2.6"
+      },
+      "generation": {
+        "do_sample": false,
+        "num_beams": 1,
+        "max_new_tokens": 5000,
+        "repetition_penalty": 1.0,
+        "temperature": null,
+        "top_p": null,
+        "top_k": null
+      },
+      "rows": 720,
+      "cohort_and_input_hashes_verified": true
+    }
+  ],
+  "source_csvs_modified": false
+}

@@ -12,6 +12,10 @@ results/*/exit.code
 results/*/adv/
 .candidate-cache/
 
+# Historical local diagnostics contain workstation paths; keep them off GitHub.
+experiments/local_validation.txt
+experiments/preparation_checks.json
+
 # Working candidates/checkpoints stay on the experiment server.
 adv/*/????????????/
 adv/*/????????????.json

@@ -10,15 +10,17 @@ def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 class ArtifactsTests(unittest.TestCase):
  def test_csv_schema_cohort_and_hashes(self):
   for f in (B/'reports').glob('*/run_manifest.json'):
-   cfg=json.loads(f.read_text());run=cfg['experiment_id'];path=B/'results'/(run+'.csv')
+   cfg=json.loads(f.read_text(encoding='utf-8'));run=cfg['experiment_id'];path=B/'results'/(run+'.csv')
+   if not cfg.get('csv_sha256'):
+    continue  # Prepared/running experiments have no final result artifact yet.
    meta=json.loads(path.with_suffix('.json').read_text())
    self.assertEqual(sha(path),meta['csv_sha256']);self.assertEqual(sha(path),cfg['csv_sha256'])
    with path.open(newline='') as stream:reader=csv.DictReader(stream);rows=list(reader);fields=reader.fieldnames
    expected=['model','case','image_id','input','n_tokens']+(['hit_cap'] if cfg['max_new_tokens']==512 else ['ended_eos','output_limit_reached'])+['latency_s','text']
-   self.assertEqual(fields,expected);self.assertEqual(len(rows),720)
+   self.assertEqual(fields,expected);self.assertEqual(len(rows),cfg['n_rows'])
    selected=json.loads((B/'adv'/cfg['image_set_id']/'selection.json').read_text())['images']
    ids={r['image_id'] for r in selected}
-   self.assertEqual({(r['case'],r['image_id'],r['input']) for r in rows},{(c,i,k) for c in CASES for i in ids for k in ['clean','noise','adv']})
+   self.assertEqual({(r['case'],r['image_id'],r['input']) for r in rows},{(c,i,k) for c in cfg['cases'] for i in ids for k in ['clean','noise','adv']})
    for r in rows:
     self.assertEqual(r['model'],'qwen2vl');self.assertEqual(len(r['image_id']),12)
     self.assertTrue(1<=int(r['n_tokens'])<=cfg['max_new_tokens']);self.assertGreaterEqual(float(r['latency_s']),0)

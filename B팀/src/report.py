@@ -2,7 +2,6 @@
 import argparse,csv,json,hashlib,statistics as st
 from pathlib import Path
 B=Path(__file__).resolve().parents[1]
-CASES=['ref','rtn-V-8','rtn-V-6','rtn-V-5','rtn-V-4','rtn-V-3','bnb-V-8','bnb-V-4']
 def write_summary(path, summary):
  """Refresh the generated block without replacing the experiment description."""
  start='<!-- measurements:start -->';end='<!-- measurements:end -->'
@@ -21,22 +20,39 @@ def write_summary(path, summary):
 
 def build(label,image_set=None):
  if image_set is None:
-  image_set=json.loads((B/'reports'/label/'run_manifest.json').read_text())['image_set_id']
- csv.field_size_limit(10000000);p=B/'results'/(label+'.csv');meta=json.loads(p.with_suffix('.json').read_text())
- with p.open() as f:r=csv.DictReader(f);fields=r.fieldnames;rows=list(r)
+  image_set=json.loads((B/'reports'/label/'run_manifest.json').read_text(encoding='utf-8'))['image_set_id']
+ csv.field_size_limit(10000000);p=B/'results'/(label+'.csv');meta=json.loads(p.with_suffix('.json').read_text(encoding='utf-8'))
+ with p.open(encoding='utf-8',newline='') as f:r=csv.DictReader(f);fields=r.fieldnames;rows=list(r)
  assert hashlib.sha256(p.read_bytes()).hexdigest()==meta['csv_sha256']
- assert len(rows)==720 and len({(r['case'],r['image_id'],r['input']) for r in rows})==720
- selected=json.loads((B/'adv'/image_set/'selection.json').read_text())['images'];assert len(selected)==30
+ if not meta.get('completed'):raise ValueError('Build reports only after measurement completes')
+ cases=meta['config']['cases']
+ selected=json.loads((B/'adv'/image_set/'selection.json').read_text(encoding='utf-8'))['images'];assert len(selected)==30
+ ids={r['image_id'] for r in selected};expected={(c,i,k) for c in cases for i in ids for k in ['clean','noise','adv']}
+ if len(rows)!=len(expected) or {(r['case'],r['image_id'],r['input']) for r in rows}!=expected:
+  raise ValueError('Result rows do not match the recorded cases and image cohort')
  out=B/'reports'/label;out.mkdir(parents=True,exist_ok=True)
- matrix=['### 사진별 같은 공격 이미지의 출력 토큰 수','','각 행은 같은 공격 PNG 한 장을 비교한다. `채택 당시 원본`은 이미지 채택 과정에서 기록한 원본 모델의 토큰 수이고, `본 측정 원본`과 양자화 모델 열은 최종 평가에서 동일 PNG를 넣어 얻은 토큰 수다. 모든 값의 단위는 토큰이다.','','| 사진 ID | 채택 당시 원본 | 본 측정 원본 | RTN8 | RTN6 | RTN5 | RTN4 | RTN3 | bnb8 | bnb4 |','|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+ component=meta['config'].get('quantization_profile')
+ if component and not (out/'README.md').exists():
+  cfg=meta['config'];env=cfg.get('environment',cfg)
+  cap=cfg.get('max_new_tokens',cfg.get('gen_kwargs',{}).get('max_new_tokens'))
+  intro=[f'# Qwen2-VL 부품 양자화 — {component["component"]}', '',
+   f'실험 ID: `{label}`. 양자화 대상은 **{component["targets"]}의 Linear weight**이며 출력층·입력 임베딩은 bf16과 공유 상태를 유지한다.', '',
+   f'고정 공격 이미지 세트 `{image_set}`를 재사용했다. 사진 30장 × clean·noise·adv × 모델 조건 {len(cases)}개 = {len(rows)}행이다. 출력 상한은 {cap}토큰이다.', '',
+   f'조건: {", ".join(cases)}. RTN group 64; bnb 4비트는 NF4이다. RTN은 모의 양자화여서 저장 용량을 줄이지 않는다.', '',
+   f'GPU: {env.get("gpu","메타데이터 참조")}. 패키지·모델 revision·census·보호된 가중치 확인 결과는 결과 JSON에 기록한다.', '',
+   '공격 성공률·전이율과 정상 답변 품질은 별도 분석 대상이다.', '',
+   '<!-- measurements:start -->', '<!-- measurements:end -->', '']
+  (out/'README.md').write_text('\n'.join(intro),encoding='utf-8')
+ labels=['본 측정 원본' if c=='ref' else c for c in cases]
+ matrix=['### 사진별 같은 공격 이미지의 출력 토큰 수','','각 행은 같은 공격 PNG 한 장을 비교한다. `채택 당시 원본`은 이미지 채택 과정에서 기록한 원본 모델의 토큰 수이고, 나머지는 최종 평가에서 동일 PNG를 넣어 얻은 토큰 수다. 모든 값의 단위는 토큰이다.','','| '+' | '.join(['사진 ID','채택 당시 원본']+labels)+' |','|---|'+'---:|'*(len(cases)+1)]
  lookup={(r['case'],r['image_id'],r['input']):r for r in rows}
  for im in selected:
   iid=im['image_id'];chosen=im.get('saved_tokens',im.get('initial_tokens'))
-  vals=[iid,str(chosen)]+[lookup[(c,iid,'adv')]['n_tokens'] for c in CASES]
+  vals=[iid,str(chosen)]+[lookup[(c,iid,'adv')]['n_tokens'] for c in cases]
   matrix.append('| '+' | '.join(vals)+' |')
  summary=['# 측정값 요약','','성공·실패, ASR, 전이율은 계산하지 않았다. 평균·중앙값·범위·생성 시간과 출력 상한 도달 장수만 기술한다.','','### 모델·입력별 요약','', '| 모델 | 입력 | 평균 토큰 | 중앙값 | 최소 | 최대 | 상한 도달 장수 | 평균 생성 초 |','|---|---|---:|---:|---:|---:|---:|---:|']
  stats=[]
- for c in CASES:
+ for c in cases:
   for k in ['clean','noise','adv']:
    rs=[r for r in rows if r['case']==c and r['input']==k];assert len(rs)==30
    n=[int(r['n_tokens']) for r in rs];limit='hit_cap' if 'hit_cap' in fields else 'output_limit_reached'
@@ -44,8 +60,14 @@ def build(label,image_set=None):
    stats.append(v);summary.append(f"| {c} | {k} | {v['mean_tokens']:.1f} | {v['median_tokens']:.1f} | {min(n)} | {max(n)} | {v['output_limit_count']}/30 | {v['mean_seconds']:.2f} |")
  summary+=['','RTN은 양자화된 값을 부동소수점 가중치로 사용하는 모의 양자화다. 이 표는 모델 품질·메모리 절감·토큰당 속도 우열을 평가하지 않는다.','']+matrix+['',f'원본: ../../results/{label}.csv',f'환경·설정: ../../results/{label}.json','']
  write_summary(out/'README.md','\n'.join(summary))
- (out/'measurements-summary.json').write_text(json.dumps(dict(experiment=label,csv_sha256=meta['csv_sha256'],attack_success_assessed=False,groups=stats),ensure_ascii=False,indent=2)+'\n')
- print('REPORT_BUILT',label,'rows=720 images=30')
+ (out/'measurements-summary.json').write_text(json.dumps(dict(experiment=label,csv_sha256=meta['csv_sha256'],attack_success_assessed=False,groups=stats),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+ manifest_path=out/'run_manifest.json'
+ if manifest_path.exists():
+  manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+  if not manifest.get('published_record'):
+   manifest.update(csv_sha256=meta['csv_sha256'],metadata_sha256=hashlib.sha256(p.with_suffix('.json').read_bytes()).hexdigest(),completed=True)
+   manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+ print('REPORT_BUILT',label,f'rows={len(rows)} images={len(ids)}')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('run_name',nargs='+');a=p.parse_args()
  for name in a.run_name:

@@ -1,4 +1,8 @@
 coco_cache/
+data/
+*.jpg
+*.jpeg
+*.zip
 *.safetensors
 *.gguf
 *.pt

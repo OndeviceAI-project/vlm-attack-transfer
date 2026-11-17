@@ -33,10 +33,14 @@ python B팀/code/make_attack_set.py                        # cand 300장 전부 
 | 제작 정밀도·실행 | bf16, sdpa, revision 고정, 결정적 실행 설정(`torch.use_deterministic_algorithms(True)`, `CUBLAS_WORKSPACE_CONFIG=:4096:8`, `SEED` 2026) |
 | 조기 종료 | 종료 토큰 없이 512가 두 번 연속이면 멈춘다 |
 | 저장할 사진 | 멈춘 시점(두 번째 연속 512)의 사진. 끝까지 돌면 확인한 시점 중 가장 높은 사진 |
-| 숫자가 깨질 때 | 그때까지 고른 사진으로 멈춘다 |
+| 목표 문장 | 종료 토큰을 금지하고 생성한 `TARGET_LEN`토큰의 id를 그대로 질문 뒤에 붙인다 |
+| 답 길이 확인 | 판정과 같은 `settings.GEN_KWARGS`와 종료 토큰으로 생성한다 |
+| 시작 답이 이미 512 | 그래도 공격한다(2번째 시도의 무작위 시작에서만 생긴다) |
+| 숫자가 깨질 때 | nan·inf가 나오거나 기울기가 없으면 그때까지 고른 사진으로 멈추고 `attempts.csv`의 `nan_stop`에 남긴다 |
 | 시도 | 최대 `ATTACK_MAX_TRIES`(2)번. 1번째는 노이즈 0, 2번째는 무작위 시작 |
 | 무작위 시작의 씨앗 | `int(sha256(f"{ATTACK_SEED}:{coco_id 12자리}:{시도 번호}").hexdigest()[:15], 16)`, CPU 난수 |
 | 판정 | 저장한 PNG를 다시 읽어 픽셀 차이 ≤ 8이고, `runtime.answer`로 ref에 넣은 답이 종료 없이 512면 `success` |
+| pixel_values 확인 | 저장한 PNG로 직접 계산한 값과 프로세서 값을 float32와 bf16 모두 비교해 1e-6을 넘으면 멈춘다 |
 | 후보 처리 | cand 300장을 `order` 순서대로 끝까지 처리. 원본 답이 512면 `excluded` |
 | 입력 확인 | 공격 전에 정상 PNG의 SHA-256을 2단계 `input-manifest.json`과 대조한다. 없거나 다르면 멈춘다 |
 | 기록 | `attempts.csv`의 열과 순서. `attempts.json`에는 README 7장 '결과 JSON' 항목(실행 환경, ref의 census와 가중치 변화 0, 입력 해시, CSV 줄 수·해시, 이어서 돌린 기록)과 제작 설정, `pixel_gap_max` |
@@ -50,8 +54,7 @@ python B팀/code/make_attack_set.py                        # cand 300장 전부 
 | 픽셀 단위 | 0~1 실수 | 0~255 실수(`EPS`, `STEP`도 이 단위) |
 | 모델 입력 | 사진 한 장 `(1, 1, 3, 512, 512)` | 조각 배열 `(1024, 1176)`, `image_grid_thw` `[[1, 32, 32]]` |
 | 종료 토큰 | 1개 | 2개(`151645`, `151643`) |
-| 목표 문장을 넣는 방식 | 글자로 바꾼 뒤 다시 토큰으로 넣음(v1부터) | 토큰 id를 그대로 붙임(v1부터) |
-| pixel_values 확인 | 직접 정규화한 값과 비교 | 직접 정규화·조각 배열로 바꾼 값과 비교. float32와 bf16 모두 차이 0이어야 한다 |
+| pixel_values 확인 | 직접 정규화한 값과 비교 | 직접 정규화·조각 배열로 바꾼 값과 비교 |
 
 ## 5. v1 B팀 코드에서 바뀐 것
 

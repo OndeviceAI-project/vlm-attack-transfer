@@ -72,7 +72,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 - 제작 정밀도. 두 모델 모두 bf16이다(`settings.MODELS[모델]["attack_dtype"]`)
 - 제작 코드가 모델에 넣는 `pixel_values`가, 평가 코드가 같은 PNG로 만드는 값과 같다는 확인 방법과 결과(차이 0)
 
-`이미지생성/attack_smolvlm.py`는 v1의 SmolVLM 제작 코드를 1-1단계에서 정한 방식(bf16, 시도마다 시작점, 멈춘 시점의 사진 저장)으로 고친 것이다. Qwen2-VL 제작 코드는 `B팀/code/attack_qwen.py`다.
+`이미지생성/attack_smolvlm.py`는 v1의 SmolVLM 제작 코드를 1-1단계에서 정한 방식(bf16, 시도마다 시작점, 멈춘 시점의 사진 저장, 목표 문장을 토큰 id 그대로 붙이기)으로 고친 것이다. Qwen2-VL 제작 코드는 `B팀/code/attack_qwen.py`다.
 
 ### 1-2단계. ref 점검
 

@@ -4,7 +4,12 @@
 #   공식 공격 사진 세트(README 3단계)는 A팀/code/make_attack_set.py가 attack_one을 불러 만든다.
 """SmolVLM verbose-image attack (ported from Verbose Images, ICLR 2024).
 모델은 평가 모델과 같은 bf16(16비트)으로 계산한다. 사진과 노이즈는 픽셀 값(0~1 실수)으로 다룬다.
-모델·질문·정밀도·공격 기본값은 공통/settings.py에서 읽는다."""
+모델·질문·정밀도·답 생성 조건·공격 기본값은 공통/settings.py에서 읽는다.
+제작 방식은 이미지생성/README.md를 따르고, Qwen2-VL 제작 코드(B팀/code/attack_qwen.py)와 같다:
+- 목표 문장은 생성한 토큰 id를 그대로 질문 뒤에 붙인다(글자로 바꿨다 다시 토큰으로 만들지 않는다).
+- 답 길이 확인은 판정(runtime.answer)과 같은 settings.GEN_KWARGS와 종료 토큰으로 한다.
+- 시작 사진의 답이 이미 512여도 공격한다.
+- 손실이나 기울기에 nan·inf가 나오거나 기울기가 없으면 그때까지 고른 사진으로 멈춘다."""
 import argparse
 import os
 import sys
@@ -82,25 +87,42 @@ def make_pixel_values(x, delta, mean, std, n_tiles):
     return pv
 
 
+def gen_kwargs(eos_ids, **overrides):
+    """답 생성 조건: settings.GEN_KWARGS와 종료 토큰(판정에 쓰는 runtime.answer와 같다). overrides는 목표 문장 생성에만 쓴다."""
+    return {**settings.GEN_KWARGS, "eos_token_id": list(eos_ids), **overrides}
+
+
 @torch.no_grad()
 def natural_answer(model, processor, x, delta, prompt, device, eos_ids):
-    """(답 토큰 수, 종료 토큰 없이 512에 닿았는가). 뒤의 것이 README 결과 표의 hit_cap이다."""
+    """(답 토큰 수, 종료 토큰 없이 상한에 닿았는가). 뒤의 것이 README 결과 표의 hit_cap이다."""
     enc = processor(text=prompt, images=[_pil_from(x, delta)], return_tensors="pt").to(device)
-    gen = model.generate(**enc, do_sample=False, max_new_tokens=512)
+    gen = model.generate(**enc, **gen_kwargs(eos_ids))
     new = gen[0, enc["input_ids"].shape[1]:].tolist()
-    return len(new), len(new) == 512 and not any(t in eos_ids for t in new)
+    ended = bool(new) and new[-1] in eos_ids
+    return len(new), len(new) == settings.MAX_NEW_TOKENS and not ended
 
 
-def losses(model, base, pixel_values, answer_start, eos_ids, use_div):
+def with_target(base, target):
+    """질문 입력 뒤에 목표 문장의 토큰 id를 그대로 붙인다."""
+    assert set(base.keys()) <= {"input_ids", "attention_mask", "pixel_values", "pixel_attention_mask"}, base.keys()
+    out = dict(base)
+    suffix = target.view(1, -1)
+    out["input_ids"] = torch.cat([base["input_ids"], suffix], dim=1)
+    out["attention_mask"] = torch.cat([base["attention_mask"], torch.ones_like(suffix)], dim=1)
+    return out
+
+
+def losses(model, inputs, pixel_values, answer_start, eos_ids, use_div):
     out = model(
-        input_ids=base["input_ids"],
-        attention_mask=base["attention_mask"],
+        input_ids=inputs["input_ids"],
+        attention_mask=inputs["attention_mask"],
         pixel_values=pixel_values,
-        pixel_attention_mask=base.get("pixel_attention_mask"),
+        pixel_attention_mask=inputs.get("pixel_attention_mask"),
         output_hidden_states=use_div,
         use_cache=False,
     )
     logits = out.logits[0, answer_start - 1:-1, :].float()
+    assert logits.shape[0] == inputs["input_ids"].shape[1] - answer_start, "목표 문장과 로짓의 자리가 맞지 않는다"
     eos_logit = logits[:, eos_ids].max(dim=-1).values
     loss_eos = eos_logit.mean()
     logp = F.log_softmax(logits, dim=-1)
@@ -128,14 +150,21 @@ def attack_one(model, processor, path, args, device, mean, std, eos_ids, init_se
             delta.copy_(torch.clamp(x + start.to(device), 0, 1) - x)
     bad_words = [[e] for e in eos_ids]
     name = os.path.basename(path)
+    # 질문 입력(토큰 id·마스크). 사진 크기가 같으면 내용과 상관없이 같으므로 한 번만 만든다
+    base = processor(text=prompt, images=[_pil_from(x, delta.detach())], return_tensors="pt").to(device)
+    prompt_len = base["input_ids"].shape[1]
+    n_tiles = base["pixel_values"].shape[1]
 
     def long_target():
+        """종료 토큰을 금지하고 target_len토큰을 생성한 긴 목표 문장의 토큰 id."""
         with torch.no_grad():
             enc = processor(text=prompt, images=[_pil_from(x, delta)], return_tensors="pt").to(device)
-            gen = model.generate(**enc, do_sample=False, bad_words_ids=bad_words,
-                                  min_new_tokens=args.target_len, max_new_tokens=args.target_len)
+            gen = model.generate(**enc, **gen_kwargs(eos_ids, bad_words_ids=bad_words,
+                                                     min_new_tokens=args.target_len, max_new_tokens=args.target_len))
             new = gen[0, enc["input_ids"].shape[1]:]
-            return processor.tokenizer.decode(new, skip_special_tokens=True).strip() or "This"
+        assert new.numel() == args.target_len and not any(int(t) in eos_ids for t in new), \
+            "목표 문장이 target_len토큰이 아니다"
+        return new
 
     def tag(cap):
         return " (종료 없이 512)" if cap else ""
@@ -148,26 +177,20 @@ def attack_one(model, processor, path, args, device, mean, std, eos_ids, init_se
     best, best_delta, best_it = (start_cap, start_len), delta.detach().clone(), None
     hits = 0
     iters_run, stopped_early, got_nan = 0, False, False
-    n_iter = args.iter
-    if start_len >= 512:   # 이미 512면 어느 걸음도 원본보다 높지 않으므로 공격하지 않는다(B팀 코드와 같음)
-        print(f"[{name}] 시작부터 512 → 공격하지 않고 원본 그대로 저장")
-        n_iter = 0
+    n_iter = args.iter   # 시작 답이 이미 512여도 공격한다(저장할 사진은 아래 규칙 하나로 고른다)
+    target = None
     for it in range(n_iter):
         if it % args.refresh == 0:
             target = long_target()
-        base = processor(text=prompt + target, images=[_pil_from(x, delta.detach())],
-                         return_tensors="pt").to(device)
-        prompt_len = processor(text=prompt, images=[_pil_from(x, delta.detach())],
-                               return_tensors="pt")["input_ids"].shape[1]
-        n_tiles = base["pixel_values"].shape[1]
+        inputs = with_target(base, target)
         pv = make_pixel_values(x, delta, mean, std, n_tiles).to(model.dtype)   # 모델과 같은 bf16으로 넣는다
-        l_eos, l_unc, l_div = losses(model, base, pv, prompt_len, eos_ids, args.w_div > 0)
+        l_eos, l_unc, l_div = losses(model, inputs, pv, prompt_len, eos_ids, args.w_div > 0)
         loss = l_eos + args.w_unc * l_unc + args.w_div * l_div
         model.zero_grad(set_to_none=True)
         delta.grad = None
         loss.backward()
-        if torch.isnan(loss) or torch.isnan(delta.grad).any():
-            print(f"[{name}] it {it}: nan 발생 → 그때까지 고른 사진을 저장하고 중단")
+        if not torch.isfinite(loss) or delta.grad is None or not torch.isfinite(delta.grad).all():
+            print(f"[{name}] it {it}: 숫자가 깨짐(nan·inf) → 그때까지 고른 사진을 저장하고 중단")
             got_nan = True
             break
         with torch.no_grad():
@@ -186,7 +209,7 @@ def attack_one(model, processor, path, args, device, mean, std, eos_ids, init_se
                 print(f"[{name}] 512 도달 → 조기 종료")
                 break
 
-    print(f"[{name}] 고른 사진: " + ("원본 그대로" if best_it is None else f"it {best_it:4d}")
+    print(f"[{name}] 고른 사진: " + ("시작 그대로" if best_it is None else f"it {best_it:4d}")
           + f" | 답 길이 {best[1]} 토큰{tag(best[0])}")
     out_path = os.path.join(args.out, os.path.splitext(name)[0] + ".png")   # 무손실 PNG로 저장
     _save_png(torch.clamp(x + best_delta, 0, 1), out_path)

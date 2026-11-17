@@ -7,7 +7,7 @@
 | 파일 | 단계 | 하는 일 |
 |---|---|---|
 | `runtime.py` | 공통 | 모델·프로세서 불러오기, 사진 전처리(448×448 → 조각 배열), 답 생성(README 5.2절), 결정적 실행 설정(5.1절), 실행 환경 기록 |
-| `prepare_images.py` | 2 | COCO JPEG를 받아 정상·노이즈 PNG(448×448)를 만들고 `B팀/results/input-manifest.json`에 해시를 남긴다 |
+| `prepare_images.py` | 2 | COCO JPEG를 받아 정상·노이즈 PNG(448×448)를 만들고 `B팀/results/input-manifest.json`에 해시를 남긴다. split을 나눠 돌리면 한 파일에 합친다 |
 | `attack_qwen.py` | 3 | 공격 사진 한 장을 만든다(`attack_one`) |
 | `make_attack_set.py` | 3 | cand를 `order` 순서대로 처리하며 시도마다 판정하고 `B팀/adv/attempts.csv`, `attempts.json`에 남긴다 |
 
@@ -23,6 +23,8 @@ python B팀/code/make_attack_set.py                        # cand 300장 전부 
 
 모델은 Hugging Face에서 `settings.MODELS["qwen2vl"]`의 `model_id`, `revision`으로 받는다. 끊겨도 같은 명령으로 이어서 하고, 끝난 후보는 건너뛴다.
 
+위 명령 중 뒤의 두 줄(dev·cand·acc 전부, cand 300장)은 README 3장의 단계 순서를 지켜 돌린다(6장 3번).
+
 ## 3. A팀과 통일한 것
 
 | 항목 | 두 팀 공통 |
@@ -36,7 +38,9 @@ python B팀/code/make_attack_set.py                        # cand 300장 전부 
 | 무작위 시작의 씨앗 | `int(sha256(f"{ATTACK_SEED}:{coco_id 12자리}:{시도 번호}").hexdigest()[:15], 16)`, CPU 난수 |
 | 판정 | 저장한 PNG를 다시 읽어 픽셀 차이 ≤ 8이고, `runtime.answer`로 ref에 넣은 답이 종료 없이 512면 `success` |
 | 후보 처리 | cand 300장을 `order` 순서대로 끝까지 처리. 원본 답이 512면 `excluded` |
-| 기록 | `attempts.csv`의 열과 순서, `attempts.json`(설정·코드 해시·실행 환경·`pixel_gap_max`) |
+| 입력 확인 | 공격 전에 정상 PNG의 SHA-256을 2단계 `input-manifest.json`과 대조한다. 없거나 다르면 멈춘다 |
+| 기록 | `attempts.csv`의 열과 순서. `attempts.json`에는 README 7장 '결과 JSON' 항목(실행 환경, ref의 census와 가중치 변화 0, 입력 해시, CSV 줄 수·해시, 이어서 돌린 기록)과 제작 설정, `pixel_gap_max` |
+| 이어 하기 | 같은 명령으로 이어서 한다. 제작·판정 settings 값, 코드, 실행 환경이 기록과 다르면 멈춘다. cand를 늘린 것은 이어서 한다 |
 
 ## 4. 모델 때문에 A팀과 다른 것
 
@@ -65,9 +69,11 @@ python B팀/code/make_attack_set.py                        # cand 300장 전부 
 
 1. **패키지 버전을 바꾸지 않는다.** transformers 5.19에서 확인했다. 프로세서에 주는 `min_pixels`, `max_pixels`는 transformers 5.23부터 없어진다는 경고가 나온다. 버전을 바꾸면 전처리가 달라질 수 있고, README 5.1절에 따라 바뀐 뒤의 단계를 다시 해야 한다.
 2. **결정적 실행 설정을 끄지 않는다.** 이 설정 때문에 느려지지만, 끄면 같은 조건에서 같은 사진이 나온다는 전제가 깨진다.
-3. **판정과 4단계는 같은 `runtime.py`를 쓴다.** 4~7단계 코드를 만들 때도 `load_ref()`·`answer()`를 그대로 써야 README 3단계의 '4단계와 같은 코드·환경의 ref'가 지켜진다. 지금 `runtime.py`에는 ref만 있고 rtn·rand·bnb 경우는 아직 없다.
-4. **기록 폴더 하나 = 설정 하나.** `settings.py`나 코드가 기록을 만들 때와 달라지면 `make_attack_set.py`가 멈춘다. 그때는 새 폴더(`--out`)를 쓴다.
-5. **올리지 않는 것.** `B팀/data/`(COCO JPEG, 정상·노이즈 PNG, 시도마다 만든 공격 PNG). 세트가 정해지면 세트에 든 공격 PNG만 `B팀/adv/`에 올린다(README 3단계).
-6. **세트가 main에 병합되기 전에는 압축 모델에 공격 사진을 넣지 않는다**(README 3단계).
-7. `W_DIV`(다양성 손실)는 구현하지 않았다. 0이 아니면 멈춘다.
-8. 이 코드는 다른 기계에서 옮겨 고친 것이므로, B팀 기계에서 처음 돌릴 때 dev로 먼저 확인한다.
+3. **단계 순서를 지킨다(README 3장).** 2단계(`prepare_images.py`로 dev·cand·acc 전부)는 1-2단계 ref 점검(`B팀/results/check_ref.json`)이 main에 병합된 뒤에, 3단계(`make_attack_set.py`로 cand)는 1-1·2단계 뒤에 한다. 압축 모델(rtn·rand·bnb)을 쓰는 4~7단계는 1-3단계 경우 점검(`B팀/results/check_cases.json`) 뒤에 한다.
+4. **판정과 4~7단계는 같은 `runtime.py`를 쓴다.** 4~7단계 코드도 `load_ref()`·`answer()`를 그대로 써야 README 3단계의 '4단계와 같은 코드·환경의 ref'가 지켜진다.
+5. **기록 폴더 하나 = 설정 하나.** `make_attack_set.py`는 제작·판정에 쓰는 settings 값이나 코드, 실행 환경(GPU·CUDA·패키지 버전·결정적 실행 설정)이 기록과 다르면 멈춘다. 그때는 새 폴더(`--out`)에서 처음부터 한다. cand를 늘려 `N_CAND`·`image_list.csv`가 바뀐 것은 같은 기록에 이어서 한다.
+6. **manifest는 한 파일이다.** `prepare_images.py --splits`로 나눠 돌리면 이미 있는 `input-manifest.json`에 split별로 합친다. 설정·패키지 버전이 다르거나 이미 적힌 사진의 해시가 달라졌으면 쓰지 않고 멈춘다.
+7. **올리지 않는 것.** `B팀/data/`(COCO JPEG, 정상·노이즈 PNG, 시도마다 만든 공격 PNG). 세트가 정해지면 세트에 든 공격 PNG만 `B팀/adv/`에 올린다(README 3단계).
+8. **세트가 main에 병합되기 전에는 압축 모델에 공격 사진을 넣지 않는다**(README 3단계).
+9. `W_DIV`(다양성 손실)는 구현하지 않았다. 0이 아니면 멈춘다.
+10. 이 코드는 다른 기계에서 옮겨 고친 것이므로, B팀 기계에서 처음 돌릴 때 dev로 먼저 확인한다. README 5.1절에 따라 Qwen2-VL의 2~7단계는 모두 그 기계 한 대에서 한다.

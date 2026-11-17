@@ -50,7 +50,10 @@ def setup():
 
 
 def determinism():
+    """5.1의 결정적 실행 설정(README 7장 결과 JSON). warn_only가 False면 결정적으로 돌지 않는 연산은 오류로 멈추므로,
+    기록이 끝까지 만들어졌다면 '돌지 않은 설정'은 없다."""
     return {"seed": settings.SEED, "use_deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+            "warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
             "CUBLAS_WORKSPACE_CONFIG": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
             "cudnn_benchmark": torch.backends.cudnn.benchmark}
 
@@ -83,18 +86,25 @@ def load_processor():
     return AutoProcessor.from_pretrained(M["model_id"], revision=M["revision"], **M["processor_kwargs"])
 
 
+def census_record(model, targets=""):
+    """README 5.4의 경우 확인과, 결과 JSON에 남길 census(부품별 [바뀐 Linear 수, 전체 Linear 수]). ref는 targets=""."""
+    count = quant_rtn.census(model, PARTS)
+    quant_rtn.check_census(count, targets, settings.PART_NAMES)
+    assert {p: c[1] for p, c in count.items()} == M["linear_count"], count
+    return {p: list(c) for p, c in count.items()}
+
+
 def load_ref(attack=False):
-    """ref: bf16 원본(5.4). census로 아무 층도 바뀌지 않았는지와 Linear 수를 확인한다.
+    """ref: bf16 원본(5.4). census로 아무 층도 바뀌지 않았는지와 Linear 수를 확인하고,
+    모델 generation_config의 종료 토큰이 settings와 같은지 확인한다(README 1-2단계 점검 2).
     attack=True면 가중치의 기울기를 끈다(공격은 사진 노이즈의 기울기만 쓴다)."""
     model = AutoModelForImageTextToText.from_pretrained(
         M["model_id"], revision=M["revision"], dtype=DTYPE,
         attn_implementation=settings.ATTN_IMPLEMENTATION).to("cuda").eval()
-    count = quant_rtn.census(model, PARTS)
-    quant_rtn.check_census(count, "", settings.PART_NAMES)
-    assert {p: c[1] for p, c in count.items()} == M["linear_count"], count
+    census_record(model)
     ids = model.generation_config.eos_token_id
-    ids = [ids] if isinstance(ids, int) else list(ids)
-    assert sorted(ids) == sorted(EOS), f"종료 토큰이 settings와 다르다: {ids}"
+    ids = [ids] if isinstance(ids, int) else list(ids or [])
+    assert sorted(ids) == sorted(EOS), f"모델의 종료 토큰 {ids}가 settings {EOS}와 다르다(README 1-2단계 점검 2)"
     if attack:
         model.requires_grad_(False)
     return model

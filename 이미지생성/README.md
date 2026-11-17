@@ -47,7 +47,13 @@ init_seed = int(sha256(f"{ATTACK_SEED}:{coco_id 12자리}:{시도 번호}").hexd
 
 `attempts.csv`에는 README 7장의 열 뒤에 `init`, `init_seed`, `iters_run`(실제로 한 업데이트 수), `stopped_early`, `attack_seconds`를 더한다.
 
+`attempts.json`에는 README 7장 '결과 JSON'의 항목을 적는다: settings 버전과 코드 커밋, 실행 환경, ref의 census와 가중치 변화(0), 입력 정상 PNG의 SHA-256, `attempts.csv`의 줄 수와 SHA-256, 이어서 돌린 기록(돌릴 때마다 시작한 줄과 더한 줄 수). 여기에 제작 설정(이어서 돌릴 때 같아야 하는 값)과 `pixel_gap_max`를 더한다.
+
+끊긴 기록을 이어서 돌릴 때, 제작 설정·코드나 실행 환경(GPU, CUDA, 패키지 버전, 결정적 실행 설정)이 기록과 다르면 멈춘다(README 5.1). 그때는 새 폴더에서 처음부터 한다.
+
 ## 4. 판정
+
+공격하기 전에, 처리할 후보의 정상 PNG가 2단계 `input-manifest.json`에 적힌 SHA-256과 같은지 확인한다. 없거나 다르면 멈춘다.
 
 시도마다 저장한 PNG를 다시 읽어 판정한다(README 3단계). 정상 PNG와의 픽셀 차이 최댓값이 `EPS` 이하이고, `<팀>/code/runtime.py`의 `load_ref()`·`answer()`(4단계와 같은 코드)로 ref에 넣은 답이 종료 토큰 없이 512에 닿으면 `success`다. 공격과 판정은 같은 모델 한 벌로 한다. 제작 코드가 출력하는 답 길이는 판정에 쓰지 않는다.
 

@@ -1,5 +1,6 @@
 """두 팀이 똑같이 쓰는 값. 바꿔야 하면 두 팀이 합의하고 SETTINGS_VERSION을 올린다.
 공격 사진이나 결과를 하나라도 만든 뒤에 값을 바꾸면, 버전을 올리고 그 값의 영향을 받는 단계를 다시 한다.
+단, cand를 늘릴 때(README 3단계 4번)는 N_CAND와 image_list.csv만 바꾸고 버전은 올리지 않는다. 이미 만든 사진과 기록은 그대로 이어서 쓴다.
 
 쓰는 법:  import sys; sys.path.insert(0, "<저장소>/공통");  import settings, quant_rtn
 """
@@ -19,14 +20,15 @@ SEED = 2026                      # torch.manual_seed
 # 공격 사진 (attack_smolvlm.py 인자와 같은 이름). 만드는 방법은 이미지생성/README.md
 EPS = 8                    # 노이즈 상한, 0~255 눈금
 STEP = 1
-ATTACK_ITERS = 300         # --iter
+ATTACK_ITERS = 500         # --iter. 시도 한 번의 최대 반복
 ATTACK_MAX_ITERS = 500     # 이보다 많이 돌리지 않는다
 TARGET_LEN = 128           # --target_len
 REFRESH = 20               # --refresh
 W_UNC = 0.05               # --w_unc
 W_DIV = 0.0                # --w_div
-ATTACK_MAX_TRIES = None    # 사진 한 장당 최대 시도 횟수. README 1-1단계에서 두 팀이 정해 정수로 적는다. None이면 공격 사진을 만들지 않는다
-N_ATTACK_SET = 30          # 두 팀이 함께 쓰는 공격 사진 세트의 사진 수
+ATTACK_MAX_TRIES = 2       # 사진 한 장당 최대 시도 횟수. 1번째는 노이즈 0에서, 2번째는 무작위로 시작(이미지생성/README.md)
+ATTACK_SEED = 2026         # 무작위 시작의 씨앗. 사진 번호·시도 번호와 섞어 쓴다
+N_ATTACK_SET = 150         # 두 팀이 함께 쓰는 공격 사진 세트의 사진 수. 두 팀 공통 성공 후보를 order 순서로 앞에서부터
 
 # 노이즈 대조군 사진: 부호는 numpy.random.default_rng([NOISE_SEED, coco_id]).choice([-1, 1], size=arr.shape)
 NOISE_SEED = 2026
@@ -45,7 +47,7 @@ CASES_ALL = CASES_VISION + CASES_LANGUAGE[1:]                        # 6·7단�
 
 # 사진 (image_list.csv의 split)
 N_DEV = 5                  # dev: 코드 점검용. 공격 사진 설정을 조정할 때도 이것만 쓴다
-N_CAND = 150               # cand: 공격 사진 세트 후보. order 순서대로 처리한다
+N_CAND = 300               # cand: 공격 사진 세트 후보. 두 팀이 각자 전부 order 순서대로 처리한다
 N_ACC = 300                # acc: 정확도 세트(공격 사진 없음)
 
 # 모델마다 다른 값. revision·eos_token_ids·linear_count는 확인값이다 — 실제와 다르면 멈춘다

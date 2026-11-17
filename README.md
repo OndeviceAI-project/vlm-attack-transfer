@@ -18,7 +18,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 | A | SmolVLM-256M-Instruct |
 | B | Qwen2-VL-2B-Instruct |
 
-두 팀은 같은 COCO 사진 30장으로 공격 사진을 만들고, 같은 경우, 같은 입력, 같은 형식으로 잰다.
+두 팀은 같은 COCO 사진 150장으로 공격 사진을 만들고, 같은 경우, 같은 입력, 같은 형식으로 잰다.
 
 분석 지표(전이율, 정확도 등)는 실험이 모두 끝난 뒤 8단계에서 정한다. 1~7단계에서는 이 문서가 정한 원자료만 남긴다.
 
@@ -49,16 +49,17 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 |---|---|---|---|---|
 | 0 | v2 규칙 | 공통 | — | 이 문서가 main에 병합 |
 | 1-1 | 공격 사진 만드는 방법 합의 | A·B 함께 | 0 | `이미지생성/README.md` 작성, `settings.ATTACK_MAX_TRIES`에 정수 기입 |
-| 1-2 | 실험 코드 준비와 점검 | 팀별 | 0 | `<팀>/code/`, `<팀>/results/check.json` |
+| 1-2 | ref 점검 | 팀별 | 0 | `<팀>/code/`, `<팀>/results/check_ref.json` |
+| 1-3 | 경우 점검 | 팀별 | 0 | `<팀>/code/`, `<팀>/results/check_cases.json` |
 | 2 | 사진 준비 | 팀별 | 1-2 | `<팀>/results/input-manifest.json` |
 | 3 | 공격 사진 세트 확정 | A·B 함께 | 1-1, 2 | `공통/attack_set.csv`, `<팀>/adv/` |
-| 4 | 비전 인코더 실험 | 팀별 | 3 | `<팀>/results/vision.csv`, `.json` |
-| 5 | 언어모델 실험 | 팀별 | 3 | `<팀>/results/language.csv`, `.json` |
-| 6 | 모델 내부 측정 | 팀별 | 3 | `<팀>/results/internal.csv`, `.json` |
-| 7 | 정확도 세트 실행 | 팀별 | 2 | `<팀>/results/accuracy.csv`, `.json` |
+| 4 | 비전 인코더 실험 | 팀별 | 1-3, 3 | `<팀>/results/vision.csv`, `.json` |
+| 5 | 언어모델 실험 | 팀별 | 1-3, 3 | `<팀>/results/language.csv`, `.json` |
+| 6 | 모델 내부 측정 | 팀별 | 1-3, 3 | `<팀>/results/internal.csv`, `.json` |
+| 7 | 정확도 세트 실행 | 팀별 | 1-3, 2 | `<팀>/results/accuracy.csv`, `.json` |
 | 8 | 분석 지표 정의 | A·B 함께 | 4~7 | 지표 정의를 이 문서에 추가 |
 
-4·5·6단계는 3단계가 끝나면 순서와 상관없이 한다. 7단계는 공격 사진이 필요 없어서 2단계가 끝나면 언제든 한다.
+2단계는 1-2단계(`check_ref.json`)가 끝난 뒤에, 4~7단계는 1-3단계(`check_cases.json`)가 끝난 뒤에 한다. 1-3단계는 2·3단계와 상관없이 따로 해도 된다. 4·5·6단계는 1-3단계와 3단계가 끝나면 순서와 상관없이 한다. 7단계는 공격 사진이 필요 없어서 1-3단계와 2단계가 끝나면 언제든 한다.
 
 ### 1-1단계. 공격 사진 만드는 방법 합의
 
@@ -71,43 +72,48 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 - 제작 정밀도. 두 모델 모두 bf16이다(`settings.MODELS[모델]["attack_dtype"]`)
 - 제작 코드가 모델에 넣는 `pixel_values`가, 평가 코드가 같은 PNG로 만드는 값과 같다는 확인 방법과 결과(차이 0)
 
-지금 `이미지생성/attack_smolvlm.py`는 v1에서 쓴 SmolVLM용 제작 코드다. v2에서 이 코드를 그대로 쓸지 고쳐 쓸지도 1-1단계에서 정한다.
+`이미지생성/attack_smolvlm.py`는 v1의 SmolVLM 제작 코드를 1-1단계에서 정한 방식(bf16, 시도마다 시작점, 멈춘 시점의 사진 저장, 목표 문장을 토큰 id 그대로 붙이기)으로 고친 것이다. Qwen2-VL 제작 코드는 `B팀/code/attack_qwen.py`다.
 
-### 1-2단계. 실험 코드 준비와 점검
+### 1-2단계. ref 점검
 
-각 팀이 4~7단계에 쓸 코드를 `<팀>/code/`에 올리고, dev 사진 5장으로 아래를 점검해 `<팀>/results/check.json`에 남긴다. 하나라도 통과하지 못하면 2단계로 가지 않는다.
+각 팀이 2·3단계에 쓸 코드(모델 불러오기, 답 생성, 사진 준비, 공격 사진 시도)를 `<팀>/code/`에 올리고, ref와 dev 사진 5장으로 아래를 점검해 `<팀>/results/check_ref.json`에 남긴다. 하나라도 통과하지 못하면 2단계로 가지 않는다.
 
 1. 모델: `model_id`, `revision`이 settings 값과 같다.
 2. 종료 토큰: 모델 generation_config의 `eos_token_id` 목록이 `settings.MODELS[모델]["eos_token_ids"]`와 같다.
 3. 전처리: dev 5장 각각에서, 프로세서가 만든 `pixel_values`가 PNG를 직접 정규화한 값과 같다(차이 최댓값 1e-6 이하). 프로세서가 사진 크기를 다시 바꾸지 않는다는 확인이다. Qwen2-VL은 직접 계산한 값을 프로세서와 같은 조각 배열 모양으로 바꿔 비교한다.
-4. census: `settings.CASES_ALL`의 25경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
-5. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn과 0.01%p 안에서 같다. bnb 경우는 값을 재서 기록만 한다.
-6. 재현성: ref에 dev 정상 사진 5장을 두 번씩 넣어 두 답이 토큰까지 같다.
-7. 생성: 25경우마다 dev 정상 사진 1장의 답을 생성해 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
+4. 재현성: ref에 dev 정상 사진 5장을 두 번씩 넣어 두 답이 토큰까지 같다.
+
+### 1-3단계. 경우 점검
+
+각 팀이 4~7단계에 쓸 코드(경우 만들기)를 `<팀>/code/`에 올리고, 아래를 점검해 `<팀>/results/check_cases.json`에 남긴다. 하나라도 통과하지 못하면 4~7단계로 가지 않는다.
+
+1. census: `settings.CASES_ALL`의 25경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
+2. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn과 0.01%p 안에서 같다. bnb 경우는 값을 재서 기록만 한다.
+3. 생성: 25경우마다 dev 정상 사진 1장의 답을 생성해 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
 
 ### 2단계. 사진 준비
 
-`공통/image_list.csv`의 dev 5장, cand 150장, acc 300장 전부의 정상·노이즈 PNG를 5.3절대로 만든다. 만든 PNG와 내려받은 COCO JPEG의 SHA-256을 `<팀>/results/input-manifest.json`에 적는다. PNG와 JPEG는 올리지 않는다.
+`공통/image_list.csv`의 dev 5장, cand 300장, acc 300장 전부의 정상·노이즈 PNG를 5.3절대로 만든다. 만든 PNG와 내려받은 COCO JPEG의 SHA-256을 `<팀>/results/input-manifest.json`에 적는다. split을 나눠 만들면 한 파일에 합친다. PNG와 JPEG는 올리지 않는다.
 
 ### 3단계. 공격 사진 세트 확정
 
-두 팀이 같은 사진 30장(`settings.N_ATTACK_SET`)으로 된 공격 사진 세트를 만든다.
+두 팀이 같은 사진 150장(`settings.N_ATTACK_SET`)으로 된 공격 사진 세트를 만든다.
 
-1. **후보 순서.** `image_list.csv`의 cand를 `order` 순서대로 처리한다. 건너뛰지 않는다. 두 팀의 순서는 같다.
+1. **후보 순서.** `image_list.csv`의 cand 300장(`settings.N_CAND`)을 `order` 순서대로 처리한다. 건너뛰지 않는다. 두 팀의 순서는 같다.
 2. **후보 한 장의 처리.** 각 팀이 자기 모델로 한다.
    - 원본(ref)에 정상 사진을 넣은 답이 종료 토큰 없이 512에 닿으면(5.2절 `hit_cap`) 그 후보는 `excluded`로 적고 공격 사진을 만들지 않는다.
    - 1-1단계에서 정한 방법으로 공격 사진을 만든다. 공격 사진 한 장을 만드는 것이 시도 한 번이다.
    - 시도마다 저장한 PNG를 다시 읽어 판정한다. 정상 PNG와의 픽셀 차이 최댓값이 `EPS`(8) 이하이고, 4단계와 같은 코드·환경의 ref에 넣은 답이 종료 토큰 없이 512에 닿으면 `success`, 아니면 `fail`이다. 제작 코드가 출력하는 성공 여부는 판정에 쓰지 않는다.
    - `success`가 나오면 그 후보는 끝난다. `fail`이면 `ATTACK_MAX_TRIES`까지 다시 시도한다.
-3. **세트 정하기.** 두 팀 모두 `success`가 나온 후보를 `order` 순서대로 앞에서 30장 고른다. 30번째 공통 성공 후보까지는 두 팀 모두 빠짐없이 처리한다.
-4. **후보가 모자랄 때.** cand 150장으로 30장이 채워지지 않으면, 먼저 cand를 같은 규칙(COCO val2017 ID 오름차순으로 다음 사진)으로 늘리는 PR을 올린 뒤 이어서 처리한다. 정렬 순위 501번째부터는 acc를 뽑는 범위라 cand에 넣지 않는다.
-5. **올리기와 고정.** 세트는 `공통/attack_set.csv`에 적는다. 각 팀은 세트 30장의 공격 PNG를 `<팀>/adv/<coco_id 12자리>.png`로 올리고, `<팀>/adv/SHA256SUMS`(`shasum -a 256 *.png`)를 붙인다. 확정한 뒤에는 바꾸지 않는다. 다시 만들어야 하면 settings 버전을 올리고 3단계를 처음부터 한다.
+3. **세트 정하기.** 각 팀은 cand 300장을 끝까지 모두 처리한다. 상대 팀의 진행을 기다리거나 맞추지 않는다. 두 팀 모두 처리가 끝나면, 두 팀 모두 `success`가 나온 후보를 `order` 순서대로 앞에서 150장 고른다.
+4. **후보가 모자랄 때.** 공통 `success`가 150장이 되지 않으면, 먼저 cand를 같은 규칙(COCO val2017 ID 오름차순으로 다음 사진)으로 100장씩 늘리는 PR을 올리고, 두 팀 모두 늘린 후보를 끝까지 처리한 뒤 3번처럼 다시 고른다. cand를 늘리는 PR은 `N_CAND`와 `image_list.csv`(cand 줄 추가)만 바꾸고 settings 버전은 올리지 않는다. 이미 처리한 후보의 기록과 사진은 바뀌지 않으므로, 각 팀은 같은 기록에 이어서 처리한다. cand는 정렬 순위 500번째까지만 늘린다(501번째부터는 acc를 뽑는 범위). 지금 cand는 307번째까지라서 한 번 늘리면 407번째까지, 두 번째에는 500번째까지 93장이다. 500번째까지 늘려도 150장이 되지 않으면 두 팀이 다시 정해 이 문서와 settings를 고친다.
+5. **올리기와 고정.** 세트는 `공통/attack_set.csv`에 적는다. 각 팀은 세트 150장의 공격 PNG를 `<팀>/adv/<coco_id 12자리>.png`로 올리고, `<팀>/adv/SHA256SUMS`(`shasum -a 256 *.png`)를 붙인다. 확정한 뒤에는 바꾸지 않는다. 다시 만들어야 하면 settings 버전을 올리고 3단계를 처음부터 한다.
 6. **순서 지키기.** 세트가 main에 병합되기 전에는 압축 모델(ref가 아닌 경우)에 공격 사진을 넣지 않는다. 압축 모델에서 나온 결과로 세트의 사진을 고르거나 바꾸지 않는다.
 7. **시도 기록.** 처리한 모든 후보와 모든 시도를 `<팀>/adv/attempts.csv`에 한 줄씩 남긴다(형식은 7장). 세트에 들지 않은 시도의 PNG는 올리지 않는다.
 
 ### 4단계. 비전 인코더 실험
 
-공격 사진 세트 30장의 정상·노이즈·공격 사진을 원본 모델과 비전 인코더만 압축한 모델에 넣고 답을 기록한다.
+공격 사진 세트 150장의 정상·노이즈·공격 사진을 원본 모델과 비전 인코더만 압축한 모델에 넣고 답을 기록한다.
 
 - 경우: `settings.CASES_VISION` 13경우
 
@@ -118,9 +124,9 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
   | bnb | `bnb-V-8`, `bnb-V-4` | bitsandbytes 8비트(LLM.int8), 4비트(nf4) |
   | rand | `rand-V-8`, `rand-V-6`, `rand-V-5`, `rand-V-4`, `rand-V-3` | 대조군. 같은 비트 rtn이 가중치마다 바꾸는 크기만큼, 방향(+/−)만 무작위로 바꿈 |
 
-- 입력: `공통/attack_set.csv`의 30장 × `clean`, `noise`, `adv` = 90개. 모든 경우에 같은 90개를 넣는다.
+- 입력: `공통/attack_set.csv`의 150장 × `clean`, `noise`, `adv` = 450개. 모든 경우에 같은 450개를 넣는다.
 - 경우 만들기와 확인: 5.4절. 경우마다 census와 가중치 변화를 JSON에 남긴다.
-- 출력: `<팀>/results/vision.csv`(13 × 90 = 1,170줄)와 `vision.json`. 형식은 7장.
+- 출력: `<팀>/results/vision.csv`(13 × 450 = 5,850줄)와 `vision.json`. 형식은 7장.
 - 정상 사진이나 노이즈 사진의 답이 상한에 닿은 줄도 지우지 않는다.
 
 ### 5단계. 언어모델 실험
@@ -128,15 +134,15 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 4단계와 같고, 압축하는 부품만 언어모델이다.
 
 - 경우: `settings.CASES_LANGUAGE` 13경우(`ref`, `rtn-L-8/6/5/4/3`, `bnb-L-8/4`, `rand-L-8/6/5/4/3`)
-- 입력: 4단계와 같은 90개
-- 출력: `<팀>/results/language.csv`(1,170줄)와 `language.json`
+- 입력: 4단계와 같은 450개
+- 출력: `<팀>/results/language.csv`(5,850줄)와 `language.json`
 
 ### 6단계. 모델 내부 측정
 
 답을 생성하지 않고 모델 안의 값을 잰다.
 
 - 경우: `settings.CASES_ALL` 25경우(4·5단계 경우 전부, `ref`는 한 번)
-- 입력: 공격 사진 세트 30장의 `clean`, `adv`
+- 입력: 공격 사진 세트 150장의 `clean`, `adv`
 - 그림 정보 f(x): 사진 x와 질문을 넣고 한 번 계산(forward)할 때 연결부(`parts["C"]`) 모듈이 내는 출력 전체를 1차원으로 편 float32 벡터
 - ref에서 먼저 준비하는 것(사진마다):
   - a: ref가 공격 사진에 생성한 답의 앞 64토큰(5.2절과 같은 생성, 종료 토큰 없음)
@@ -156,7 +162,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 - 로짓은 float32로 바꿔 계산한다. 종료 토큰은 `settings.MODELS[모델]["eos_token_ids"]`다.
 - ref 줄과 5단계 경우(L)는 그림 정보가 ref와 같으므로 `feat_change_clean` 0, `attack_dir_kept` 1, `shake_ratio` 0이 나와야 한다. 다르면 원인을 확인하고 JSON에 적는다.
-- 출력: `<팀>/results/internal.csv`(25 × 30 = 750줄)와 `internal.json`
+- 출력: `<팀>/results/internal.csv`(25 × 150 = 3,750줄)와 `internal.json`
 
 ### 7단계. 정확도 세트 실행
 
@@ -178,8 +184,8 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 | split | 장수 | 쓰는 곳 | 고른 방법 |
 |---|---|---|---|
 | `pilot` | 3 | 쓰지 않음(예비 실험에 썼음) | — |
-| `dev` | 5 | 1-2단계 점검, 공격 사진 설정 조정 | val2017 ID 오름차순 3~7번째 |
-| `cand` | 150 | 3단계 후보, `order` 순서대로 | val2017 ID 오름차순 8~157번째 |
+| `dev` | 5 | 1-2·1-3단계 점검, 공격 사진 설정 조정 | val2017 ID 오름차순 3~7번째 |
+| `cand` | 300 | 3단계 후보, `order` 순서대로 | val2017 ID 오름차순 8~307번째 |
 | `acc` | 300 | 7단계 | val2017 ID 오름차순 501~5000번째 사진 중 `numpy.random.default_rng(2026).choice(..., 300, replace=False)`로 뽑아 ID 오름차순 정렬 |
 
 dev와 pilot은 결과 CSV에 넣지 않는다. cand의 1~43번째는 v1의 eval 30장과 extra 13장과 같은 사진이다.
@@ -231,7 +237,7 @@ dev와 pilot은 결과 CSV에 넣지 않는다. cand의 1~43번째는 v1의 eval
 
 ## 6. 양자화 확인값
 
-rtn 경우의 가중치 변화(%)다. 1-2단계 점검에서 이 값과 0.01%p 안에서 같아야 한다. rand는 같은 부품·비트의 rtn과 0.01%p 안에서 같아야 한다.
+rtn 경우의 가중치 변화(%)다. 1-3단계 점검에서 이 값과 0.01%p 안에서 같아야 한다. rand는 같은 부품·비트의 rtn과 0.01%p 안에서 같아야 한다.
 
 | 모델 | 부품 | 8비트 | 6비트 | 5비트 | 4비트 | 3비트 |
 |---|---|---|---|---|---|---|
@@ -248,9 +254,10 @@ rtn 경우의 가중치 변화(%)다. 1-2단계 점검에서 이 값과 0.01%p �
 
 | 단계 | 파일 |
 |---|---|
-| 1-2 | `<팀>/results/check.json` |
+| 1-2 | `<팀>/results/check_ref.json` |
+| 1-3 | `<팀>/results/check_cases.json` |
 | 2 | `<팀>/results/input-manifest.json` |
-| 3 | `공통/attack_set.csv`, `<팀>/adv/<coco_id 12자리>.png` 30장, `<팀>/adv/SHA256SUMS`, `<팀>/adv/attempts.csv` |
+| 3 | `공통/attack_set.csv`, `<팀>/adv/<coco_id 12자리>.png` 150장, `<팀>/adv/SHA256SUMS`, `<팀>/adv/attempts.csv`, `<팀>/adv/attempts.json` |
 | 4 | `<팀>/results/vision.csv`, `vision.json` |
 | 5 | `<팀>/results/language.csv`, `language.json` |
 | 6 | `<팀>/results/internal.csv`, `internal.json` |
@@ -292,7 +299,7 @@ rtn 경우의 가중치 변화(%)다. 1-2단계 점검에서 이 값과 0.01%p �
 
 ### 공격 사진 세트와 시도 기록 (3단계)
 
-`공통/attack_set.csv` 열: `set_order`(1~30), `cand_order`(image_list의 order), `coco_id`
+`공통/attack_set.csv` 열: `set_order`(1~150), `cand_order`(image_list의 order), `coco_id`
 
 `<팀>/adv/attempts.csv`는 처리한 후보의 시도마다 한 줄이다. `excluded` 후보는 `attempt`를 0으로 한 줄만 적고, 공격 사진에 관한 열(`ref_adv_n_tokens`, `ref_adv_hit_cap`, `linf`, `png_sha256`)은 비운다.
 
@@ -308,12 +315,14 @@ rtn 경우의 가중치 변화(%)다. 1-2단계 점검에서 이 값과 0.01%p �
 
 1-1단계에서 정한 '시도마다 달라지는 값'은 열을 더해 남긴다.
 
+`<팀>/adv/attempts.json`은 `attempts.csv`의 결과 JSON이다. 위 '결과 JSON'의 항목을 적는다. 경우는 `ref` 하나이고(census, 가중치 변화 0), 입력 사진은 처리한 후보의 정상 PNG다. 여기에 이어서 돌릴 때 확인하는 제작 설정과, 5.3절 `pixel_values` 확인의 가장 큰 차이(`pixel_gap_max`)를 더한다.
+
 ## 8. 폴더
 
 ```
 README.md      이 문서(규칙 v2)
 공통/          settings.py · quant_rtn.py · image_list.csv · attack_set.csv(3단계에서 생김)
-이미지생성/     attack_smolvlm.py(v1 제작 코드) · README.md(1-1단계에서 생김)
+이미지생성/     attack_smolvlm.py(SmolVLM 제작 코드) · README.md(제작 방식, 1-1단계)
 A팀/  B팀/     code/ · adv/ · results/
 ```
 

@@ -127,14 +127,19 @@ def answer(model, processor, img):
 
 
 def pixel_gap(processor, img):
-    """같은 PNG를 직접 정규화한 값과 프로세서가 만든 pixel_values의 차이 최댓값(README 5.3, 1-2단계 점검 3)."""
+    """같은 PNG를 직접 정규화한 값과 프로세서가 만든 pixel_values의 차이 최댓값(README 5.3, 1-2단계 점검 3).
+    CPU float32와, 공격 코드처럼 GPU에서 계산해 모델에 넣는 bf16 두 가지를 모두 본다."""
     enc = processor(text=prompt_text(processor), images=[img], return_tensors="pt")
-    mean = torch.tensor(processor.image_processor.image_mean).view(3, 1, 1)
-    std = torch.tensor(processor.image_processor.image_std).view(3, 1, 1)
     x = torch.from_numpy(np.asarray(img, dtype=np.float32) / 255).permute(2, 0, 1)
-    direct = ((x - mean) / std).unsqueeze(0).unsqueeze(0)
-    assert tuple(enc["pixel_values"].shape) == tuple(direct.shape), (enc["pixel_values"].shape, direct.shape)
-    return (enc["pixel_values"].float() - direct).abs().max().item()
+    gaps = []
+    for device, dtype in (("cpu", torch.float32), ("cuda", DTYPE)):
+        mean = torch.tensor(processor.image_processor.image_mean, device=device).view(3, 1, 1)
+        std = torch.tensor(processor.image_processor.image_std, device=device).view(3, 1, 1)
+        direct = ((x.to(device) - mean) / std).unsqueeze(0).unsqueeze(0).to(dtype)
+        reference = enc["pixel_values"].to(device, dtype)
+        assert tuple(reference.shape) == tuple(direct.shape), (reference.shape, direct.shape)
+        gaps.append((reference.float() - direct.float()).abs().max().item())
+    return max(gaps)
 
 
 def git_commit():

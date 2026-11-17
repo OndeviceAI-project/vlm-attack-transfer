@@ -42,7 +42,7 @@ import attack_smolvlm as atk  # noqa: E402
 COLUMNS = ["cand_order", "coco_id", "attempt", "status", "ref_clean_n_tokens", "ref_clean_hit_cap",
            "ref_adv_n_tokens", "ref_adv_hit_cap", "linf", "png_sha256",
            # 이미지생성/README.md가 정한 '시도마다 달라지는 값'과 과정 기록
-           "init", "init_seed", "iters_run", "stopped_early", "attack_seconds"]
+           "init", "init_seed", "iters_run", "stopped_early", "nan_stop", "attack_seconds"]
 
 
 def init_seed(coco_id, attempt):
@@ -214,7 +214,8 @@ def main():
                               "ref_adv_hit_cap": ref_adv["hit_cap"], "linf": linf, "png_sha256": rt.sha256(png),
                               "init": "zero" if seed is None else "random",
                               "init_seed": "" if seed is None else seed, "iters_run": res["iters_run"],
-                              "stopped_early": res["stopped_early"], "attack_seconds": round(seconds, 1)})
+                              "stopped_early": res["stopped_early"], "nan_stop": res["nan"],
+                              "attack_seconds": round(seconds, 1)})
                 print(f"[{k}/{len(todo)}] {cid} 시도 {attempt}: {status} (ref 답 {ref_adv['n_tokens']}토큰, "
                       f"최대 차이 {linf}, {res['iters_run']}회, {seconds:.0f}초)", flush=True)
                 if status == "success":

@@ -111,7 +111,8 @@ def prompt_text(processor):
 
 @torch.no_grad()
 def answer(model, processor, img):
-    """5.2: 사진 하나와 질문으로 답을 만든다. n_tokens·ended_eos·hit_cap·latency_s·text."""
+    """5.2: 사진 하나와 질문으로 답을 만든다. n_tokens·ended_eos·hit_cap·latency_s·text와,
+    새로 만든 토큰 id 목록 token_ids(1-2단계 재현성 점검용. 결과 CSV에는 적지 않는다)."""
     enc = processor(text=prompt_text(processor), images=[img], return_tensors="pt").to(model.device)
     torch.cuda.synchronize()
     t0 = time.perf_counter()
@@ -123,7 +124,7 @@ def answer(model, processor, img):
     return {"n_tokens": len(new), "ended_eos": ended,
             "hit_cap": len(new) == settings.MAX_NEW_TOKENS and not ended,
             "latency_s": round(latency, 3),
-            "text": processor.tokenizer.decode(new, skip_special_tokens=True)}
+            "text": processor.tokenizer.decode(new, skip_special_tokens=True), "token_ids": new}
 
 
 def pixel_gap(processor, img):

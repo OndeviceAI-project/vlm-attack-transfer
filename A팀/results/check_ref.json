@@ -1,0 +1,308 @@
+{
+ "environment": {
+  "settings_version": "v2",
+  "code_commit": "fe4c32e80ea703740f3648ddaf9acc6b5a8958a6",
+  "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+  "eos_token_ids": [
+   49279
+  ],
+  "dtype": "bfloat16",
+  "attn_implementation": "sdpa",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "cuda": "12.8",
+  "packages": {
+   "python": "3.12.3",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.19.0",
+   "bitsandbytes": "0.50.2",
+   "pillow": "11.2.1",
+   "numpy": "2.5.2"
+  },
+  "determinism": {
+   "seed": 2026,
+   "use_deterministic_algorithms": true,
+   "warn_only": false,
+   "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+   "cudnn_benchmark": false
+  }
+ },
+ "cases": {
+  "ref": {
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": 0.0
+  }
+ },
+ "inputs": {
+  "split": "dev",
+  "clean_sha256": {
+   "000000000632": "75821982c11125c7740158655a26b7158b357b683398c3e94e2b0448c5f52e9f",
+   "000000000724": "3b62cd197334bc9bb2dc17e64e13dde3da82f3a1c58ed306b163ec32bec56ce8",
+   "000000000776": "e6d519842801bc0e3fa720bb9fadcf15352624f5faed191e7a912b15a1752b28",
+   "000000000785": "dda3dc0e718eda085818e65970d0697bdbce69e79acdc3c0d89a23cdd8ae7e80",
+   "000000000802": "932af6fbdd0a8c55b0844a0e2bb7299bcb662e6f52d295bf80d2cac4d7ed4572"
+  },
+  "noise_sha256": {
+   "000000000632": "9b31e8da8d529d6e32c9218338f1934a24079e31162b76d8269663bf3079b594",
+   "000000000724": "da06b029f6991868728442762feb954e371c9a058abd6a5dba17fd42defdb2a3",
+   "000000000776": "4535e577527cde8e33be733eb5142132da2492d0b3ecf858c0fe344bfcb9deba",
+   "000000000785": "60393d3b894eff0817b2b8e1d3d5ab1f9f29acd9ef1149dc3fd63108705559b2",
+   "000000000802": "af20c3c6f7b74843b4039821235e96326a4191a57c44d2f1a40023744545a813"
+  }
+ },
+ "checks": {
+  "model": {
+   "pass": true,
+   "settings_model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+   "settings_revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+   "loaded_name_or_path": "HuggingFaceTB/SmolVLM-256M-Instruct",
+   "snapshot_commit": {
+    "config.json": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "generation_config.json": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "model.safetensors": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "preprocessor_config.json": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "processor_config.json": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "tokenizer.json": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "tokenizer_config.json": "7e3e67edbbed1bf9888184d9df282b700a323964",
+    "chat_template.json": "7e3e67edbbed1bf9888184d9df282b700a323964"
+   }
+  },
+  "eos": {
+   "pass": true,
+   "generation_config": [
+    49279
+   ],
+   "settings": [
+    49279
+   ]
+  },
+  "preprocess": {
+   "pass": true,
+   "gap_max_allowed": 1e-06,
+   "expected_shape": [
+    1,
+    1,
+    3,
+    512,
+    512
+   ],
+   "gap": {
+    "clean": {
+     "000000000632": 0.0,
+     "000000000724": 0.0,
+     "000000000776": 0.0,
+     "000000000785": 0.0,
+     "000000000802": 0.0
+    },
+    "noise": {
+     "000000000632": 0.0,
+     "000000000724": 0.0,
+     "000000000776": 0.0,
+     "000000000785": 0.0,
+     "000000000802": 0.0
+    }
+   },
+   "shape": {
+    "clean": {
+     "000000000632": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000724": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000776": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000785": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000802": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ]
+    },
+    "noise": {
+     "000000000632": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000724": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000776": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000785": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ],
+     "000000000802": [
+      1,
+      1,
+      3,
+      512,
+      512
+     ]
+    }
+   },
+   "dtypes": [
+    "float32",
+    "bfloat16"
+   ]
+  },
+  "reproducibility": {
+   "pass": true,
+   "same_tokens": {
+    "000000000632": true,
+    "000000000724": true,
+    "000000000776": true,
+    "000000000785": true,
+    "000000000802": true
+   },
+   "answers": {
+    "000000000632": [
+     {
+      "n_tokens": 25,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 2.492,
+      "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window.",
+      "token_ids_sha256": "c7ccaac81259beef5799baef0606094e606cddfc348d45c3b82e85ffbd39069b"
+     },
+     {
+      "n_tokens": 25,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.868,
+      "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window.",
+      "token_ids_sha256": "c7ccaac81259beef5799baef0606094e606cddfc348d45c3b82e85ffbd39069b"
+     }
+    ],
+    "000000000724": [
+     {
+      "n_tokens": 17,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.631,
+      "text": " In this image we can see a building, trees, plants and a pole.",
+      "token_ids_sha256": "c19fdb13231ae179cf01aa8584963c7c37f158934c5b2c9137a00ff077067a40"
+     },
+     {
+      "n_tokens": 17,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.625,
+      "text": " In this image we can see a building, trees, plants and a pole.",
+      "token_ids_sha256": "c19fdb13231ae179cf01aa8584963c7c37f158934c5b2c9137a00ff077067a40"
+     }
+    ],
+    "000000000776": [
+     {
+      "n_tokens": 12,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.375,
+      "text": " In this image we can see a few teddy bears.",
+      "token_ids_sha256": "470a9912fd3585c8ad2515f7187b450457a72141fdbb6f6f49881348bfec1236"
+     },
+     {
+      "n_tokens": 12,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.473,
+      "text": " In this image we can see a few teddy bears.",
+      "token_ids_sha256": "470a9912fd3585c8ad2515f7187b450457a72141fdbb6f6f49881348bfec1236"
+     }
+    ],
+    "000000000785": [
+     {
+      "n_tokens": 14,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.445,
+      "text": " In this image we can see a person standing on the snow.",
+      "token_ids_sha256": "adc4b68f92ad70fe836a703abb2e63f61eefd2fad9dd5854c7294a96564c8db0"
+     },
+     {
+      "n_tokens": 14,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.54,
+      "text": " In this image we can see a person standing on the snow.",
+      "token_ids_sha256": "adc4b68f92ad70fe836a703abb2e63f61eefd2fad9dd5854c7294a96564c8db0"
+     }
+    ],
+    "000000000802": [
+     {
+      "n_tokens": 10,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.304,
+      "text": " In this image we can see a kitchen.",
+      "token_ids_sha256": "22fdcd9a682ccc2f11e149ead89b87f19de1b2af9d6dca65223a174c8c3b45c6"
+     },
+     {
+      "n_tokens": 10,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.419,
+      "text": " In this image we can see a kitchen.",
+      "token_ids_sha256": "22fdcd9a682ccc2f11e149ead89b87f19de1b2af9d6dca65223a174c8c3b45c6"
+     }
+    ]
+   }
+  }
+ },
+ "passed": true,
+ "note": "README 1-2단계 점검 1~4. checks의 각 pass가 모두 true면 통과"
+}

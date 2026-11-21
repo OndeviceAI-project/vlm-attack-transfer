@@ -80,7 +80,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 1. 모델: `model_id`, `revision`이 settings 값과 같다.
 2. 종료 토큰: 모델 generation_config의 `eos_token_id` 목록이 `settings.MODELS[모델]["eos_token_ids"]`와 같다.
-3. 전처리: dev 5장 각각에서, 프로세서가 만든 `pixel_values`가 PNG를 직접 정규화한 값과 같다(차이 최댓값 1e-6 이하). 프로세서가 사진 크기를 다시 바꾸지 않는다는 확인이다. Qwen2-VL은 직접 계산한 값을 프로세서와 같은 조각 배열 모양으로 바꿔 비교한다.
+3. 전처리: dev 5장의 정상·노이즈 PNG 각각에서, 프로세서가 만든 `pixel_values`가 PNG를 직접 정규화한 값과 같다(차이 최댓값 1e-6 이하, float32와 모델에 넣는 bf16 모두). 프로세서가 사진 크기를 다시 바꾸지 않는다는 확인이다. Qwen2-VL은 직접 계산한 값을 프로세서와 같은 조각 배열 모양으로 바꿔 비교한다.
 4. 재현성: ref에 dev 정상 사진 5장을 두 번씩 넣어 두 답이 토큰까지 같다.
 
 ### 1-3단계. 경우 점검
@@ -89,7 +89,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 1. census: `settings.CASES_ALL`의 25경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
 2. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn과 0.01%p 안에서 같다. bnb 경우는 값을 재서 기록만 한다.
-3. 생성: 25경우마다 dev 정상 사진 1장의 답을 생성해 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
+3. 생성: 25경우마다 dev 1번 정상 사진(`order` 1, `000000000632`)의 답을 생성해 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
 
 ### 2단계. 사진 준비
 
@@ -219,6 +219,7 @@ dev와 pilot은 결과 CSV에 넣지 않는다. cand의 1~43번째는 v1의 eval
 - 노이즈 사진(`noise`): 정상 사진 배열 `arr`(int16)에 `arr + EPS × sign`을 하고 0~255로 자른 뒤 uint8 PNG로 저장한다. `sign = numpy.random.default_rng([settings.NOISE_SEED, coco_id]).choice(numpy.array([-1, 1], dtype=numpy.int16), size=arr.shape)`
 - 공격 사진(`adv`): 3단계에서 확정한 `<팀>/adv/<coco_id 12자리>.png`
 - 사진은 PNG만 쓴다. JPEG로 저장하면 노이즈가 지워진다.
+- 같은 JPEG라도 Pillow 버전이 다르면 정상 사진의 픽셀이 다를 수 있다(13.0.0과 11.2.1은 일부 세로 사진의 리사이즈 결과가 다르다). 그래서 각 팀은 2~7단계 내내 자기 `input-manifest.json`의 `packages.pillow` 버전을 쓴다(A 11.2.1, B 13.0.0).
 - 같은 PNG라면 공격 사진 제작 코드, 4~7단계 코드, 내부 측정 코드가 모델에 넣는 `pixel_values`가 모두 같아야 한다(차이 0).
 
 ### 5.4 경우 만들기

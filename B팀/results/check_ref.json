@@ -1,0 +1,288 @@
+{
+ "environment": {
+  "settings_version": "v2",
+  "code_commit": "bcfe20f929a6fa1426754f71ccc95fc775e4cb69",
+  "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+  "revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+  "eos_token_ids": [
+   151645,
+   151643
+  ],
+  "dtype": "bfloat16",
+  "attn_implementation": "sdpa",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cuda": "12.8",
+  "packages": {
+   "python": "3.12.3",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.19.0",
+   "bitsandbytes": "0.50.0",
+   "pillow": "13.0.0",
+   "numpy": "2.5.4"
+  },
+  "determinism": {
+   "seed": 2026,
+   "use_deterministic_algorithms": true,
+   "warn_only": false,
+   "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+   "cudnn_benchmark": false
+  }
+ },
+ "cases": {
+  "ref": {
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": 0.0
+  }
+ },
+ "inputs": {
+  "split": "dev",
+  "clean_sha256": {
+   "000000000632": "2b19c508da5b602e5388ce85996d98d683faa9c9659f3c8068da9c2d959a036d",
+   "000000000724": "a7fe53a16390e4dd1d3f079356d6fd659e4af1dffcacf87ed78322142233074a",
+   "000000000776": "ec2a99146acb6c8a8a7a4b0bce6941d0841ea3333367a70f9b48a210fffa2cd0",
+   "000000000785": "b35f3d3ece73b0fa76d4638a2d8e78e2c7ff0250d2a48671d4726eb003296c4c",
+   "000000000802": "1d30b0776ecbbdc321dbcefc0a3023fb9b6177728d812aa41e579b683b92cad4"
+  },
+  "noise_sha256": {
+   "000000000632": "190ea5694e09f034c359a4f9c852147d07c9f23bb9e2d33090902b6b0e562590",
+   "000000000724": "8d4445b156e4437982e38503886a522fc1dc19dda4bd25a5cf341d44c47e2c88",
+   "000000000776": "7bfc9545a329a7e10b1e262d19d5a897a856ff348d33a5d83b370d8c75e6ef79",
+   "000000000785": "bf938fe98c7d0f2c19342d4951310616bb08ea82e964e33209cddd80e0f40581",
+   "000000000802": "f6b90fc88a9def96ace912eac86ad49bd5944aae07fe2605d498569b8fdacdbe"
+  }
+ },
+ "checks": {
+  "model": {
+   "pass": true,
+   "settings_model_id": "Qwen/Qwen2-VL-2B-Instruct",
+   "settings_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+   "loaded_name_or_path": "Qwen/Qwen2-VL-2B-Instruct",
+   "required_files": [
+    "config.json",
+    "model-00001-of-00002.safetensors",
+    "model-00002-of-00002.safetensors",
+    "model.safetensors.index.json"
+   ],
+   "snapshot_commit": {
+    "config.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "generation_config.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "model.safetensors.index.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "model-00001-of-00002.safetensors": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "model-00002-of-00002.safetensors": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "preprocessor_config.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "processor_config.json": null,
+    "tokenizer.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "tokenizer_config.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "chat_template.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "vocab.json": "895c3a49bc3fa70a340399125c650a463535e71c",
+    "merges.txt": "895c3a49bc3fa70a340399125c650a463535e71c"
+   }
+  },
+  "eos": {
+   "pass": true,
+   "generation_config": [
+    151645,
+    151643
+   ],
+   "settings": [
+    151645,
+    151643
+   ]
+  },
+  "preprocess": {
+   "pass": true,
+   "gap_max_allowed": 1e-06,
+   "expected_shape": [
+    1024,
+    1176
+   ],
+   "gap": {
+    "clean": {
+     "000000000632": 0.0,
+     "000000000724": 0.0,
+     "000000000776": 0.0,
+     "000000000785": 0.0,
+     "000000000802": 0.0
+    },
+    "noise": {
+     "000000000632": 0.0,
+     "000000000724": 0.0,
+     "000000000776": 0.0,
+     "000000000785": 0.0,
+     "000000000802": 0.0
+    }
+   },
+   "shape": {
+    "clean": {
+     "000000000632": [
+      1024,
+      1176
+     ],
+     "000000000724": [
+      1024,
+      1176
+     ],
+     "000000000776": [
+      1024,
+      1176
+     ],
+     "000000000785": [
+      1024,
+      1176
+     ],
+     "000000000802": [
+      1024,
+      1176
+     ]
+    },
+    "noise": {
+     "000000000632": [
+      1024,
+      1176
+     ],
+     "000000000724": [
+      1024,
+      1176
+     ],
+     "000000000776": [
+      1024,
+      1176
+     ],
+     "000000000785": [
+      1024,
+      1176
+     ],
+     "000000000802": [
+      1024,
+      1176
+     ]
+    }
+   },
+   "dtypes": [
+    "float32",
+    "bfloat16"
+   ]
+  },
+  "reproducibility": {
+   "pass": true,
+   "same_tokens": {
+    "000000000632": true,
+    "000000000724": true,
+    "000000000776": true,
+    "000000000785": true,
+    "000000000802": true
+   },
+   "answers": {
+    "000000000632": [
+     {
+      "n_tokens": 29,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 1.208,
+      "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books.",
+      "token_ids_sha256": "aafff4c1611634939e3080d769cc7fc37b170f0fecf7ee48267f6fe8c2b1945f"
+     },
+     {
+      "n_tokens": 29,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.556,
+      "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books.",
+      "token_ids_sha256": "aafff4c1611634939e3080d769cc7fc37b170f0fecf7ee48267f6fe8c2b1945f"
+     }
+    ],
+    "000000000724": [
+     {
+      "n_tokens": 26,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.503,
+      "text": "A red stop sign is mounted on a metal pole in a parking lot with trees and a clear blue sky in the background.",
+      "token_ids_sha256": "b22a4e2a92a7689dad4f62140a7732210ada99e04f0d5910605af466deae1b3c"
+     },
+     {
+      "n_tokens": 26,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.503,
+      "text": "A red stop sign is mounted on a metal pole in a parking lot with trees and a clear blue sky in the background.",
+      "token_ids_sha256": "b22a4e2a92a7689dad4f62140a7732210ada99e04f0d5910605af466deae1b3c"
+     }
+    ],
+    "000000000776": [
+     {
+      "n_tokens": 16,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.321,
+      "text": "Three brown teddy bears are hugging each other on a blue surface.",
+      "token_ids_sha256": "e98f122b0b412c4fe6fa780dc8a23785d95db9af21a0ffbe59217976e22f80b5"
+     },
+     {
+      "n_tokens": 16,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.321,
+      "text": "Three brown teddy bears are hugging each other on a blue surface.",
+      "token_ids_sha256": "e98f122b0b412c4fe6fa780dc8a23785d95db9af21a0ffbe59217976e22f80b5"
+     }
+    ],
+    "000000000785": [
+     {
+      "n_tokens": 24,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.466,
+      "text": "A woman in a red jacket and black pants is skiing down a snowy slope, holding ski poles and wearing sunglasses.",
+      "token_ids_sha256": "621ff04ae0969c690e1638307993731a11ce96205a5ea3d9fa7afd7c5a6b0b7a"
+     },
+     {
+      "n_tokens": 24,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.467,
+      "text": "A woman in a red jacket and black pants is skiing down a snowy slope, holding ski poles and wearing sunglasses.",
+      "token_ids_sha256": "621ff04ae0969c690e1638307993731a11ce96205a5ea3d9fa7afd7c5a6b0b7a"
+     }
+    ],
+    "000000000802": [
+     {
+      "n_tokens": 33,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.631,
+      "text": "The image shows a kitchen with a white refrigerator, wooden cabinets, and a white stove. The floor is tiled, and the walls are painted a light color.",
+      "token_ids_sha256": "40e38f0a2873eaf75b09ffee98cbe508a930dec4e34ddbd46ccb90226b0b8439"
+     },
+     {
+      "n_tokens": 33,
+      "ended_eos": true,
+      "hit_cap": false,
+      "latency_s": 0.631,
+      "text": "The image shows a kitchen with a white refrigerator, wooden cabinets, and a white stove. The floor is tiled, and the walls are painted a light color.",
+      "token_ids_sha256": "40e38f0a2873eaf75b09ffee98cbe508a930dec4e34ddbd46ccb90226b0b8439"
+     }
+    ]
+   }
+  }
+ },
+ "passed": true,
+ "note": "README 1-2단계 점검 1~4. checks의 각 pass가 모두 true면 통과"
+}

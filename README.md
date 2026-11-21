@@ -322,7 +322,7 @@ rtn 경우의 가중치 변화(%)다. 1-3단계 점검에서 이 값과 0.01%p �
 
 ```
 README.md      이 문서(규칙 v2)
-공통/          settings.py · quant_rtn.py · image_list.csv · attack_set.csv(3단계에서 생김)
+공통/          settings.py · quant_rtn.py · image_list.csv · select_attack_set.py(3단계 세트 고르기) · attack_set.csv(3단계에서 생김)
 이미지생성/     attack_smolvlm.py(SmolVLM 제작 코드) · README.md(제작 방식, 1-1단계)
 A팀/  B팀/     code/ · adv/ · results/
 ```

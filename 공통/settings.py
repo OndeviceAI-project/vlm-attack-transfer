@@ -1,6 +1,7 @@
 """두 팀이 똑같이 쓰는 값. 바꿔야 하면 두 팀이 합의하고 SETTINGS_VERSION을 올린다.
 공격 사진이나 결과를 하나라도 만든 뒤에 값을 바꾸면, 버전을 올리고 그 값의 영향을 받는 단계를 다시 한다.
 단, cand를 늘릴 때(README 3단계 4번)는 N_CAND와 image_list.csv만 바꾸고 버전은 올리지 않는다. 이미 만든 사진과 기록은 그대로 이어서 쓴다.
+세트(공통/attack_set.csv)를 정하기 전에 N_ATTACK_SET을 바꿀 때도 버전은 올리지 않는다(README 3단계 3번).
 
 쓰는 법:  import sys; sys.path.insert(0, "<저장소>/공통");  import settings, quant_rtn
 """
@@ -28,7 +29,7 @@ W_UNC = 0.05               # --w_unc
 W_DIV = 0.0                # --w_div
 ATTACK_MAX_TRIES = 2       # 사진 한 장당 최대 시도 횟수. 1번째는 노이즈 0에서, 2번째는 무작위로 시작(이미지생성/README.md)
 ATTACK_SEED = 2026         # 무작위 시작의 씨앗. 사진 번호·시도 번호와 섞어 쓴다
-N_ATTACK_SET = 150         # 두 팀이 함께 쓰는 공격 사진 세트의 사진 수. 두 팀 공통 성공 후보를 order 순서로 앞에서부터
+N_ATTACK_SET = 200         # 두 팀이 함께 쓰는 공격 사진 세트의 사진 수. 두 팀 공통 성공 후보를 order 순서로 앞에서부터
 
 # 노이즈 대조군 사진: 부호는 numpy.random.default_rng([NOISE_SEED, coco_id]).choice([-1, 1], size=arr.shape)
 NOISE_SEED = 2026

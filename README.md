@@ -10,7 +10,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 이 저장소의 실험은 두 가지를 잰다.
 
-- 원본 모델에서 성공한 공격 사진을 비전 인코더만 압축한 모델, 언어모델만 압축한 모델에 넣었을 때 나오는 답
+- 원본 모델에서 성공한 공격 사진을 비전 인코더만 압축한 모델, 언어모델만 압축한 모델, 둘을 함께 압축한 모델에 넣었을 때 나오는 답
 - 같은 압축 모델에 공격하지 않은 사진을 넣었을 때 나오는 답
 
 | 팀 | 모델 |
@@ -50,16 +50,17 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 | 0 | v2 규칙 | 공통 | — | 이 문서가 main에 병합 |
 | 1-1 | 공격 사진 만드는 방법 합의 | A·B 함께 | 0 | `이미지생성/README.md` 작성, `settings.ATTACK_MAX_TRIES`에 정수 기입 |
 | 1-2 | ref 점검 | 팀별 | 0 | `<팀>/code/`, `<팀>/results/check_ref.json` |
-| 1-3 | 경우 점검 | 팀별 | 0 | `<팀>/code/`, `<팀>/results/check_cases.json` |
+| 1-3 | 경우 점검 | 팀별 | 2 | `<팀>/results/check_cases.json`(`passed`가 true) |
 | 2 | 사진 준비 | 팀별 | 1-2 | `<팀>/results/input-manifest.json` |
 | 3 | 공격 사진 세트 확정 | A·B 함께 | 1-1, 2 | `공통/attack_set.csv`, `<팀>/adv/` |
 | 4 | 비전 인코더 실험 | 팀별 | 1-3, 3 | `<팀>/results/vision.csv`, `.json` |
 | 5 | 언어모델 실험 | 팀별 | 1-3, 3 | `<팀>/results/language.csv`, `.json` |
+| 5-2 | 함께 압축 실험 | 팀별 | 1-3, 3 | `<팀>/results/both.csv`, `.json` |
 | 6 | 모델 내부 측정 | 팀별 | 1-3, 3 | `<팀>/results/internal.csv`, `.json` |
 | 7 | 정확도 세트 실행 | 팀별 | 1-3, 2 | `<팀>/results/accuracy.csv`, `.json` |
 | 8 | 분석 지표 정의 | A·B 함께 | 4~7 | 지표 정의를 이 문서에 추가 |
 
-2단계는 1-2단계(`check_ref.json`)가 끝난 뒤에, 4~7단계는 1-3단계(`check_cases.json`)가 끝난 뒤에 한다. 1-3단계는 2·3단계와 상관없이 따로 해도 된다. 4·5·6단계는 1-3단계와 3단계가 끝나면 순서와 상관없이 한다. 7단계는 공격 사진이 필요 없어서 1-3단계와 2단계가 끝나면 언제든 한다.
+2단계는 1-2단계(`check_ref.json`)가 끝난 뒤에, 4~7단계는 1-3단계(`check_cases.json`)가 끝난 뒤에 한다. 이 문서에서 '4~7단계'는 5-2단계를 포함한다. 1-3단계는 dev 사진과 `input-manifest.json`을 쓰므로 2단계 뒤에 하고, 3단계와는 상관없이 해도 된다. 4·5·5-2·6단계는 1-3단계와 3단계가 끝나면 한다. 7단계는 공격 사진이 필요 없어서 1-3단계와 2단계가 끝나면 언제든 한다. 4·5·5-2·7단계를 먼저 하고 6단계는 마지막에 한다.
 
 ### 1-1단계. 공격 사진 만드는 방법 합의
 
@@ -85,11 +86,31 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 ### 1-3단계. 경우 점검
 
-각 팀이 4~7단계에 쓸 코드(경우 만들기)를 `<팀>/code/`에 올리고, 아래를 점검해 `<팀>/results/check_cases.json`에 남긴다. 하나라도 통과하지 못하면 4~7단계로 가지 않는다.
+4~7단계에 쓰는 32경우(`settings.CASES_ALL`)가 의도대로 만들어지는지 점검한다. 경우를 만드는 코드(`공통/cases.py`)와 점검 코드(`공통/check_cases.py`)는 두 팀이 같은 것을 쓴다. 팀이 할 일은 자기 실험 기계에서 점검을 실행하고 결과 파일을 올리는 것이다. 하나라도 통과하지 못하면 4~7단계로 가지 않는다.
 
-1. census: `settings.CASES_ALL`의 25경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
-2. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn과 0.01%p 안에서 같다. bnb 경우는 값을 재서 기록만 한다.
-3. 생성: 25경우마다 dev 1번 정상 사진(`order` 1, `000000000632`)의 답을 생성해 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
+**할 일(팀마다)**
+
+1. 2·3단계를 한 그 기계, 그 패키지 환경에서 최신 main을 받는다. `공통/`, `이미지생성/`, `<팀>/code/`에 커밋하지 않은 수정이 없게 한다(있으면 결과의 `code_commit`에 `-dirty`가 붙는다).
+2. 저장소 폴더에서 `python 공통/check_cases.py --team A`를 실행한다(B팀은 `--team B`). 2단계에서 만든 dev 1번 정상 PNG가 `<팀>/data/dev/clean/`에 그대로 있어야 한다.
+3. `<팀>/results/check_cases.json`이 생긴다. `passed`가 `true`인지 본다.
+4. 이 파일 하나만 PR로 올린다. 커밋 메시지와 PR 제목은 `[A] 1-3단계 결과: check_cases.json`처럼 쓴다. PR 본문에는 `passed`, 네 점검의 `pass`, bnb 경우의 가중치 변화, 답이 512에 닿은 경우의 이름, `bnb_repeat_differs`를 파일에서 옮겨 적는다.
+
+**지킬 것**
+
+- `<팀>/code/runtime.py`를 고치지 않는다. 3단계 시도 기록(`attempts.json`)에 이 파일의 SHA-256이 적혀 있고, 3단계의 성공 판정과 4단계의 측정이 같은 코드의 ref를 썼다는 근거가 그 해시다.
+- `공통/`의 파일을 팀에서 고쳐서 쓰지 않는다. 고쳐야 하면 공통 PR로 올려 두 팀이 승인한 뒤, 두 팀 모두 점검을 다시 한다.
+- 통과하지 못하거나 오류가 나도, 통과시키려고 설정(결정적 실행, 허용 차이, 경우 목록, 확인값)을 바꾸지 않는다. 나온 `check_cases.json`을 그대로 PR로 올리되 병합하지 않고, 두 팀이 원인과 처리 방법을 함께 정한다.
+- `check_cases.json`을 손으로 고치지 않는다.
+- GPU와 패키지 버전은 그 팀의 `check_ref.json`에 적힌 것과 같아야 한다(5.1절).
+
+**점검 내용(코드가 확인한다)**
+
+1. 입력: dev 1번 정상 PNG(`order` 1, `000000000632`)의 SHA-256이 `input-manifest.json`의 값과 같다.
+2. census: 32경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
+3. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn을 잰 값과 0.01%p 안에서 같다. `VL` 경우는 V와 L을 따로 재서 각각 비교한다. bnb 경우는 값을 재서 기록만 한다.
+4. 생성: 경우마다 dev 1번 정상 사진의 답을 두 번 생성해 기록한다. ref·rtn·rand 경우는 두 답이 같아야 한다. bnb 경우는 두 답이 다르면 그 사실만 `bnb_repeat_differs`에 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
+
+어느 경우에서 오류가 나면 그 경우의 `error`에 내용을 적고 다음 경우로 넘어간다. 그 경우는 census와 생성 점검을 통과하지 못한 것으로 센다.
 
 ### 2단계. 사진 준비
 
@@ -137,11 +158,19 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 - 입력: 4단계와 같은 600개
 - 출력: `<팀>/results/language.csv`(7,800줄)와 `language.json`
 
+### 5-2단계. 함께 압축 실험
+
+4단계와 같고, 비전 인코더와 언어모델을 함께 압축한다. 연결부와 출력층은 그대로 둔다.
+
+- 경우: `settings.CASES_BOTH` 8경우(`ref`, `rtn-VL-8/6/5/4/3`, `bnb-VL-8/4`). 두 부품에 같은 방식, 같은 비트를 쓴다. rand 경우는 두지 않는다.
+- 입력: 4단계와 같은 600개
+- 출력: `<팀>/results/both.csv`(8 × 600 = 4,800줄)와 `both.json`
+
 ### 6단계. 모델 내부 측정
 
 답을 생성하지 않고 모델 안의 값을 잰다.
 
-- 경우: `settings.CASES_ALL` 25경우(4·5단계 경우 전부, `ref`는 한 번)
+- 경우: `settings.CASES_ALL` 32경우(4·5·5-2단계 경우 전부, `ref`는 한 번)
 - 입력: 공격 사진 세트 200장의 `clean`, `adv`
 - 그림 정보 f(x): 사진 x와 질문을 넣고 한 번 계산(forward)할 때 연결부(`parts["C"]`) 모듈이 내는 출력 전체를 1차원으로 편 float32 벡터
 - ref에서 먼저 준비하는 것(사진마다):
@@ -161,16 +190,16 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 | `clean_end_margin` | 정상 사진과 질문 뒤에 c를 붙여 한 번 계산한다. c 다음 토큰을 고르는 자리에서 (종료 토큰 로짓 중 최댓값) − (종료 토큰이 아닌 토큰 로짓 중 최댓값) |
 
 - 로짓은 float32로 바꿔 계산한다. 종료 토큰은 `settings.MODELS[모델]["eos_token_ids"]`다.
-- ref 줄과 5단계 경우(L)는 그림 정보가 ref와 같으므로 `feat_change_clean` 0, `attack_dir_kept` 1, `shake_ratio` 0이 나와야 한다. 다르면 원인을 확인하고 JSON에 적는다.
-- 출력: `<팀>/results/internal.csv`(25 × 200 = 5,000줄)와 `internal.json`
+- ref 줄과 언어모델만 압축한 경우(L)는 그림 정보가 ref와 같으므로 `feat_change_clean` 0, `attack_dir_kept` 1, `shake_ratio` 0이 나와야 한다. 다르면 원인을 확인하고 JSON에 적는다.
+- 출력: `<팀>/results/internal.csv`(32 × 200 = 6,400줄)와 `internal.json`
 
 ### 7단계. 정확도 세트 실행
 
 공격 사진 없이, 압축이 평소 답에 주는 변화를 재기 위한 원자료를 만든다.
 
-- 경우: `settings.CASES_ALL` 25경우
+- 경우: `settings.CASES_ALL` 32경우
 - 입력: `image_list.csv`의 acc 300장 × `clean`, `noise` = 600개
-- 출력: `<팀>/results/accuracy.csv`(25 × 600 = 15,000줄)와 `accuracy.json`. 형식은 4단계와 같다.
+- 출력: `<팀>/results/accuracy.csv`(32 × 600 = 19,200줄)와 `accuracy.json`. 형식은 4단계와 같다.
 - 답을 채점하는 방법은 8단계에서 정한다.
 
 ### 8단계. 분석 지표 정의
@@ -224,21 +253,24 @@ dev와 pilot은 결과 CSV에 넣지 않는다. cand의 1~43번째는 v1의 eval
 
 ### 5.4 경우 만들기
 
-경우 이름은 `<방식>-<부품>-<비트>`다. 부품 이름은 `settings.MODELS[모델]["parts"]`의 V(비전 인코더), L(언어모델)이다. 연결부(C)와 출력층(H)은 어느 경우에도 바꾸지 않는다. 모든 방식은 Linear 층의 weight만 바꾸고, bias·정규화·Conv·임베딩은 그대로 둔다.
+경우 이름은 `<방식>-<부품>-<비트>`다. 부품은 `settings.MODELS[모델]["parts"]`의 V(비전 인코더), L(언어모델), 또는 둘 다인 VL이다. 연결부(C)와 출력층(H)은 어느 경우에도 바꾸지 않는다. 모든 방식은 Linear 층의 weight만 바꾸고, bias·정규화·Conv·임베딩은 그대로 둔다.
 
-- `ref`: bf16 원본을 그대로 올린다.
+경우는 `공통/cases.py`의 `build(rt, 이름, reference)`로 만든다. `rt`는 팀의 `runtime.py`이고, `reference`는 `cases.reference_weights(rt)`가 돌려주는 원본 가중치다. 1-3단계와 4~7단계의 코드는 경우를 직접 만들지 않고 이 함수를 부른다. 함수가 하는 일은 아래와 같다.
+
+- `ref`: `rt.load_ref()`로 bf16 원본을 그대로 올린다.
 - `rtn`: bf16 원본을 올린 뒤 `quant_rtn.apply_rtn(model, parts, targets=부품, bits=비트, group=settings.QUANT_GROUP)`
 - `rand`: bf16 원본을 올린 뒤 `quant_rtn.apply_rand(model, parts, targets=부품, bits=비트, group=settings.QUANT_GROUP, seed=settings.RAND_SEED)`
-- `bnb`: `from_pretrained`에 `quantization_config`를 준다. `llm_int8_skip_modules`는 parts 중 대상이 아닌 세 부품의 이름이다(예: `bnb-V-4`면 C, L, H의 이름).
+- `bnb`: `from_pretrained`에 `quantization_config`와 `device_map={"": 0}`을 준다. 그 밖의 인자(`model_id`, `revision`, dtype, `attn_implementation`)는 ref와 같다. `llm_int8_skip_modules`는 parts 중 대상이 아닌 부품의 이름이다(`bnb-V-4`면 C, L, H의 이름, `bnb-VL-4`면 C, H의 이름).
   - 8비트: `BitsAndBytesConfig(load_in_8bit=True, llm_int8_skip_modules=skip)`
   - 4비트: `BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16, llm_int8_skip_modules=skip)`
+  - bitsandbytes의 8비트 층은 bf16 입력을 float16으로 바꿔 계산하고 그때마다 안내 글을 찍는다. `cases.py`는 이 안내 글만 끈다.
 - 경우마다 모델을 새로 올린다. 한 모델에 방식을 두 번 적용하지 않는다.
-- 경우마다 확인한다: `quant_rtn.check_census(quant_rtn.census(model, parts), targets, settings.PART_NAMES)`(ref는 `targets=""`). 부품별 Linear 수는 `linear_count`와 같아야 한다.
-- 가중치 변화(%) = 100 × √(Σ‖W_경우 − W_원본‖² ÷ Σ‖W_원본‖²). 합은 대상 부품의 Linear weight 전부에 대해 한다. rtn과 rand는 함수가 돌려주는 값을 쓴다. bnb는 가중치를 실수로 되돌려 같은 식으로 계산한다. 8비트는 `int8 weight × SCB ÷ 127`(행마다), 4비트는 `bitsandbytes.functional.dequantize_4bit(weight, weight.quant_state)`로 되돌린다.
+- 경우마다 확인한다: `quant_rtn.check_census(quant_rtn.census(model, parts), targets, settings.PART_NAMES)`(ref는 `targets=""`). 부품별 Linear 수는 `linear_count`와 같아야 한다. bnb 경우는 모델의 종료 토큰 목록이 settings와 같은지도 확인한다(나머지 경우는 `rt.load_ref()`가 확인한다).
+- 가중치 변화(%) = 100 × √(Σ‖W_경우 − W_원본‖² ÷ Σ‖W_원본‖²). 합은 대상 부품의 Linear weight 전부에 대해 한다. rtn과 rand는 함수가 돌려주는 값을 쓴다. bnb는 가중치를 실수로 되돌려 같은 식으로 계산한다. 8비트는 `int8 weight × SCB ÷ 127`(행마다), 4비트는 `bitsandbytes.functional.dequantize_4bit(weight, weight.quant_state)`로 되돌린다. `VL` 경우는 V와 L을 따로 계산한다.
 
 ## 6. 양자화 확인값
 
-rtn 경우의 가중치 변화(%)다. 1-3단계 점검에서 이 값과 0.01%p 안에서 같아야 한다. rand는 같은 부품·비트의 rtn과 0.01%p 안에서 같아야 한다.
+rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이 있다. 1-3단계 점검에서 이 값과 0.01%p(`settings.CHANGE_TOL`) 안에서 같아야 한다. rand는 같은 부품·비트의 rtn과 0.01%p 안에서 같아야 한다. `VL` 경우의 V는 V 줄과, L은 L 줄과 비교한다.
 
 | 모델 | 부품 | 8비트 | 6비트 | 5비트 | 4비트 | 3비트 |
 |---|---|---|---|---|---|---|
@@ -261,10 +293,11 @@ rtn 경우의 가중치 변화(%)다. 1-3단계 점검에서 이 값과 0.01%p �
 | 3 | `공통/attack_set.csv`, `<팀>/adv/<coco_id 12자리>.png` 200장, `<팀>/adv/SHA256SUMS`, `<팀>/adv/attempts.csv`, `<팀>/adv/attempts.json` |
 | 4 | `<팀>/results/vision.csv`, `vision.json` |
 | 5 | `<팀>/results/language.csv`, `language.json` |
+| 5-2 | `<팀>/results/both.csv`, `both.json` |
 | 6 | `<팀>/results/internal.csv`, `internal.json` |
 | 7 | `<팀>/results/accuracy.csv`, `accuracy.json` |
 
-### 답 CSV (4·5·7단계)
+### 답 CSV (4·5·5-2·7단계)
 
 한 답이 한 줄이다. 줄 순서는 경우(settings 목록 순서) → 사진(attack_set의 `set_order` 또는 acc의 `order`) → 입력(`clean`, `noise`, `adv`) 순이다.
 
@@ -298,6 +331,18 @@ rtn 경우의 가중치 변화(%)다. 1-3단계 점검에서 이 값과 0.01%p �
 - 끊겼다가 이어서 돌렸다면 그 사실과 이어 붙인 지점
 - 6단계는 사진마다 a와 c의 토큰 id
 
+### 경우 점검 JSON (1-3단계)
+
+`<팀>/results/check_cases.json`은 `공통/check_cases.py`가 쓴다.
+
+| 항목 | 내용 |
+|---|---|
+| `environment` | 위 '결과 JSON'의 실행 환경 항목(코드의 git 커밋, 모델, GPU, 패키지 버전, 결정적 실행 설정) |
+| `inputs` | dev 1번 정상 PNG의 `coco_id`, `clean_sha256`, `matches_manifest` |
+| `cases` | 경우마다 `method`, `targets`, `bits`, `census`(부품별 [바뀐 Linear 수, 전체 Linear 수]), `weight_change_pct`(부품별 %), `answer`(5.2절의 다섯 값), `repeat_same`. 오류가 난 경우는 `error` |
+| `checks` | `input`, `census`, `weight_change`, `generation` 각각의 `pass`와 근거 |
+| `passed` | 네 점검이 모두 통과했는가 |
+
 ### 공격 사진 세트와 시도 기록 (3단계)
 
 `공통/attack_set.csv` 열: `set_order`(1~200), `cand_order`(image_list의 order), `coco_id`
@@ -322,7 +367,8 @@ rtn 경우의 가중치 변화(%)다. 1-3단계 점검에서 이 값과 0.01%p �
 
 ```
 README.md      이 문서(규칙 v2)
-공통/          settings.py · quant_rtn.py · image_list.csv · select_attack_set.py(3단계 세트 고르기) · attack_set.csv(3단계에서 생김)
+공통/          settings.py · quant_rtn.py · cases.py(경우 만들기) · check_cases.py(1-3단계 점검) · image_list.csv
+               select_attack_set.py(3단계 세트 고르기) · attack_set.csv(공격 사진 세트)
 이미지생성/     attack_smolvlm.py(SmolVLM 제작 코드) · README.md(제작 방식, 1-1단계)
 A팀/  B팀/     code/ · adv/ · results/
 ```
@@ -331,7 +377,7 @@ A팀/  B팀/     code/ · adv/ · results/
 
 - `main`에 직접 push하지 않는다. 브랜치를 만들어 PR로 올리고 승인을 받아 병합한다. main은 GitHub 설정으로 보호되어 직접 push, force push, 삭제가 막혀 있다.
 - `A팀/`, `B팀/`을 바꾸는 PR은 그 팀이 승인한다(`.github/CODEOWNERS`). `README.md`, `공통/`, `이미지생성/`을 바꾸는 PR은 두 팀에서 한 명씩 승인한다.
-- 커밋 메시지는 `[공통] 내용`, `[A] 내용`, `[B] 내용`처럼 쓴다.
+- 커밋 메시지와 PR 제목은 `[공통] 내용`, `[A] 내용`, `[B] 내용`처럼 쓴다. PR 제목은 병합 커밋의 메시지에 그대로 들어간다.
 - PR 하나에는 한 단계의 결과만 담는다.
 - 결과 파일은 코드가 쓴 그대로 올린다. 노트북은 출력을 지우고 올린다.
 - 결과를 만든 코드는 그 결과보다 먼저, 또는 같은 PR로 올린다.

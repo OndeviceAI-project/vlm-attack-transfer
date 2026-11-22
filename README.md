@@ -90,10 +90,10 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 **할 일(팀마다)**
 
-1. 2·3단계를 한 그 기계, 그 패키지 환경에서 최신 main을 받는다. `공통/`, `이미지생성/`, `<팀>/code/`에 커밋하지 않은 수정이 없게 한다(있으면 결과의 `code_commit`에 `-dirty`가 붙는다).
+1. 2·3단계를 한 그 기계, 그 패키지 환경에서 최신 main을 받는다. `공통/`, `이미지생성/`, `<팀>/code/`에 커밋하지 않은 수정이 없게 한다(있으면 결과의 `code_commit`에 `-dirty`가 붙고 점검을 통과하지 못한다).
 2. 저장소 폴더에서 `python 공통/check_cases.py --team A`를 실행한다(B팀은 `--team B`). 2단계에서 만든 dev 1번 정상 PNG가 `<팀>/data/dev/clean/`에 그대로 있어야 한다.
 3. `<팀>/results/check_cases.json`이 생긴다. `passed`가 `true`인지 본다.
-4. 이 파일 하나만 PR로 올린다. 커밋 메시지와 PR 제목은 `[A] 1-3단계 결과: check_cases.json`처럼 쓴다. PR 본문에는 `passed`, 네 점검의 `pass`, bnb 경우의 가중치 변화, 답이 512에 닿은 경우의 이름, `bnb_repeat_differs`를 파일에서 옮겨 적는다.
+4. 이 파일 하나만 PR로 올린다. 커밋 메시지와 PR 제목은 `[A] 1-3단계 결과: check_cases.json`처럼 쓴다. PR 본문에는 `passed`, 여섯 점검의 `pass`, bnb 경우의 가중치 변화, 답이 512에 닿은 경우의 이름, `bnb_repeat_differs`를 파일에서 옮겨 적는다.
 
 **지킬 것**
 
@@ -101,14 +101,16 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 - `공통/`의 파일을 팀에서 고쳐서 쓰지 않는다. 고쳐야 하면 공통 PR로 올려 두 팀이 승인한 뒤, 두 팀 모두 점검을 다시 한다.
 - 통과하지 못하거나 오류가 나도, 통과시키려고 설정(결정적 실행, 허용 차이, 경우 목록, 확인값)을 바꾸지 않는다. 나온 `check_cases.json`을 그대로 PR로 올리되 병합하지 않고, 두 팀이 원인과 처리 방법을 함께 정한다.
 - `check_cases.json`을 손으로 고치지 않는다.
-- GPU와 패키지 버전은 그 팀의 `check_ref.json`에 적힌 것과 같아야 한다(5.1절).
+- GPU와 패키지 버전은 그 팀의 `check_ref.json`에 적힌 것과 같아야 한다(5.1절). 점검 코드가 확인하고, 다르면 통과하지 못한다.
 
 **점검 내용(코드가 확인한다)**
 
-1. 입력: dev 1번 정상 PNG(`order` 1, `000000000632`)의 SHA-256이 `input-manifest.json`의 값과 같다.
-2. census: 32경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
-3. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn을 잰 값과 0.01%p 안에서 같다. `VL` 경우는 V와 L을 따로 재서 각각 비교한다. bnb 경우는 값을 재서 기록만 한다.
-4. 생성: 경우마다 dev 1번 정상 사진의 답을 두 번 생성해 기록한다. ref·rtn·rand 경우는 두 답이 같아야 한다. bnb 경우는 두 답이 다르면 그 사실만 `bnb_repeat_differs`에 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
+1. 실행 환경: GPU, CUDA, 패키지 버전, 결정적 실행 설정, 모델(`model_id`, `revision`, 종료 토큰, dtype, attention 구현)이 그 팀 `check_ref.json`의 `environment`와 같고, `check_ref.json`의 `passed`가 true다. 코드 커밋은 달라도 된다.
+2. 코드: 결과의 `code_commit`이 커밋 해시이고 `-dirty`가 붙지 않았다.
+3. 입력: dev 1번 정상 PNG(`order` 1, `000000000632`)의 SHA-256이 `input-manifest.json`의 값과 같다.
+4. census: 32경우 모두, 대상 부품의 Linear는 전부 바뀌고 나머지 부품은 하나도 바뀌지 않는다(`quant_rtn.check_census`). 부품별 Linear 수가 `settings.MODELS[모델]["linear_count"]`와 같다.
+5. 가중치 변화: rtn 경우의 값이 6장 '양자화 확인값'과 0.01%p 안에서 같다. rand 경우는 같은 부품·비트의 rtn을 잰 값과 0.01%p 안에서 같다. `VL` 경우는 V와 L을 따로 재서 각각 비교한다. bnb 경우는 값을 재서 기록만 한다.
+6. 생성: 경우마다 dev 1번 정상 사진의 답을 두 번 생성해 기록한다. ref·rtn·rand 경우는 두 답이 같아야 한다. bnb 경우는 두 답이 다르면 그 사실만 `bnb_repeat_differs`에 기록한다. 답이 상한에 닿아도 오류가 아니라 기록할 사실이다.
 
 어느 경우에서 오류가 나면 그 경우의 `error`에 내용을 적고 다음 경우로 넘어간다. 그 경우는 census와 생성 점검을 통과하지 못한 것으로 센다.
 
@@ -340,8 +342,8 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 | `environment` | 위 '결과 JSON'의 실행 환경 항목(코드의 git 커밋, 모델, GPU, 패키지 버전, 결정적 실행 설정) |
 | `inputs` | dev 1번 정상 PNG의 `coco_id`, `clean_sha256`, `matches_manifest` |
 | `cases` | 경우마다 `method`, `targets`, `bits`, `census`(부품별 [바뀐 Linear 수, 전체 Linear 수]), `weight_change_pct`(부품별 %), `answer`(5.2절의 다섯 값), `repeat_same`. 오류가 난 경우는 `error` |
-| `checks` | `input`, `census`, `weight_change`, `generation` 각각의 `pass`와 근거 |
-| `passed` | 네 점검이 모두 통과했는가 |
+| `checks` | `environment`, `code`, `input`, `census`, `weight_change`, `generation` 각각의 `pass`와 근거. `environment`에는 `check_ref.json`과 다른 항목(`differs`)을 적는다 |
+| `passed` | 여섯 점검이 모두 통과했는가 |
 
 ### 공격 사진 세트와 시도 기록 (3단계)
 

@@ -8,12 +8,15 @@
 - 2단계: dev 1번 정상 PNG와 <팀>/results/input-manifest.json
 - main을 받은 그대로일 것. 공통·이미지생성·팀 code 폴더에 커밋하지 않은 수정이 있으면 결과의 code_commit에 '-dirty'가 붙는다
 
-settings.CASES_ALL의 경우마다 모델을 새로 올려 네 가지를 점검한다.
-1. 입력: dev 1번 정상 PNG의 SHA-256이 input-manifest.json과 같다.
-2. census: 대상 부품의 Linear는 전부 바뀌고 나머지는 하나도 바뀌지 않는다. 부품별 Linear 수가 settings와 같다.
-3. 가중치 변화: rtn은 settings.RTN_CHANGE_PCT와, rand는 같은 부품·비트의 rtn을 잰 값과 CHANGE_TOL 안에서 같다.
+여섯 가지를 점검한다. 3~6번은 settings.CASES_ALL의 경우마다 모델을 새로 올려서 한다.
+1. 실행 환경: GPU·CUDA·패키지 버전·결정적 실행 설정·모델이 그 팀 check_ref.json의 environment와 같고,
+   check_ref.json의 passed가 true다. 코드 커밋은 달라도 된다.
+2. 코드: 결과의 code_commit이 커밋 해시이고 '-dirty'가 붙지 않았다.
+3. 입력: dev 1번 정상 PNG의 SHA-256이 input-manifest.json과 같다.
+4. census: 대상 부품의 Linear는 전부 바뀌고 나머지는 하나도 바뀌지 않는다. 부품별 Linear 수가 settings와 같다.
+5. 가중치 변화: rtn은 settings.RTN_CHANGE_PCT와, rand는 같은 부품·비트의 rtn을 잰 값과 CHANGE_TOL 안에서 같다.
    bnb는 값을 재서 기록만 한다.
-4. 생성: 경우마다 dev 1번 정상 사진의 답을 두 번 생성해 기록한다. ref·rtn·rand는 두 답이 같아야 한다.
+6. 생성: 경우마다 dev 1번 정상 사진의 답을 두 번 생성해 기록한다. ref·rtn·rand는 두 답이 같아야 한다.
    bnb는 두 답이 다르면 그 사실만 기록한다.
 """
 import argparse
@@ -30,6 +33,9 @@ ROOT = Path(__file__).resolve().parent.parent
 TEAMS = {"A": "A팀", "B": "B팀"}
 ANSWER_KEYS = ("n_tokens", "ended_eos", "hit_cap", "latency_s", "text")
 SAME_KEYS = ("n_tokens", "ended_eos", "hit_cap", "text")
+# check_ref.json의 environment와 같아야 하는 항목(code_commit은 뺀다)
+ENV_KEYS = ("settings_version", "model_id", "revision", "eos_token_ids", "dtype", "attn_implementation",
+            "gpu", "cuda", "packages", "determinism")
 
 
 def load_runtime(team):
@@ -57,6 +63,31 @@ def dev_photo(rt):
     record = {"split": "dev", "order": order, "coco_id": coco_id, "clean_sha256": actual,
               "matches_manifest": recorded.get("coco_id") == coco_id and recorded.get("clean_sha256") == actual}
     return path, record
+
+
+def check_environment(rt, env):
+    """실행 환경이 그 팀의 1-2단계(check_ref.json) 때와 같은가(README 5.1). 다른 항목을 모두 적는다."""
+    try:
+        ref = json.loads((rt.TEAM / "results" / "check_ref.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as err:
+        return {"pass": False, "check_ref_passed": None, "differs": [],
+                "reason": f"check_ref.json을 읽지 못했다({type(err).__name__})"}
+    recorded, differs = ref.get("environment", {}), []
+    for key in ENV_KEYS:
+        old, new = recorded.get(key), env.get(key)
+        if isinstance(old, dict) and isinstance(new, dict):
+            differs += [{"key": f"{key}.{k}", "check_ref": old.get(k), "now": new.get(k)}
+                        for k in sorted(set(old) | set(new)) if old.get(k) != new.get(k)]
+        elif old != new:
+            differs.append({"key": key, "check_ref": old, "now": new})
+    return {"pass": ref.get("passed") is True and not differs, "check_ref_passed": ref.get("passed"),
+            "differs": differs}
+
+
+def check_code(env):
+    """커밋한 코드 그대로 돌렸는가. 커밋하지 않은 수정이 있으면 code_commit에 '-dirty'가 붙는다."""
+    commit = env.get("code_commit")
+    return {"pass": bool(commit) and not commit.endswith("-dirty"), "code_commit": commit}
 
 
 def _short(err):
@@ -129,6 +160,11 @@ def main():
     path, inputs = dev_photo(rt)
 
     rt.setup()
+    env = rt.environment()
+    checks = {"environment": check_environment(rt, env), "code": check_code(env)}
+    for name, check in checks.items():
+        if not check["pass"]:
+            print(f"{name}: 통과하지 못함 → 끝까지 돌려도 passed는 false다. {check}")
     processor, img = rt.load_processor(), rt.read_png(path)
     reference = cases.reference_weights(rt)
     records = {}
@@ -138,10 +174,11 @@ def main():
         print(f"{name:10s} 가중치 변화 {record.get('weight_change_pct')} | 답 {tokens}토큰 | "
               f"두 번 같음 {record.get('repeat_same')} | {record.get('error', '오류 없음')}")
 
-    checks = {"input": {"pass": inputs["matches_manifest"]}, "census": check_census(records),
-              "weight_change": check_weight_change(rt.MODEL_KEY, records), "generation": check_generation(records)}
+    checks.update({"input": {"pass": inputs["matches_manifest"]}, "census": check_census(records),
+                   "weight_change": check_weight_change(rt.MODEL_KEY, records),
+                   "generation": check_generation(records)})
     passed = all(c["pass"] for c in checks.values())
-    meta = {"environment": rt.environment(), "inputs": inputs, "cases": records, "checks": checks, "passed": passed,
+    meta = {"environment": env, "inputs": inputs, "cases": records, "checks": checks, "passed": passed,
             "note": "README 1-3단계. checks의 pass가 모두 true면 통과. census는 부품별 [바뀐 Linear 수, 전체 Linear 수]"}
     out = rt.TEAM / "results" / "check_cases.json"
     try:

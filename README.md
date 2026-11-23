@@ -134,6 +134,42 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 6. **순서 지키기.** 세트가 main에 병합되기 전에는 압축 모델(ref가 아닌 경우)에 공격 사진을 넣지 않는다. 압축 모델에서 나온 결과로 세트의 사진을 고르거나 바꾸지 않는다.
 7. **시도 기록.** 처리한 모든 후보와 모든 시도를 `<팀>/adv/attempts.csv`에 한 줄씩 남긴다(형식은 7장). 세트에 들지 않은 시도의 PNG는 올리지 않는다.
 
+### 4·5·5-2·7단계의 실행
+
+네 단계는 넣는 사진과 경우 목록만 다르고 하는 일은 같다. 두 팀이 같은 코드(`공통/run_answers.py`)로 실행한다. 6단계는 이 코드로 하지 않는다.
+
+| 단계 | 명령 (B팀은 `--team B`) | 결과 (`<팀>/results/`) |
+|---|---|---|
+| 4 | `python 공통/run_answers.py --team A --step vision` | `vision.csv`, `vision.json` |
+| 5 | `python 공통/run_answers.py --team A --step language` | `language.csv`, `language.json` |
+| 5-2 | `python 공통/run_answers.py --team A --step both` | `both.csv`, `both.json` |
+| 7 | `python 공통/run_answers.py --team A --step accuracy` | `accuracy.csv`, `accuracy.json` |
+
+**코드가 하는 일**
+
+1. 시작 조건을 확인하고, 하나라도 맞지 않으면 모델을 올리지 않고 멈춘다.
+   - 실행 환경이 그 팀 `check_ref.json`과 같고, 코드에 커밋하지 않은 수정이 없다(1-3단계 점검 1·2번과 같은 확인).
+   - 그 팀 `check_cases.json`의 `passed`가 true다.
+   - 넣을 사진의 SHA-256이 기록과 같다. 정상·노이즈 PNG는 `input-manifest.json`, 공격 PNG는 `adv/SHA256SUMS`와 비교한다.
+2. 경우(settings 목록 순서)마다 `cases.build`로 모델을 새로 올려, 사진마다 `clean`, `noise`, `adv` 순으로 `rt.answer`를 한 번씩 부른다.
+3. 4·5·5-2단계는 첫 경우인 ref가 끝나면 3단계 기록과 맞는지 본다. ref의 공격 사진 답 200개가 모두 512에 닿고, 정상 사진 답은 하나도 닿지 않으며, 정상 사진 답의 토큰 수가 `adv/attempts.csv`의 `ref_clean_n_tokens`와 사진마다 같아야 한다. 3단계와 같은 코드, 같은 환경이면 그대로 재현된다. 다르면 멈춘다.
+4. 경우 하나가 끝날 때마다 `<팀>/data/runs/<step>/`에 저장한다. 끊기면 같은 명령으로 이어서 한다(끝난 경우는 건너뛴다). 환경, 코드, 넣는 사진이 처음과 다르면 이어서 하지 않고 멈춘다.
+5. 모든 경우가 끝나면 `<팀>/results/<step>.csv`와 `<step>.json`을 쓴다. 끝나기 전에는 결과 폴더에 아무것도 쓰지 않는다.
+
+**할 일(팀마다)**
+
+1. 2·3단계를 한 그 기계, 그 패키지 환경에서 최신 main을 받는다. 자기 팀의 1-3단계 결과가 main에 병합되어 있어야 한다.
+2. 먼저 짧은 시험을 한다: `python 공통/run_answers.py --team A --step vision --limit 2 --cases ref,rtn-V-4`. 사진 2장, 경우 2개만 돌리고 결과는 `<팀>/data/trial/vision/`에 쓴다. 오류 없이 끝나고, `vision.json`의 `ref_check`와 `checks`가 모두 통과인지 본다.
+3. 7단계를 먼저 하고, 4단계, 5-2단계, 5단계 순으로 한다. 7단계는 답이 짧아 가장 빨리 끝난다.
+4. 단계가 끝나면 그 단계의 `.csv`와 `.json` 두 파일만 PR로 올린다. 단계마다 PR 하나다. 커밋 메시지와 PR 제목은 `[A] 4단계 결과: vision.csv·vision.json`처럼 쓴다. PR 본문에는 `.json`에서 옮겨 적는다: `csv`의 줄 수, `ref_check`, 경우마다 `clean_hit_cap`(정상 사진 답이 512에 닿은 수), `runs`(몇 번에 나눠 돌렸는지), `environment`의 `code_commit`·GPU·패키지 버전.
+
+**지킬 것**
+
+- 1-3단계의 '지킬 것'과 같다. `<팀>/code/runtime.py`와 `공통/`의 파일을 고치지 않고, 통과시키려고 설정을 바꾸지 않으며, 결과 파일을 손으로 고치지 않는다.
+- 멈추면 화면의 '멈춤:' 뒤에 나온 글을 그대로 알린다. `--restart`(처음부터 다시)는 코드가 그렇게 하라고 알릴 때만 쓴다.
+- 도는 동안 `<팀>/data/` 폴더를 지우거나 옮기지 않는다. 정상·노이즈 사진과 이어 하기 기록이 들어 있다.
+- 한 단계를 여러 기계에 나눠 돌리지 않는다.
+
 ### 4단계. 비전 인코더 실험
 
 공격 사진 세트 200장의 정상·노이즈·공격 사진을 원본 모델과 비전 인코더만 압축한 모델에 넣고 답을 기록한다.
@@ -333,6 +369,21 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 - 끊겼다가 이어서 돌렸다면 그 사실과 이어 붙인 지점
 - 6단계는 사진마다 a와 c의 토큰 id
 
+### 답 JSON (4·5·5-2·7단계)
+
+`공통/run_answers.py`가 쓴다. 위 '결과 JSON'의 항목을 아래 이름으로 적는다.
+
+| 항목 | 내용 |
+|---|---|
+| `environment` | 실행 환경(코드의 git 커밋, 모델, GPU, 패키지 버전, 결정적 실행 설정) |
+| `step` | `vision` / `language` / `both` / `accuracy` |
+| `cases` | 경우마다 `census`, `weight_change_pct`, `rows`(줄 수), `seconds`(걸린 시간), `clean_hit_cap`(정상 사진 답이 512에 닿은 수) |
+| `inputs` | 넣은 사진의 SHA-256(`clean_sha256`, `noise_sha256`, `adv_sha256`) |
+| `ref_check` | ref의 답이 3단계 기록과 맞는지(4·5·5-2단계). `adv_hit_cap`, `clean_hit_cap`, `clean_tokens_differ` |
+| `checks` | 시작 조건 `environment`, `code`, `check_cases` 각각의 `pass` |
+| `csv` | CSV의 줄 수(`rows`)와 SHA-256 |
+| `runs` | 실행마다 처음 쓴 줄 번호(`first_row`)와 더한 줄 수(`rows_added`). 한 번에 끝냈으면 하나다 |
+
 ### 경우 점검 JSON (1-3단계)
 
 `<팀>/results/check_cases.json`은 `공통/check_cases.py`가 쓴다.
@@ -369,7 +420,8 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 
 ```
 README.md      이 문서(규칙 v2)
-공통/          settings.py · quant_rtn.py · cases.py(경우 만들기) · check_cases.py(1-3단계 점검) · image_list.csv
+공통/          settings.py · quant_rtn.py · cases.py(경우 만들기) · check_cases.py(1-3단계 점검)
+               run_answers.py(4·5·5-2·7단계 실행) · image_list.csv
                select_attack_set.py(3단계 세트 고르기) · attack_set.csv(공격 사진 세트)
 이미지생성/     attack_smolvlm.py(SmolVLM 제작 코드) · README.md(제작 방식, 1-1단계)
 A팀/  B팀/     code/ · adv/ · results/

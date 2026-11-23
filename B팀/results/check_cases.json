@@ -1,0 +1,1501 @@
+{
+ "environment": {
+  "settings_version": "v2",
+  "code_commit": "68970f9f99c89a6ee45b0f48e8a2591d4e8d66e5",
+  "model_id": "Qwen/Qwen2-VL-2B-Instruct",
+  "revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+  "eos_token_ids": [
+   151645,
+   151643
+  ],
+  "dtype": "bfloat16",
+  "attn_implementation": "sdpa",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "cuda": "12.8",
+  "packages": {
+   "python": "3.12.3",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.19.0",
+   "bitsandbytes": "0.50.0",
+   "pillow": "13.0.0",
+   "numpy": "2.5.4"
+  },
+  "determinism": {
+   "seed": 2026,
+   "use_deterministic_algorithms": true,
+   "warn_only": false,
+   "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+   "cudnn_benchmark": false
+  }
+ },
+ "inputs": {
+  "split": "dev",
+  "order": 1,
+  "coco_id": "000000000632",
+  "clean_sha256": "2b19c508da5b602e5388ce85996d98d683faa9c9659f3c8068da9c2d959a036d",
+  "matches_manifest": true
+ },
+ "cases": {
+  "ref": {
+   "case": "ref",
+   "method": "ref",
+   "targets": "",
+   "bits": null,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {},
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.344,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-8": {
+   "case": "rtn-V-8",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 8,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.5727
+   },
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.593,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-6": {
+   "case": "rtn-V-6",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 6,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 2.2124
+   },
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.601,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-5": {
+   "case": "rtn-V-5",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 5,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 4.4883
+   },
+   "answer": {
+    "n_tokens": 30,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.615,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a wooden dresser, a blue comforter, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-4": {
+   "case": "rtn-V-4",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 4,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.2746
+   },
+   "answer": {
+    "n_tokens": 30,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.616,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a wooden dresser, a blue comforter, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-3": {
+   "case": "rtn-V-3",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 3,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 19.876
+   },
+   "answer": {
+    "n_tokens": 27,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.553,
+    "text": "A cozy bedroom with a large window, a bookshelf filled with books, and a comfortable bed covered with a blue comforter."
+   },
+   "repeat_same": true
+  },
+  "bnb-V-8": {
+   "case": "bnb-V-8",
+   "method": "bnb",
+   "targets": "V",
+   "bits": 8,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.9653
+   },
+   "answer": {
+    "n_tokens": 34,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.778,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a dresser, a bookshelf filled with books, and a basket on the floor."
+   },
+   "repeat_same": true
+  },
+  "bnb-V-4": {
+   "case": "bnb-V-4",
+   "method": "bnb",
+   "targets": "V",
+   "bits": 4,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.3675
+   },
+   "answer": {
+    "n_tokens": 40,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.817,
+    "text": "A cozy bedroom with a large window that offers a view of greenery outside, a wooden dresser with a mirror, a blue comforter on the bed, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rand-V-8": {
+   "case": "rand-V-8",
+   "method": "rand",
+   "targets": "V",
+   "bits": 8,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.5725
+   },
+   "answer": {
+    "n_tokens": 30,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.616,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a wooden dresser, a blue comforter, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rand-V-6": {
+   "case": "rand-V-6",
+   "method": "rand",
+   "targets": "V",
+   "bits": 6,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 2.2122
+   },
+   "answer": {
+    "n_tokens": 30,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.615,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bedspread, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rand-V-5": {
+   "case": "rand-V-5",
+   "method": "rand",
+   "targets": "V",
+   "bits": 5,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 4.4881
+   },
+   "answer": {
+    "n_tokens": 30,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.621,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a wooden dresser, a blue bedspread, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rand-V-4": {
+   "case": "rand-V-4",
+   "method": "rand",
+   "targets": "V",
+   "bits": 4,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.2745
+   },
+   "answer": {
+    "n_tokens": 27,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.577,
+    "text": "A cozy bedroom with a large window, a blue bed, a bookshelf filled with books, and a basket on the floor."
+   },
+   "repeat_same": true
+  },
+  "rand-V-3": {
+   "case": "rand-V-3",
+   "method": "rand",
+   "targets": "V",
+   "bits": 3,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     0,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 19.8759
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.522,
+    "text": "A cozy bedroom with a large window, a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-8": {
+   "case": "rtn-L-8",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 8,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 0.5689
+   },
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.593,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-6": {
+   "case": "rtn-L-6",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 6,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 2.2109
+   },
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.592,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-5": {
+   "case": "rtn-L-5",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 5,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 4.4851
+   },
+   "answer": {
+    "n_tokens": 28,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.559,
+    "text": "A cozy bedroom with a large window, a wooden bookshelf filled with books, and a comfortable bed covered in a blue comforter."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-4": {
+   "case": "rtn-L-4",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 4,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 9.2667
+   },
+   "answer": {
+    "n_tokens": 23,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.468,
+    "text": "A cozy bedroom with a large window, a wooden bookshelf filled with books, and a blue bedspread."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-3": {
+   "case": "rtn-L-3",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 3,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 19.8678
+   },
+   "answer": {
+    "n_tokens": 27,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.546,
+    "text": "A cozy bedroom with a large bed covered in a blue comforter, a wooden dresser, and a window overlooking a green view."
+   },
+   "repeat_same": true
+  },
+  "bnb-L-8": {
+   "case": "bnb-L-8",
+   "method": "bnb",
+   "targets": "L",
+   "bits": 8,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 1.0091
+   },
+   "answer": {
+    "n_tokens": 36,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 2.314,
+    "text": "A cozy bedroom with a large window that offers a view of greenery, a wooden dresser with a mirror, a blue comforter, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "bnb-L-4": {
+   "case": "bnb-L-4",
+   "method": "bnb",
+   "targets": "L",
+   "bits": 4,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 9.3573
+   },
+   "answer": {
+    "n_tokens": 28,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.471,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rand-L-8": {
+   "case": "rand-L-8",
+   "method": "rand",
+   "targets": "L",
+   "bits": 8,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 0.5687
+   },
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.596,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rand-L-6": {
+   "case": "rand-L-6",
+   "method": "rand",
+   "targets": "L",
+   "bits": 6,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 2.2107
+   },
+   "answer": {
+    "n_tokens": 37,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.747,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, a bookshelf filled with books, and a wicker basket on the floor."
+   },
+   "repeat_same": true
+  },
+  "rand-L-5": {
+   "case": "rand-L-5",
+   "method": "rand",
+   "targets": "L",
+   "bits": 5,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 4.4849
+   },
+   "answer": {
+    "n_tokens": 29,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.591,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, a bookshelf, and a basket."
+   },
+   "repeat_same": true
+  },
+  "rand-L-4": {
+   "case": "rand-L-4",
+   "method": "rand",
+   "targets": "L",
+   "bits": 4,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 9.2666
+   },
+   "answer": {
+    "n_tokens": 26,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.54,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a comfortable bed, a bookshelf, and a wooden dresser."
+   },
+   "repeat_same": true
+  },
+  "rand-L-3": {
+   "case": "rand-L-3",
+   "method": "rand",
+   "targets": "L",
+   "bits": 3,
+   "census": {
+    "V": [
+     0,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 19.8677
+   },
+   "answer": {
+    "n_tokens": 28,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.58,
+    "text": "The bedroom features a large bed covered in blue sheets, a window with a view of trees, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-8": {
+   "case": "rtn-VL-8",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 8,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.5727,
+    "L": 0.5689
+   },
+   "answer": {
+    "n_tokens": 30,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.606,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bedspread, a wooden dresser, and a bookshelf filled with books."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-6": {
+   "case": "rtn-VL-6",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 6,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 2.2124,
+    "L": 2.2109
+   },
+   "answer": {
+    "n_tokens": 35,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.711,
+    "text": "A cozy bedroom with a large window overlooking greenery, featuring a blue bed, a wooden dresser, a bookshelf filled with books, and a basket on the floor."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-5": {
+   "case": "rtn-VL-5",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 5,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 4.4883,
+    "L": 4.4851
+   },
+   "answer": {
+    "n_tokens": 28,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.574,
+    "text": "A cozy bedroom with a large window, a wooden bookshelf filled with books, and a comfortable bed covered with a blue comforter."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-4": {
+   "case": "rtn-VL-4",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 4,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.2746,
+    "L": 9.2667
+   },
+   "answer": {
+    "n_tokens": 32,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.654,
+    "text": "A cozy bedroom with a large window, a wooden dresser, a mirror, a bookshelf filled with books, and a blue comforter on the bed."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-3": {
+   "case": "rtn-VL-3",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 3,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 19.876,
+    "L": 19.8678
+   },
+   "answer": {
+    "n_tokens": 35,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.698,
+    "text": "A cozy bedroom with a large window overlooking a lush green view, a bed covered with a blue comforter, a wooden bookshelf, and a dresser with a mirror."
+   },
+   "repeat_same": true
+  },
+  "bnb-VL-8": {
+   "case": "bnb-VL-8",
+   "method": "bnb",
+   "targets": "VL",
+   "bits": 8,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.9653,
+    "L": 1.0091
+   },
+   "answer": {
+    "n_tokens": 43,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 2.763,
+    "text": "A cozy bedroom with a large window that offers a view of greenery outside, a wooden bookshelf filled with books, a blue bed with a matching blanket, and a dresser with a mirror and various items."
+   },
+   "repeat_same": true
+  },
+  "bnb-VL-4": {
+   "case": "bnb-VL-4",
+   "method": "bnb",
+   "targets": "VL",
+   "bits": 4,
+   "census": {
+    "V": [
+     128,
+     128
+    ],
+    "C": [
+     0,
+     2
+    ],
+    "L": [
+     196,
+     196
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.3675,
+    "L": 9.3573
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.434,
+    "text": "A cozy bedroom with a large window, a wooden bookshelf filled with books, and a blue bed with a quilt."
+   },
+   "repeat_same": true
+  }
+ },
+ "checks": {
+  "environment": {
+   "pass": true,
+   "check_ref_passed": true,
+   "differs": []
+  },
+  "code": {
+   "pass": true,
+   "code_commit": "68970f9f99c89a6ee45b0f48e8a2591d4e8d66e5"
+  },
+  "input": {
+   "pass": true
+  },
+  "census": {
+   "pass": true,
+   "failed": []
+  },
+  "weight_change": {
+   "pass": true,
+   "tolerance": 0.01,
+   "rows": [
+    {
+     "case": "rtn-V-8",
+     "part": "V",
+     "measured": 0.5727,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-6",
+     "part": "V",
+     "measured": 2.2124,
+     "expected": 2.21,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-5",
+     "part": "V",
+     "measured": 4.4883,
+     "expected": 4.49,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-4",
+     "part": "V",
+     "measured": 9.2746,
+     "expected": 9.27,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-3",
+     "part": "V",
+     "measured": 19.876,
+     "expected": 19.88,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "bnb-V-8",
+     "part": "V",
+     "measured": 0.9653,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-V-4",
+     "part": "V",
+     "measured": 9.3675,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "rand-V-8",
+     "part": "V",
+     "measured": 0.5725,
+     "expected": 0.5727,
+     "basis": "rtn-V-8의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-6",
+     "part": "V",
+     "measured": 2.2122,
+     "expected": 2.2124,
+     "basis": "rtn-V-6의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-5",
+     "part": "V",
+     "measured": 4.4881,
+     "expected": 4.4883,
+     "basis": "rtn-V-5의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-4",
+     "part": "V",
+     "measured": 9.2745,
+     "expected": 9.2746,
+     "basis": "rtn-V-4의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-3",
+     "part": "V",
+     "measured": 19.8759,
+     "expected": 19.876,
+     "basis": "rtn-V-3의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-8",
+     "part": "L",
+     "measured": 0.5689,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-6",
+     "part": "L",
+     "measured": 2.2109,
+     "expected": 2.21,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-5",
+     "part": "L",
+     "measured": 4.4851,
+     "expected": 4.49,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-4",
+     "part": "L",
+     "measured": 9.2667,
+     "expected": 9.27,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-3",
+     "part": "L",
+     "measured": 19.8678,
+     "expected": 19.87,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "bnb-L-8",
+     "part": "L",
+     "measured": 1.0091,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-L-4",
+     "part": "L",
+     "measured": 9.3573,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "rand-L-8",
+     "part": "L",
+     "measured": 0.5687,
+     "expected": 0.5689,
+     "basis": "rtn-L-8의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-6",
+     "part": "L",
+     "measured": 2.2107,
+     "expected": 2.2109,
+     "basis": "rtn-L-6의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-5",
+     "part": "L",
+     "measured": 4.4849,
+     "expected": 4.4851,
+     "basis": "rtn-L-5의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-4",
+     "part": "L",
+     "measured": 9.2666,
+     "expected": 9.2667,
+     "basis": "rtn-L-4의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-3",
+     "part": "L",
+     "measured": 19.8677,
+     "expected": 19.8678,
+     "basis": "rtn-L-3의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-8",
+     "part": "V",
+     "measured": 0.5727,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-8",
+     "part": "L",
+     "measured": 0.5689,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-6",
+     "part": "V",
+     "measured": 2.2124,
+     "expected": 2.21,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-6",
+     "part": "L",
+     "measured": 2.2109,
+     "expected": 2.21,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-5",
+     "part": "V",
+     "measured": 4.4883,
+     "expected": 4.49,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-5",
+     "part": "L",
+     "measured": 4.4851,
+     "expected": 4.49,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-4",
+     "part": "V",
+     "measured": 9.2746,
+     "expected": 9.27,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-4",
+     "part": "L",
+     "measured": 9.2667,
+     "expected": 9.27,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-3",
+     "part": "V",
+     "measured": 19.876,
+     "expected": 19.88,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-3",
+     "part": "L",
+     "measured": 19.8678,
+     "expected": 19.87,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-8",
+     "part": "V",
+     "measured": 0.9653,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-8",
+     "part": "L",
+     "measured": 1.0091,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-4",
+     "part": "V",
+     "measured": 9.3675,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-4",
+     "part": "L",
+     "measured": 9.3573,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    }
+   ]
+  },
+  "generation": {
+   "pass": true,
+   "failed": [],
+   "repeat_differs": [],
+   "bnb_repeat_differs": []
+  }
+ },
+ "passed": true,
+ "note": "README 1-3단계. checks의 pass가 모두 true면 통과. census는 부품별 [바뀐 Linear 수, 전체 Linear 수]"
+}

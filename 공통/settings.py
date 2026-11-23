@@ -2,6 +2,7 @@
 공격 사진이나 결과를 하나라도 만든 뒤에 값을 바꾸면, 버전을 올리고 그 값의 영향을 받는 단계를 다시 한다.
 단, cand를 늘릴 때(README 3단계 4번)는 N_CAND와 image_list.csv만 바꾸고 버전은 올리지 않는다. 이미 만든 사진과 기록은 그대로 이어서 쓴다.
 세트(공통/attack_set.csv)를 정하기 전에 N_ATTACK_SET을 바꿀 때도 버전은 올리지 않는다(README 3단계 3번).
+4~7단계 결과가 하나도 없을 때 경우 목록에 경우를 더하는 것도 버전을 올리지 않는다(README 5-2단계). 공격 사진과 시도 기록은 경우 목록과 관계없다.
 
 쓰는 법:  import sys; sys.path.insert(0, "<저장소>/공통");  import settings, quant_rtn
 """
@@ -44,7 +45,19 @@ CASES_VISION = (["ref"] + [f"rtn-V-{b}" for b in RTN_BITS] + [f"bnb-V-{b}" for b
                 + [f"rand-V-{b}" for b in RTN_BITS])                  # 4단계 비전 인코더 실험, 13경우
 CASES_LANGUAGE = (["ref"] + [f"rtn-L-{b}" for b in RTN_BITS] + [f"bnb-L-{b}" for b in BNB_BITS]
                   + [f"rand-L-{b}" for b in RTN_BITS])                # 5단계 언어모델 실험, 13경우
-CASES_ALL = CASES_VISION + CASES_LANGUAGE[1:]                        # 6·7단계, 25경우(ref는 한 번)
+CASES_BOTH = (["ref"] + [f"rtn-VL-{b}" for b in RTN_BITS]
+              + [f"bnb-VL-{b}" for b in BNB_BITS])                    # 5-2단계 함께 압축 실험, 8경우(rand 없음)
+CASES_ALL = CASES_VISION + CASES_LANGUAGE[1:] + CASES_BOTH[1:]       # 1-3·6·7단계, 32경우(ref는 한 번)
+
+# rtn 가중치 변화(%) 확인값(README 6장과 같은 값). 1-3단계에서 잰 값이 CHANGE_TOL 안에서 같아야 한다.
+# rand는 같은 부품·비트의 rtn을 잰 값과 CHANGE_TOL 안에서 같아야 한다
+RTN_CHANGE_PCT = {
+    "smolvlm": {"V": {8: 0.57, 6: 2.24, 5: 4.54, 4: 9.38, 3: 20.10},
+                "L": {8: 0.57, 6: 2.21, 5: 4.48, 4: 9.26, 3: 19.86}},
+    "qwen2vl": {"V": {8: 0.57, 6: 2.21, 5: 4.49, 4: 9.27, 3: 19.88},
+                "L": {8: 0.57, 6: 2.21, 5: 4.49, 4: 9.27, 3: 19.87}},
+}
+CHANGE_TOL = 0.01          # %p
 
 # 사진 (image_list.csv의 split)
 N_DEV = 5                  # dev: 코드 점검용. 공격 사진 설정을 조정할 때도 이것만 쓴다

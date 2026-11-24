@@ -1,0 +1,1500 @@
+{
+ "environment": {
+  "settings_version": "v2",
+  "code_commit": "92b1d89918a2eebe593515b46a6ef23f9f90f532",
+  "model_id": "HuggingFaceTB/SmolVLM-256M-Instruct",
+  "revision": "7e3e67edbbed1bf9888184d9df282b700a323964",
+  "eos_token_ids": [
+   49279
+  ],
+  "dtype": "bfloat16",
+  "attn_implementation": "sdpa",
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "cuda": "12.8",
+  "packages": {
+   "python": "3.12.3",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.19.0",
+   "bitsandbytes": "0.50.2",
+   "pillow": "11.2.1",
+   "numpy": "2.5.2"
+  },
+  "determinism": {
+   "seed": 2026,
+   "use_deterministic_algorithms": true,
+   "warn_only": false,
+   "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+   "cudnn_benchmark": false
+  }
+ },
+ "inputs": {
+  "split": "dev",
+  "order": 1,
+  "coco_id": "000000000632",
+  "clean_sha256": "75821982c11125c7740158655a26b7158b357b683398c3e94e2b0448c5f52e9f",
+  "matches_manifest": true
+ },
+ "cases": {
+  "ref": {
+   "case": "ref",
+   "method": "ref",
+   "targets": "",
+   "bits": null,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {},
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 2.721,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-8": {
+   "case": "rtn-V-8",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 8,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.5734
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.925,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-6": {
+   "case": "rtn-V-6",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 6,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 2.2368
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.905,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-5": {
+   "case": "rtn-V-5",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 5,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 4.5387
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.969,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-4": {
+   "case": "rtn-V-4",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 4,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.3768
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.829,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-V-3": {
+   "case": "rtn-V-3",
+   "method": "rtn",
+   "targets": "V",
+   "bits": 3,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 20.1034
+   },
+   "answer": {
+    "n_tokens": 36,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.146,
+    "text": " In this image we can see a book, a table, a chair, a window, a wall, a lamp, a flower pot, a book stand and a book."
+   },
+   "repeat_same": true
+  },
+  "bnb-V-8": {
+   "case": "bnb-V-8",
+   "method": "bnb",
+   "targets": "V",
+   "bits": 8,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.9603
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.996,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "bnb-V-4": {
+   "case": "bnb-V-4",
+   "method": "bnb",
+   "targets": "V",
+   "bits": 4,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.4246
+   },
+   "answer": {
+    "n_tokens": 32,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.057,
+    "text": " In this image I can see a bed, a table, a mirror, a cupboard, a basket, a plant, a window and a wall."
+   },
+   "repeat_same": true
+  },
+  "rand-V-8": {
+   "case": "rand-V-8",
+   "method": "rand",
+   "targets": "V",
+   "bits": 8,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.5732
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.806,
+    "text": " In this image I can see a bed, a mirror, a table, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rand-V-6": {
+   "case": "rand-V-6",
+   "method": "rand",
+   "targets": "V",
+   "bits": 6,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 2.2366
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.814,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rand-V-5": {
+   "case": "rand-V-5",
+   "method": "rand",
+   "targets": "V",
+   "bits": 5,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 4.5385
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.768,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rand-V-4": {
+   "case": "rand-V-4",
+   "method": "rand",
+   "targets": "V",
+   "bits": 4,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.3767
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.873,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rand-V-3": {
+   "case": "rand-V-3",
+   "method": "rand",
+   "targets": "V",
+   "bits": 3,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     0,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 20.1033
+   },
+   "answer": {
+    "n_tokens": 24,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.74,
+    "text": " In this image there is a bed, a table, a window, a plant, a basket and a book."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-8": {
+   "case": "rtn-L-8",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 8,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 0.5667
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.772,
+    "text": " In this image I can see a bed, a mirror, a table, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-6": {
+   "case": "rtn-L-6",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 6,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 2.2099
+   },
+   "answer": {
+    "n_tokens": 31,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.25,
+    "text": " In this image we can see a bed, a mirror, a table, a plant, a basket, a book, a wall and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-5": {
+   "case": "rtn-L-5",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 5,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 4.4837
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.727,
+    "text": " In this image we can see a bed, a mirror, a table, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-4": {
+   "case": "rtn-L-4",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 4,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 9.2639
+   },
+   "answer": {
+    "n_tokens": 23,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.759,
+    "text": " A bedroom with a bed, a mirror, a plant, a bookshelf, and a rack of books."
+   },
+   "repeat_same": true
+  },
+  "rtn-L-3": {
+   "case": "rtn-L-3",
+   "method": "rtn",
+   "targets": "L",
+   "bits": 3,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 19.8616
+   },
+   "answer": {
+    "n_tokens": 512,
+    "ended_eos": false,
+    "hit_cap": true,
+    "latency_s": 16.778,
+    "text": " Flashboard of a room's interior view of the bedroom. It's a view of the bedroom that you can see all the rest of the world. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the picture. It's a view of the bedroom that you can see in the image. It's a view of the bedroom that you can see in the image. It's a view of the bedroom that you can see in the image. It's a view of the bedroom that you can see in the image. It's a view of the bedroom that you can see in the image. It's a view of the image that you can see in the image. It's a view of the image that you can see in the image. It's"
+   },
+   "repeat_same": true
+  },
+  "bnb-L-8": {
+   "case": "bnb-L-8",
+   "method": "bnb",
+   "targets": "L",
+   "bits": 8,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 0.855
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 3.904,
+    "text": " In this image I can see a bed, a mirror, a table, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "bnb-L-4": {
+   "case": "bnb-L-4",
+   "method": "bnb",
+   "targets": "L",
+   "bits": 4,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 9.3473
+   },
+   "answer": {
+    "n_tokens": 22,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.73,
+    "text": " A bedroom with a bed, a mirror, a bookshelf, and a window with a tree outside."
+   },
+   "repeat_same": true
+  },
+  "rand-L-8": {
+   "case": "rand-L-8",
+   "method": "rand",
+   "targets": "L",
+   "bits": 8,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 0.5665
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.835,
+    "text": " In this image I can see a bed, a mirror, a table, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rand-L-6": {
+   "case": "rand-L-6",
+   "method": "rand",
+   "targets": "L",
+   "bits": 6,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 2.2097
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.82,
+    "text": " In this image I can see a bed, a mirror, a table, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rand-L-5": {
+   "case": "rand-L-5",
+   "method": "rand",
+   "targets": "L",
+   "bits": 5,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 4.4836
+   },
+   "answer": {
+    "n_tokens": 42,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.354,
+    "text": " In this image, we can see a bed, a mirror, a table, a cup, a bottle, a plant, a basket, a rack, a window, a wall, and a curtain."
+   },
+   "repeat_same": true
+  },
+  "rand-L-4": {
+   "case": "rand-L-4",
+   "method": "rand",
+   "targets": "L",
+   "bits": 4,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 9.2637
+   },
+   "answer": {
+    "n_tokens": 36,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.244,
+    "text": " In this image, we can see a window, a table, a mirror, a cup, a book, a basket, a plant, and a rack in the room."
+   },
+   "repeat_same": true
+  },
+  "rand-L-3": {
+   "case": "rand-L-3",
+   "method": "rand",
+   "targets": "L",
+   "bits": 3,
+   "census": {
+    "V": [
+     0,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "L": 19.8615
+   },
+   "answer": {
+    "n_tokens": 512,
+    "ended_eos": false,
+    "hit_cap": true,
+    "latency_s": 17.689,
+    "text": " The answer to the question. 1.11. 1.5. 25% is that. 25% is that. 25% is that. 25% is that. 25% is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is that. 26 is"
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-8": {
+   "case": "rtn-VL-8",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 8,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.5734,
+    "L": 0.5667
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.924,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-6": {
+   "case": "rtn-VL-6",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 6,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 2.2368,
+    "L": 2.2099
+   },
+   "answer": {
+    "n_tokens": 31,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.065,
+    "text": " In this image we can see a bed, a mirror, a table, a plant, a basket, a book, a wall and a window."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-5": {
+   "case": "rtn-VL-5",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 5,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 4.5387,
+    "L": 4.4837
+   },
+   "answer": {
+    "n_tokens": 28,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.881,
+    "text": " In this image we can see a bed, a table, a mirror, a window, a plant, a basket and a wall."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-4": {
+   "case": "rtn-VL-4",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 4,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.3768,
+    "L": 9.2639
+   },
+   "answer": {
+    "n_tokens": 17,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 0.709,
+    "text": " Bed with a pillow and a bedside table with a mirror and a book."
+   },
+   "repeat_same": true
+  },
+  "rtn-VL-3": {
+   "case": "rtn-VL-3",
+   "method": "rtn",
+   "targets": "VL",
+   "bits": 3,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 20.1034,
+    "L": 19.8616
+   },
+   "answer": {
+    "n_tokens": 512,
+    "ended_eos": false,
+    "hit_cap": true,
+    "latency_s": 19.148,
+    "text": " What is the most likely to be the most likely to be the most likely to be the most of this image? The most likely to be the most likely to be the most of this image is the most likely to be the most of this image. The most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most likely to be the most of this image is the most of this image is the most of this image is the most of this image is the most of this image is the most of this image is the most of this image is the most of this image is the most of this image is the most of of this image is the most of of this image is the most of of this image is the most of of this image is the most of of this image is the most of of this image is the most of of of this image is the most of of of this image is the most of of of this image is the most of of of this image is the most of of of of this image is the most of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of of"
+   },
+   "repeat_same": true
+  },
+  "bnb-VL-8": {
+   "case": "bnb-VL-8",
+   "method": "bnb",
+   "targets": "VL",
+   "bits": 8,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 0.9603,
+    "L": 0.855
+   },
+   "answer": {
+    "n_tokens": 25,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 4.251,
+    "text": " In this image I can see a bed, a table, a mirror, a plant, a basket and a window."
+   },
+   "repeat_same": true
+  },
+  "bnb-VL-4": {
+   "case": "bnb-VL-4",
+   "method": "bnb",
+   "targets": "VL",
+   "bits": 4,
+   "census": {
+    "V": [
+     72,
+     72
+    ],
+    "C": [
+     0,
+     1
+    ],
+    "L": [
+     210,
+     210
+    ],
+    "H": [
+     0,
+     1
+    ]
+   },
+   "weight_change_pct": {
+    "V": 9.4246,
+    "L": 9.3473
+   },
+   "answer": {
+    "n_tokens": 23,
+    "ended_eos": true,
+    "hit_cap": false,
+    "latency_s": 1.078,
+    "text": " A bedroom with a bed, a mirror, a bookshelf, a window with a plant and a curtain."
+   },
+   "repeat_same": true
+  }
+ },
+ "checks": {
+  "environment": {
+   "pass": true,
+   "check_ref_passed": true,
+   "differs": []
+  },
+  "code": {
+   "pass": true,
+   "code_commit": "92b1d89918a2eebe593515b46a6ef23f9f90f532"
+  },
+  "input": {
+   "pass": true
+  },
+  "census": {
+   "pass": true,
+   "failed": []
+  },
+  "weight_change": {
+   "pass": true,
+   "tolerance": 0.01,
+   "rows": [
+    {
+     "case": "rtn-V-8",
+     "part": "V",
+     "measured": 0.5734,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-6",
+     "part": "V",
+     "measured": 2.2368,
+     "expected": 2.24,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-5",
+     "part": "V",
+     "measured": 4.5387,
+     "expected": 4.54,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-4",
+     "part": "V",
+     "measured": 9.3768,
+     "expected": 9.38,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-V-3",
+     "part": "V",
+     "measured": 20.1034,
+     "expected": 20.1,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "bnb-V-8",
+     "part": "V",
+     "measured": 0.9603,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-V-4",
+     "part": "V",
+     "measured": 9.4246,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "rand-V-8",
+     "part": "V",
+     "measured": 0.5732,
+     "expected": 0.5734,
+     "basis": "rtn-V-8의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-6",
+     "part": "V",
+     "measured": 2.2366,
+     "expected": 2.2368,
+     "basis": "rtn-V-6의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-5",
+     "part": "V",
+     "measured": 4.5385,
+     "expected": 4.5387,
+     "basis": "rtn-V-5의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-4",
+     "part": "V",
+     "measured": 9.3767,
+     "expected": 9.3768,
+     "basis": "rtn-V-4의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-V-3",
+     "part": "V",
+     "measured": 20.1033,
+     "expected": 20.1034,
+     "basis": "rtn-V-3의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-8",
+     "part": "L",
+     "measured": 0.5667,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-6",
+     "part": "L",
+     "measured": 2.2099,
+     "expected": 2.21,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-5",
+     "part": "L",
+     "measured": 4.4837,
+     "expected": 4.48,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-4",
+     "part": "L",
+     "measured": 9.2639,
+     "expected": 9.26,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-L-3",
+     "part": "L",
+     "measured": 19.8616,
+     "expected": 19.86,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "bnb-L-8",
+     "part": "L",
+     "measured": 0.855,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-L-4",
+     "part": "L",
+     "measured": 9.3473,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "rand-L-8",
+     "part": "L",
+     "measured": 0.5665,
+     "expected": 0.5667,
+     "basis": "rtn-L-8의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-6",
+     "part": "L",
+     "measured": 2.2097,
+     "expected": 2.2099,
+     "basis": "rtn-L-6의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-5",
+     "part": "L",
+     "measured": 4.4836,
+     "expected": 4.4837,
+     "basis": "rtn-L-5의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-4",
+     "part": "L",
+     "measured": 9.2637,
+     "expected": 9.2639,
+     "basis": "rtn-L-4의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rand-L-3",
+     "part": "L",
+     "measured": 19.8615,
+     "expected": 19.8616,
+     "basis": "rtn-L-3의 잰 값",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-8",
+     "part": "V",
+     "measured": 0.5734,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-8",
+     "part": "L",
+     "measured": 0.5667,
+     "expected": 0.57,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-6",
+     "part": "V",
+     "measured": 2.2368,
+     "expected": 2.24,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-6",
+     "part": "L",
+     "measured": 2.2099,
+     "expected": 2.21,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-5",
+     "part": "V",
+     "measured": 4.5387,
+     "expected": 4.54,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-5",
+     "part": "L",
+     "measured": 4.4837,
+     "expected": 4.48,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-4",
+     "part": "V",
+     "measured": 9.3768,
+     "expected": 9.38,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-4",
+     "part": "L",
+     "measured": 9.2639,
+     "expected": 9.26,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-3",
+     "part": "V",
+     "measured": 20.1034,
+     "expected": 20.1,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "rtn-VL-3",
+     "part": "L",
+     "measured": 19.8616,
+     "expected": 19.86,
+     "basis": "settings.RTN_CHANGE_PCT",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-8",
+     "part": "V",
+     "measured": 0.9603,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-8",
+     "part": "L",
+     "measured": 0.855,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-4",
+     "part": "V",
+     "measured": 9.4246,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    },
+    {
+     "case": "bnb-VL-4",
+     "part": "L",
+     "measured": 9.3473,
+     "expected": null,
+     "basis": "기록만",
+     "pass": true
+    }
+   ]
+  },
+  "generation": {
+   "pass": true,
+   "failed": [],
+   "repeat_differs": [],
+   "bnb_repeat_differs": []
+  }
+ },
+ "passed": true,
+ "note": "README 1-3단계. checks의 pass가 모두 true면 통과. census는 부품별 [바뀐 Linear 수, 전체 Linear 수]"
+}

@@ -136,7 +136,7 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 ### 4·5·5-2·7단계의 실행
 
-네 단계는 넣는 사진과 경우 목록만 다르고 하는 일은 같다. 두 팀이 같은 코드(`공통/run_answers.py`)로 실행한다. 6단계는 이 코드로 하지 않는다.
+네 단계는 넣는 사진과 경우 목록만 다르고 하는 일은 같다. 두 팀이 같은 코드(`공통/run_answers.py`)로 실행한다. 6단계는 `공통/run_internal.py`로 한다(6단계 절).
 
 | 단계 | 명령 (B팀은 `--team B`) | 결과 (`<팀>/results/`) |
 |---|---|---|
@@ -206,13 +206,13 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 ### 6단계. 모델 내부 측정
 
-답을 생성하지 않고 모델 안의 값을 잰다.
+답을 채점하지 않고 모델 안의 값을 잰다. 두 팀이 같은 코드(`공통/run_internal.py`)로 실행한다.
 
 - 경우: `settings.CASES_ALL` 32경우(4·5·5-2단계 경우 전부, `ref`는 한 번)
 - 입력: 공격 사진 세트 200장의 `clean`, `adv`
-- 그림 정보 f(x): 사진 x와 질문을 넣고 한 번 계산(forward)할 때 연결부(`parts["C"]`) 모듈이 내는 출력 전체를 1차원으로 편 float32 벡터
+- 그림 정보 f(x): 사진 x와 질문을 넣고 한 번 계산(forward)할 때 연결부(`parts["C"]`) 모듈이 내는 출력 전체를 1차원으로 편 벡터. 사진만으로 정해지는 값이므로 아래 로짓을 구하는 계산에서 함께 얻는다. 아래 식은 float64로 바꿔 계산한다.
 - ref에서 먼저 준비하는 것(사진마다):
-  - a: ref가 공격 사진에 생성한 답의 앞 64토큰(5.2절과 같은 생성, 종료 토큰 없음)
+  - a: ref가 공격 사진에 생성한 답의 앞 64토큰. 5.2절의 생성에서 `max_new_tokens`만 64로 줄여 만든다(샘플링이 없으므로 512까지 생성한 답의 앞 64토큰과 같다). 그 안에 종료 토큰이 있으면 멈춘다.
   - c: ref가 정상 사진에 생성한 답에서 마지막 종료 토큰을 뺀 토큰들(마지막 토큰이 종료 토큰이 아니면 멈춘다)
   - a와 c의 토큰 id는 `internal.json`에 남긴다.
 
@@ -228,8 +228,26 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 | `clean_end_margin` | 정상 사진과 질문 뒤에 c를 붙여 한 번 계산한다. c 다음 토큰을 고르는 자리에서 (종료 토큰 로짓 중 최댓값) − (종료 토큰이 아닌 토큰 로짓 중 최댓값) |
 
 - 로짓은 float32로 바꿔 계산한다. 종료 토큰은 `settings.MODELS[모델]["eos_token_ids"]`다.
-- ref 줄과 언어모델만 압축한 경우(L)는 그림 정보가 ref와 같으므로 `feat_change_clean` 0, `attack_dir_kept` 1, `shake_ratio` 0이 나와야 한다. 다르면 원인을 확인하고 JSON에 적는다.
+- ref 줄과 언어모델만 압축한 경우(L)는 그림 정보가 ref와 같으므로 `feat_change_clean` 0, `attack_dir_kept` 1, `shake_ratio` 0이 나와야 한다. 다르면 원인을 확인하고 JSON에 적는다. 코드는 그림 정보가 ref와 값까지 같은 사진 수를 경우마다 `same_features`에 적고, 언어모델만 압축한 경우 가운데 200장이 아닌 것이 있으면 `checks.language_features`에 그 경우 이름을 적는다.
 - 출력: `<팀>/results/internal.csv`(32 × 200 = 6,400줄)와 `internal.json`
+
+**코드가 하는 일**
+
+1. 시작 조건을 확인하고, 하나라도 맞지 않으면 모델을 올리지 않고 멈춘다. '4·5·5-2·7단계의 실행'의 시작 조건과 같다(실행 환경, 코드, `check_cases.json`의 `passed`, 넣을 사진의 SHA-256).
+2. 첫 경우인 ref에서 사진마다 a와 c를 만들고, 3단계 기록과 맞는지 본다. 정상 사진 답의 토큰 수가 `adv/attempts.csv`의 `ref_clean_n_tokens`와 사진마다 같아야 한다. 다르면 멈춘다.
+3. 경우(`settings.CASES_ALL` 순서)마다 `cases.build`로 모델을 새로 올려, 사진마다 두 번 계산한다. 공격 사진과 질문 뒤에 a를 붙인 계산에서 f(adv)와 `eos_gap`을, 정상 사진과 질문 뒤에 c를 붙인 계산에서 f(clean)과 `clean_end_margin`을 얻는다. 입력은 5.2·5.3절과 같게 만든다.
+4. ref에서는 다시 계산한 로짓이 ref가 생성한 답(a의 64토큰, c의 토큰, c 다음의 종료 토큰)을 고르는 비율을 `ref_check.replay`에 적는다. 입력과 자리 계산이 5.2절의 생성과 같다는 확인이다. bf16에서는 로짓이 동점인 자리가 있어 1이 되지 않을 수 있다. 0.8보다 낮으면 멈춘다.
+5. 경우 하나가 끝날 때마다 `<팀>/data/runs/internal/`에 저장한다. 끊기면 같은 명령으로 이어서 한다(끝난 경우는 건너뛴다). 환경, 코드, 넣는 사진이 처음과 다르면 이어서 하지 않고 멈춘다.
+6. 모든 경우가 끝나면 `<팀>/results/internal.csv`와 `internal.json`을 쓴다. 끝나기 전에는 결과 폴더에 아무것도 쓰지 않는다.
+
+**할 일(팀마다)**
+
+1. 4·5·5-2·7단계를 한 그 기계, 그 패키지 환경에서 최신 main을 받는다(기계를 옮겼다면 5.1절의 조건을 따른다). 커밋하지 않은 수정이 없게 한다.
+2. 먼저 짧은 시험을 한다: `python 공통/run_internal.py --team A --limit 2 --cases rtn-V-4,rtn-L-4`(B팀은 `--team B`). 사진 2장, ref와 두 경우만 돌리고 결과는 `<팀>/data/trial/internal/`에 쓴다. 오류 없이 끝나고, `internal.json`의 `ref_check`의 `pass`와 `replay_pass`, `checks`가 모두 통과인지 본다.
+3. 본 실행을 한다: `python 공통/run_internal.py --team A`. 답을 512토큰까지 생성하지 않으므로 4단계보다 훨씬 빨리 끝난다.
+4. `internal.csv`와 `internal.json` 두 파일만 PR로 올린다. 커밋 메시지와 PR 제목은 `[A] 6단계 결과: internal.csv·internal.json`처럼 쓴다. PR 본문에는 `.json`에서 옮겨 적는다: `csv`의 줄 수, `ref_check`, `checks`, 경우마다 `same_features`, `runs`, `environment`의 `code_commit`·GPU·패키지 버전.
+
+지킬 것은 '4·5·5-2·7단계의 실행'의 '지킬 것'과 같다.
 
 ### 7단계. 정확도 세트 실행
 
@@ -360,7 +378,7 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 
 ### 내부 측정 CSV (6단계)
 
-열: `model`, `case`, `image_id`, `feat_change_clean`, `attack_shift`, `attack_dir_kept`, `shake_ratio`, `eos_gap_mean`, `eos_gap_min`, `clean_end_margin`. 줄 순서는 경우 → 사진이다.
+열: `model`, `case`, `image_id`, `feat_change_clean`, `attack_shift`, `attack_dir_kept`, `shake_ratio`, `eos_gap_mean`, `eos_gap_min`, `clean_end_margin`. 줄 순서는 경우(`settings.CASES_ALL` 순서) → 사진(attack_set의 `set_order`)이다. 앞의 네 값은 소수 여섯째 자리, 뒤의 세 값은 넷째 자리까지 적는다.
 
 ### 결과 JSON
 
@@ -390,6 +408,18 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 | `checks` | 시작 조건 `environment`, `code`, `check_cases` 각각의 `pass` |
 | `csv` | CSV의 줄 수(`rows`)와 SHA-256 |
 | `runs` | 실행마다 처음 쓴 줄 번호(`first_row`)와 더한 줄 수(`rows_added`). 한 번에 끝냈으면 하나다 |
+
+### 내부 측정 JSON (6단계)
+
+`공통/run_internal.py`가 쓴다. `environment`, `inputs`, `csv`, `runs`와 `checks`의 시작 조건 세 가지는 '답 JSON'과 같다(`inputs`는 `clean_sha256`, `adv_sha256`).
+
+| 항목 | 내용 |
+|---|---|
+| `step` | `internal` |
+| `cases` | 경우마다 `census`, `weight_change_pct`, `rows`(줄 수), `seconds`(걸린 시간), `same_features`(그림 정보가 ref와 값까지 같은 사진 수) |
+| `ref_check` | ref의 정상 사진 답이 3단계 기록과 맞는지(`pass`, `clean_tokens_differ`)와, 다시 계산한 로짓이 ref가 생성한 답을 고른 비율(`replay`의 `a`, `c`, `end`, 그리고 `replay_pass`) |
+| `tokens` | 사진마다 a와 c의 토큰 id |
+| `checks` | 시작 조건 세 가지와 `language_features`(언어모델만 압축한 경우의 그림 정보가 모두 ref와 같은가, 다른 경우의 이름 `differs`) |
 
 ### 경우 점검 JSON (1-3단계)
 
@@ -428,7 +458,7 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 ```
 README.md      이 문서(규칙 v2)
 공통/          settings.py · quant_rtn.py · cases.py(경우 만들기) · check_cases.py(1-3단계 점검)
-               run_answers.py(4·5·5-2·7단계 실행) · image_list.csv
+               run_answers.py(4·5·5-2·7단계 실행) · run_internal.py(6단계 실행) · image_list.csv
                select_attack_set.py(3단계 세트 고르기) · attack_set.csv(공격 사진 세트)
 이미지생성/     attack_smolvlm.py(SmolVLM 제작 코드) · README.md(제작 방식, 1-1단계)
 A팀/  B팀/     code/ · adv/ · results/

@@ -12,9 +12,11 @@
    - 실행 환경이 그 팀 check_ref.json과 같고, 코드에 커밋하지 않은 수정이 없으며, check_cases.json의 passed가 true다
      (run_answers.py와 같은 확인)
    - 9-1단계 기록이 온전하다. attempts.csv가 attempts.json에 적힌 줄 수·SHA-256과 같고, 만든 때의 실행 환경이 지금과
-     같으며, 출발 경우(settings.CASES_DIRECT)마다 사진 N_DIRECT장이 모두 끝까지 처리되어 있다
+     같으며, 출발 경우(settings.CASES_DIRECT)마다 set_order 1~N_DIRECT가 모두 끝까지 처리되어 있다
    - 넣을 PNG가 기록과 같다. success 시도의 PNG가 모두 있고 SHA-256이 attempts.csv, SHA256SUMS 둘 다와 같다.
-     SHA256SUMS에 그 밖의 파일이 없다
+     SHA256SUMS에 9-1단계 기록의 success PNG가 아닌 파일이 없다
+   - set_order가 N_DIRECT보다 큰 사진의 기록과 PNG(본 실행을 시작한 뒤에 N_DIRECT를 줄이면 남는다, README 9단계
+     '순서와 고정')는 넣지도 세지도 않는다. 출발 경우마다 그 사진 수만 결과 JSON의 sources에 outside로 적는다
 2. 도착 경우(settings.CASES_DIRECT_TARGETS 순서)마다 모델을 새로 올려, 출발 경우(CASES_DIRECT 순서)마다 success가
    나온 사진(set_order 순서)을 넣어 답을 하나씩 만든다.
 3. 도착 경우가 출발 경우이기도 하면, 그 경우에서 만든 사진의 답이 모두 512에 닿는지 본다. 9-1단계의 판정이 같은
@@ -42,10 +44,15 @@ ATTEMPT_COLUMNS = ["source_case", "set_order", "coco_id", "attempt", "status", "
 stop = common.stop
 
 
+def set_rows():
+    """attack_set.csv의 모든 사진을 set_order 순서로. [(set_order, 'coco_id 12자리')]"""
+    rows = sorted(common.read_csv(ROOT / "공통" / "attack_set.csv", "attack_set.csv"), key=lambda r: int(r["set_order"]))
+    return [(int(r["set_order"]), f"{int(r['coco_id']):012d}") for r in rows]
+
+
 def set_photos(limit):
     """쓰는 사진: attack_set.csv의 set_order 1~N_DIRECT. [(set_order, 'coco_id 12자리')]"""
-    rows = sorted(common.read_csv(ROOT / "공통" / "attack_set.csv", "attack_set.csv"), key=lambda r: int(r["set_order"]))
-    photos = [(int(r["set_order"]), f"{int(r['coco_id']):012d}") for r in rows[:settings.N_DIRECT]]
+    photos = [photo for photo in set_rows() if photo[0] <= settings.N_DIRECT]
     return photos if limit is None else photos[:limit]
 
 
@@ -57,7 +64,8 @@ def finished(row):
 
 def read_attempts(rt, photos, env, trial):
     """9-1단계 시도 기록을 읽고 확인한다.
-    ({출발 경우: {사진: 마지막 시도 줄}}, 출발 경우별 사진 수 기록, 확인 기록, attempts.csv의 SHA-256)"""
+    ({출발 경우: {사진: 마지막 시도 줄}}, N_DIRECT 밖 사진의 같은 꼴, 출발 경우별 사진 수 기록, 확인 기록,
+     attempts.csv의 SHA-256)"""
     folder = rt.TEAM / "adv_direct"
     rows = common.read_csv(folder / "attempts.csv", "adv_direct/attempts.csv")
     meta = common.read_json(folder / "attempts.json", "adv_direct/attempts.json")
@@ -71,32 +79,38 @@ def read_attempts(rt, photos, env, trial):
     now = json.loads(json.dumps(env))
     differs = [k for k in check_cases.ENV_KEYS if (meta.get("environment") or {}).get(k) != now.get(k)]
 
-    order_of = {coco_id: order for order, coco_id in set_photos(None)}
+    order_of = {coco_id: order for order, coco_id in set_rows()}
     last = {source: {} for source in settings.CASES_DIRECT}
+    outside = {source: {} for source in settings.CASES_DIRECT}      # set_order가 N_DIRECT보다 큰 사진: 넣지도 세지도 않는다
     for row in rows:
         source, coco_id = row["source_case"], f"{int(row['coco_id']):012d}"
         if source not in last:
             stop(f"attempts.csv에 settings.CASES_DIRECT에 없는 출발 경우가 있다: {source}")
         if order_of.get(coco_id) != int(row["set_order"]):
-            stop(f"attempts.csv의 사진 {coco_id}(set_order {row['set_order']})이 attack_set.csv의 앞 "
-                 f"{settings.N_DIRECT}장과 맞지 않는다")
+            stop(f"attempts.csv의 사진 {coco_id}(set_order {row['set_order']})이 attack_set.csv와 맞지 않는다")
         if row["status"] == "success" and (int(row["linf"]) > settings.EPS or row["adv_hit_cap"] != "True"):
             stop(f"{source} {coco_id}: success 줄인데 판정 조건(linf ≤ EPS, adv_hit_cap)과 맞지 않는다")
-        last[source][coco_id] = row      # 같은 사진의 뒤 시도가 앞 시도를 덮는다
+        group = outside if int(row["set_order"]) > settings.N_DIRECT else last
+        group[source][coco_id] = row     # 같은 사진의 뒤 시도가 앞 시도를 덮는다
 
     unfinished = [f"{source}:{coco_id}" for source in last for _, coco_id in photos
                   if coco_id not in last[source] or not finished(last[source][coco_id])]
     counts = {}
     for source in last:
         final = [last[source][coco_id]["status"] for _, coco_id in photos if coco_id in last[source]]
-        counts[source] = {"photos": len(photos), **{s: final.count(s) for s in ("success", "fail", "excluded")}}
+        counts[source] = {"photos": len(photos), **{s: final.count(s) for s in ("success", "fail", "excluded")},
+                          "outside": len(outside[source])}
     check = {"pass": not differs and not unfinished, "environment_differs": differs, "unfinished": len(unfinished)}
     if not check["pass"] and not trial:
         stop(f"9-1단계 기록이 시작 조건과 맞지 않는다: 실행 환경이 다른 항목 {differs}, 끝나지 않은 (출발 경우:사진) "
              f"{len(unfinished)}개(예: {unfinished[:3]})")
     if not check["pass"]:
         print(f"알림(시험이라 계속한다): 9-1단계 기록이 시작 조건과 맞지 않는다. {check}")
-    return last, counts, check, digest
+    skipped = sum(len(by_photo) for by_photo in outside.values())
+    if skipped:
+        print(f"알림: set_order가 N_DIRECT({settings.N_DIRECT})보다 큰 (출발 경우, 사진) {skipped}개의 기록은 넣지도 세지도 "
+              "않는다(README 9단계 '순서와 고정')")
+    return last, outside, counts, check, digest
 
 
 def photo_plan(rt, photos, last):
@@ -110,8 +124,9 @@ def photo_plan(rt, photos, last):
     return plan
 
 
-def verify_pngs(rt, plan, trial):
-    """넣을 PNG의 SHA-256을 attempts.csv, SHA256SUMS와 맞대 본다. 같으면 그 해시들을 돌려주고, 다르면 멈춘다."""
+def verify_pngs(rt, plan, outside, trial):
+    """넣을 PNG의 SHA-256을 attempts.csv, SHA256SUMS와 맞대 본다. 같으면 그 해시들을 돌려주고, 다르면 멈춘다.
+    N_DIRECT 밖 사진의 success PNG는 넣지 않지만, SHA256SUMS에 기록과 같은 해시로 있는 것은 그대로 둔다."""
     folder = rt.TEAM / "adv_direct"
     try:
         lines = (folder / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
@@ -135,9 +150,11 @@ def verify_pngs(rt, plan, trial):
     if bad:
         stop(f"공격 PNG {len(bad)}개가 없거나 기록(attempts.csv, SHA256SUMS)과 다르다(예: {bad[:3]}) "
              "→ 9-1단계에서 만든 파일을 그대로 쓴다")
-    extra = sorted(set(sums) - wanted)
+    kept = {f"{source}/{coco_id}.png": row["png_sha256"] for source, by_photo in outside.items()
+            for coco_id, row in by_photo.items() if row["status"] == "success"}
+    extra = sorted(name for name in set(sums) - wanted if sums[name] != kept.get(name))
     if extra and not trial:
-        stop(f"SHA256SUMS에 success 시도의 PNG가 아닌 파일이 {len(extra)}개 있다(예: {extra[:3]})")
+        stop(f"SHA256SUMS에 9-1단계 기록의 success PNG가 아닌 파일이 {len(extra)}개 있다(예: {extra[:3]})")
     return hashes
 
 
@@ -214,7 +231,8 @@ def finalize(rt, args, state, work, checks, inputs, sources):
             "csv": {"rows": sum(c["rows"] for c in state["cases"].values()), "sha256": common.sha256(data)},
             "runs": state["runs"],
             "note": "README 9단계. csv 한 줄 = 출발 경우에서 만든 사진 하나를 도착 경우(case)에 넣은 답. sources는 출발 "
-                    "경우마다 9-1단계에서 처리한 사진 수와 마지막 상태별 수. cases의 hit_cap은 출발 경우별로 512에 닿은 "
+                    "경우마다 9-1단계에서 처리한 사진 수와 마지막 상태별 수(outside는 set_order가 N_DIRECT보다 커서 쓰지 "
+                    "않은 사진 수). cases의 hit_cap은 출발 경우별로 512에 닿은 "
                     "답의 수. runs의 first_row는 그 실행이 처음 쓴 줄 번호(머리줄 제외)"}
     out = work if args.limit is not None else rt.TEAM / "results"
     try:
@@ -252,10 +270,10 @@ def main():
     rt.setup()
     env = rt.environment()
     checks = common.preconditions(rt, env, trial)
-    last, sources, attempts_check, attempts_sha = read_attempts(rt, photos, env, trial)
+    last, outside, sources, attempts_check, attempts_sha = read_attempts(rt, photos, env, trial)
     checks["direct_attempts"] = attempts_check
     plan = photo_plan(rt, photos, last)
-    inputs = {"attempts_csv_sha256": attempts_sha, "adv_sha256": verify_pngs(rt, plan, trial)}
+    inputs = {"attempts_csv_sha256": attempts_sha, "adv_sha256": verify_pngs(rt, plan, outside, trial)}
     identity = {"environment": env, "step": STEP, "cases": targets, "sources": list(plan),
                 "images": [coco_id for _, coco_id in photos], "inputs": inputs,
                 "prompt": settings.PROMPT, "gen_kwargs": settings.GEN_KWARGS}

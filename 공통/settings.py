@@ -3,6 +3,8 @@
 단, cand를 늘릴 때(README 3단계 4번)는 N_CAND와 image_list.csv만 바꾸고 버전은 올리지 않는다. 이미 만든 사진과 기록은 그대로 이어서 쓴다.
 세트(공통/attack_set.csv)를 정하기 전에 N_ATTACK_SET을 바꿀 때도 버전은 올리지 않는다(README 3단계 3번).
 4~7단계 결과가 하나도 없을 때 경우 목록에 경우를 더하는 것도 버전을 올리지 않는다(README 5-2단계). 공격 사진과 시도 기록은 경우 목록과 관계없다.
+9단계용 값(CASES_DIRECT, N_DIRECT, CASES_DIRECT_TARGETS)을 더하거나, 9-1단계 본 실행 전에 바꾸는 것도 버전을 올리지 않는다(README 9단계). 1~7단계의 값과 결과는 그대로다.
+9-1단계 본 실행을 시작한 뒤에 N_DIRECT를 줄일 때도 버전은 올리지 않는다. 이미 만든 사진과 기록은 그대로 두고 set_order 1~N_DIRECT만 쓴다(README 9단계 '순서와 고정').
 
 쓰는 법:  import sys; sys.path.insert(0, "<저장소>/공통");  import settings, quant_rtn
 """
@@ -48,6 +50,11 @@ CASES_LANGUAGE = (["ref"] + [f"rtn-L-{b}" for b in RTN_BITS] + [f"bnb-L-{b}" for
 CASES_BOTH = (["ref"] + [f"rtn-VL-{b}" for b in RTN_BITS]
               + [f"bnb-VL-{b}" for b in BNB_BITS])                    # 5-2단계 함께 압축 실험, 8경우(rand 없음)
 CASES_ALL = CASES_VISION + CASES_LANGUAGE[1:] + CASES_BOTH[1:]       # 1-3·6·7단계, 32경우(ref는 한 번)
+
+# 9단계: 압축 모델에서 만든 공격 사진(README 9단계). 만드는 값은 위 '공격 사진' 값을 그대로 쓴다(9단계용 값을 따로 두지 않는다)
+CASES_DIRECT = ["rtn-V-4", "rtn-V-3", "rand-V-3", "bnb-V-4"]         # 출발 경우: 공격 사진을 만드는 모델. 두 팀이 같다
+N_DIRECT = 30                                                        # 쓰는 사진: attack_set.csv의 set_order 1~N_DIRECT
+CASES_DIRECT_TARGETS = CASES_VISION                                  # 도착 경우: 만든 사진을 넣어 보는 모델, 13경우
 
 # rtn 가중치 변화(%) 확인값(README 6장과 같은 값). 1-3단계에서 잰 값이 CHANGE_TOL 안에서 같아야 한다.
 # rand는 같은 부품·비트의 rtn을 잰 값과 CHANGE_TOL 안에서 같아야 한다

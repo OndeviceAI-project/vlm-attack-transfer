@@ -20,7 +20,9 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 두 팀은 같은 COCO 사진 200장으로 공격 사진을 만들고, 같은 경우, 같은 입력, 같은 형식으로 잰다.
 
-분석 지표(전이율, 정확도 등)는 실험이 모두 끝난 뒤 8단계에서 정한다. 1~7단계에서는 이 문서가 정한 원자료만 남긴다.
+9단계는 위 두 가지와 따로 한다. 압축 모델로 만든 공격 사진을 그 압축 모델과 다른 경우에 넣었을 때 나오는 답을 잰다. 1~7단계에서 쓰는 공격 사진은 모두 원본 모델로 만든 것이고, 9단계의 사진과 결과는 파일을 따로 둔다.
+
+분석 지표(전이율, 정확도 등)는 실험이 모두 끝난 뒤 8단계에서 정한다. 1~7단계에서는 이 문서가 정한 원자료만 남긴다. 9단계에서 세는 값은 9단계 절에 미리 적어 둔다.
 
 ## 2. 저장소에 올리는 것과 올리지 않는 것
 
@@ -59,8 +61,10 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 | 6 | 모델 내부 측정 | 팀별 | 1-3, 3 | `<팀>/results/internal.csv`, `.json` |
 | 7 | 정확도 세트 실행 | 팀별 | 1-3, 2 | `<팀>/results/accuracy.csv`, `.json` |
 | 8 | 분석 지표 정의 | A·B 함께 | 4~7 | 지표 정의를 이 문서에 추가 |
+| 9-1 | 압축 모델에서 공격 사진 만들기 | 팀별 | 4~7 | `<팀>/adv_direct/`(PNG, `SHA256SUMS`, `attempts.csv`, `attempts.json`) |
+| 9-2 | 만든 사진을 여러 경우에 넣기 | 팀별 | 9-1 | `<팀>/results/direct.csv`, `.json` |
 
-2단계는 1-2단계(`check_ref.json`)가 끝난 뒤에, 4~7단계는 1-3단계(`check_cases.json`)가 끝난 뒤에 한다. 이 문서에서 '4~7단계'는 5-2단계를 포함한다. 1-3단계는 dev 사진과 `input-manifest.json`을 쓰므로 2단계 뒤에 하고, 3단계와는 상관없이 해도 된다. 4·5·5-2·6단계는 1-3단계와 3단계가 끝나면 한다. 7단계는 공격 사진이 필요 없어서 1-3단계와 2단계가 끝나면 언제든 한다. 4·5·5-2·7단계를 먼저 하고 6단계는 마지막에 한다.
+2단계는 1-2단계(`check_ref.json`)가 끝난 뒤에, 4~7단계는 1-3단계(`check_cases.json`)가 끝난 뒤에 한다. 이 문서에서 '4~7단계'는 5-2단계를 포함한다. 1-3단계는 dev 사진과 `input-manifest.json`을 쓰므로 2단계 뒤에 하고, 3단계와는 상관없이 해도 된다. 4·5·5-2·6단계는 1-3단계와 3단계가 끝나면 한다. 7단계는 공격 사진이 필요 없어서 1-3단계와 2단계가 끝나면 언제든 한다. 4·5·5-2·7단계를 먼저 하고 6단계는 마지막에 한다. 9단계는 4~7단계가 끝난 뒤에 한다. 9단계의 실행은 8단계와 함께 진행해도 되지만, 9단계 결과 PR은 8단계가 끝난 뒤에 올린다(9단계 절).
 
 ### 1-1단계. 공격 사진 만드는 방법 합의
 
@@ -262,6 +266,93 @@ v2에서는 공격 사진부터 모든 실험을 새로 한다. v1(중간발표�
 
 4~7단계가 모두 끝나면 두 팀이 분석 지표의 정의를 이 문서에 추가한다. 계산한 지표 값, 그래프, 해석은 2장에 따라 저장소에 올리지 않는다.
 
+### 9단계. 압축 모델에서 만든 공격 사진
+
+1~7단계의 공격 사진은 모두 원본(ref)으로 만들었다. 9단계는 공격 사진을 압축 모델로 만들어, 그 모델과 다른 경우에 넣었을 때의 답을 기록한다. 1~7단계의 사진, 기록, 결과는 바꾸지 않는다.
+
+- 출발 경우(공격 사진을 만드는 모델): `settings.CASES_DIRECT` 4경우. `rtn-V-4`, `rtn-V-3`, `rand-V-3`, `bnb-V-4`다. 두 팀이 같은 경우를 쓴다.
+- 사진: `공통/attack_set.csv`의 `set_order` 1~30(`settings.N_DIRECT`). 4단계 결과와 같은 사진끼리 맞대 보려고 세트의 앞에서부터 쓴다.
+- 도착 경우(만든 사진을 넣어 보는 모델): `settings.CASES_DIRECT_TARGETS`. 4단계의 13경우와 같다.
+- 9-1단계(만들기)는 팀의 코드로, 9-2단계(넣어 보기)는 두 팀이 같은 코드(`공통/run_direct.py`)로 한다.
+- 2~7단계를 한 그 기계, 그 패키지 환경에서 한다(5.1절).
+
+**순서와 고정**
+
+- 9단계는 그 팀의 4~7단계 결과가 모두 main에 병합된 뒤에 시작한다.
+- 출발 경우, 사진 수, 도착 경우, 아래 '9단계에서 세는 값'은 9-1단계 본 실행을 시작하기 전에만 바꿀 수 있다. 사진 수를 줄이는 것만 아래 규칙대로 시작한 뒤에도 할 수 있다. 바꿀 때는 공통 PR로 올려 두 팀이 승인한다.
+- 코드 확인과 짧은 시험은 dev 사진으로만 한다. 세트 사진으로 미리 돌려 보지 않는다.
+- `bnb-V-4`에서 9-1단계 코드가 돌지 않으면(dev 사진 시험에서 확인한다), 본 실행 전에 `CASES_DIRECT`에서 이 경우를 빼는 PR을 올린다. 한 팀에서만 돌지 않아도 두 팀 모두 뺀다.
+- 사진 수를 줄여야 하면 `N_DIRECT`를 줄인다. 두 팀이, 모든 출발 경우에 같은 수를 쓰고 세트의 앞에서부터 쓴다. 결과를 보고 사진을 고르지 않는다.
+  - 본 실행을 시작한 뒤에 줄일 때는 줄이는 이유와 그때까지 처리한 범위를 PR 본문에 적는다.
+  - 이미 만든 것 가운데 줄인 수 밖의 사진(`set_order`가 `N_DIRECT`보다 큰 것)의 기록과 PNG는 지우거나 고치지 않고 그대로 둔다. 9-2단계 코드는 그 사진을 넣지 않고, `direct.json`의 `sources`에 그 수(`outside`)만 적는다.
+  - '9단계에서 세는 값'은 두 팀 모두 `set_order` 1~`N_DIRECT`만 쓴다. 다른 팀이 9-2단계를 이미 끝냈으면 그 결과 파일은 다시 만들지 않는다.
+- 9단계용 값을 바꾸는 PR은 settings 버전을 올리지 않는다. 본 실행 전에 바꿀 때도, 시작한 뒤에 `N_DIRECT`를 줄일 때도 같다. 이미 만든 사진과 기록은 그대로이고, 버전을 올리면 실행 환경이 `check_ref.json`과 달라져 모든 실행 코드가 시작 조건에서 멈춘다.
+- 9단계의 실행은 8단계와 함께 진행해도 된다. 9단계 결과 PR(9-1단계의 `adv_direct/`, 9-2단계의 `direct.csv`)은 8단계의 지표 정의가 main에 병합된 뒤에 올린다.
+
+#### 9-1단계. 만들기
+
+3단계와 같은 규칙으로 하되, 원본 대신 출발 경우의 모델을 쓴다. 만드는 방식과 값은 `이미지생성/README.md` 2·3·5장과 `settings.py`의 공격 사진 값 그대로다. 9단계용 값을 따로 두지 않는다. 달라지는 것은 모델뿐이다.
+
+1. **모델.** 출발 경우마다(`settings.CASES_DIRECT` 순서) `cases.build`로 모델을 올린다. 만들기와 판정은 이 모델 한 벌로 한다.
+2. **사진 한 장의 처리.** `set_order` 순서대로 하고, 건너뛰지 않는다.
+   - 그 모델에 정상 사진을 넣은 답이 종료 토큰 없이 512에 닿으면(5.2절 `hit_cap`) `excluded`로 적고 공격 사진을 만들지 않는다.
+   - 공격 사진 한 장을 만드는 것이 시도 한 번이다. 시도마다 달라지는 것(시작점, 씨앗)은 3단계와 같다.
+   - 시도마다 저장한 PNG를 다시 읽어 판정한다. 정상 PNG와의 픽셀 차이 최댓값이 `EPS`(8) 이하이고, 그 모델에 `rt.answer`로 넣은 답이 종료 토큰 없이 512에 닿으면 `success`, 아니면 `fail`이다. 제작 코드가 출력하는 성공 여부는 판정에 쓰지 않는다.
+   - `success`가 나오면 그 사진은 끝난다. `fail`이면 `ATTACK_MAX_TRIES`까지 다시 시도한다.
+3. **끝까지 처리.** 모든 출발 경우에서 `set_order` 1~`N_DIRECT`를 모두 처리한다. `success`가 적게 나와도 그대로 기록한다. `success`를 늘리려고 설정이나 방식을 바꾸지 않는다.
+4. **기록과 올리기.** 처리한 모든 사진의 모든 시도를 `<팀>/adv_direct/attempts.csv`에 한 줄씩 남긴다(형식은 7장). `success`가 나온 시도의 PNG만 `<팀>/adv_direct/<출발 경우>/<coco_id 12자리>.png`로 올리고, `<팀>/adv_direct/` 안에서 `shasum -a 256 */*.png`로 만든 `SHA256SUMS`를 붙인다. `fail`인 시도의 PNG는 올리지 않는다.
+
+**코드(팀마다)**
+
+- 9-1단계의 코드는 팀이 만들어 `<팀>/code/`에 올린다. 코드의 위치와 실행 방법을 `이미지생성/README.md` 1장에 더한다. 코드는 결과보다 먼저, 또는 같은 PR로 올린다(9장).
+- `<팀>/adv/attempts.json`의 `config`에 SHA-256이 적힌 코드 파일(3단계의 제작 코드, `make_attack_set.py`, `runtime.py`)은 고치지 않는다. 3단계 기록이 그 SHA-256을 근거로 삼는다. 9-1단계에 더 필요한 것은 새 파일에 둔다.
+- 모델은 `cases.build`로만 만든다. `공통/`의 파일은 팀에서 고쳐 쓰지 않는다.
+- 3단계 코드가 하던 확인을 그대로 한다. 처리할 사진의 정상 PNG가 `input-manifest.json`의 SHA-256과 같은지, 시도마다 저장한 PNG의 `pixel_values`가 5.3절대로 같은지(차이 1e-6 이하) 확인하고, 다르면 멈춘다.
+- 끊겨도 이어서 할 수 있게 하고, 제작·판정 설정이나 코드, 실행 환경이 기록과 다르면 이어서 하지 않는다.
+- 결과 PR의 커밋 메시지와 제목은 `[A] 9-1단계 결과: adv_direct`처럼 쓴다.
+
+#### 9-2단계. 넣어 보기
+
+9-1단계에서 `success`가 나온 공격 사진을 도착 경우마다 넣어 답을 기록한다. 실행은 `python 공통/run_direct.py --team A`다(B팀은 `--team B`).
+
+**코드가 하는 일**
+
+1. 시작 조건을 확인하고, 하나라도 맞지 않으면 모델을 올리지 않고 멈춘다.
+   - 실행 환경이 그 팀 `check_ref.json`과 같고, 코드에 커밋하지 않은 수정이 없으며, `check_cases.json`의 `passed`가 true다('4·5·5-2·7단계의 실행'과 같은 확인).
+   - 9-1단계 기록이 온전하다. `attempts.csv`의 줄 수와 SHA-256이 `attempts.json`에 적힌 값과 같고, 만든 때의 실행 환경이 지금과 같으며, 출발 경우마다 `set_order` 1~`N_DIRECT`가 모두 끝까지 처리되어 있다. `set_order`가 `N_DIRECT`보다 큰 사진의 기록은 넣지도 세지도 않는다.
+   - 넣을 PNG가 기록과 같다. `success` 시도의 PNG가 모두 있고, SHA-256이 `attempts.csv`의 `png_sha256`, `SHA256SUMS`와 모두 같다. `SHA256SUMS`에 9-1단계 기록의 `success` PNG가 아닌 파일이 없다.
+2. 도착 경우(`settings.CASES_DIRECT_TARGETS` 순서)마다 `cases.build`로 모델을 새로 올려, 출발 경우(`settings.CASES_DIRECT` 순서)마다 `success` 사진(`set_order` 순서)을 넣어 `rt.answer`를 한 번씩 부른다. 정상·노이즈 사진은 넣지 않는다. 같은 사진, 같은 경우의 정상·노이즈 답은 4단계 `vision.csv`에 있다.
+3. 도착 경우가 출발 경우이기도 하면, 그 경우에서 만든 사진의 답이 모두 512에 닿는지 본다. 9-1단계의 판정이 같은 코드, 같은 환경에서 그대로 재현된다는 확인이다. 다르면 멈춘다.
+4. 도착 경우 하나가 끝날 때마다 `<팀>/data/runs/direct/`에 저장한다. 끊기면 같은 명령으로 이어서 한다(끝난 경우는 건너뛴다). 환경, 코드, 넣는 사진이 처음과 다르면 이어서 하지 않고 멈춘다.
+5. 모든 도착 경우가 끝나면 `<팀>/results/direct.csv`와 `direct.json`을 쓴다. 끝나기 전에는 결과 폴더에 아무것도 쓰지 않는다.
+
+**할 일(팀마다)**
+
+1. 9-1단계를 한 그 기계에서, `<팀>/adv_direct/`가 그대로 있고 커밋하지 않은 수정이 없는 상태로 시작한다.
+2. 먼저 짧은 시험을 한다: `python 공통/run_direct.py --team A --limit 2 --cases ref,rtn-V-4`. 사진 2장, 도착 경우 2개만 돌리고 결과는 `<팀>/data/trial/direct/`에 쓴다. 오류 없이 끝나고, `direct.json`의 `checks`와 `self_check`가 모두 통과인지 본다.
+3. 본 실행을 한다: `python 공통/run_direct.py --team A`
+4. `direct.csv`와 `direct.json` 두 파일만 PR로 올린다. 커밋 메시지와 PR 제목은 `[A] 9-2단계 결과: direct.csv·direct.json`처럼 쓴다. PR 본문에는 `.json`에서 옮겨 적는다: `csv`의 줄 수, `sources`, `self_check`, `checks`, `runs`, `environment`의 `code_commit`·GPU·패키지 버전.
+
+지킬 것은 '4·5·5-2·7단계의 실행'의 '지킬 것'과 같다.
+
+#### 9단계에서 세는 값
+
+9-1단계 본 실행 전에 정해 둔다. 계산한 값과 해석은 2장에 따라 저장소에 올리지 않는다.
+
+쓰는 사진은 `set_order` 1~`N_DIRECT`다. 출발 경우마다, 그 가운데 `excluded`가 아닌 사진을 유효 사진이라 한다.
+
+| 값 | 정의 |
+|---|---|
+| 성공 비율 | 마지막 상태가 `success`인 유효 사진 수 ÷ 유효 사진 수. 첫 시도(`attempt` 1)만으로 센 값도 함께 낸다 |
+| 반복 수 | 사진마다, `success`가 나온 시도까지의 `iters_run`을 모두 더한 값. 앞선 `fail` 시도의 것도 더한다 |
+| 반복 비 | 9-1단계와 3단계 모두 `success`인 사진에서, 사진마다 (9-1단계의 반복 수 ÷ 3단계의 반복 수)를 구한 것의 중앙값 |
+| 도착 비율 | 출발 경우 s에서 `success`가 나온 사진을 도착 경우 t에 넣은 답 가운데 `hit_cap`인 것의 비율. t에서 그 사진의 정상 답이 `hit_cap`인 사진(4단계 `vision.csv`)은 빼고 센다 |
+
+- 비교 기준은 3단계 시도 기록(`<팀>/adv/attempts.csv`)이다. 같은 사진(`set_order` 1~`N_DIRECT`)의 값과, 3단계에서 처리한 후보 전체(`excluded` 제외)의 값을 함께 낸다. 세트의 사진은 ref에서 `success`가 나온 것만 고른 것이라, 같은 사진의 ref 성공 비율은 고른 방법 때문에 1이다.
+- 같은 사진끼리의 비교는 4단계 `vision.csv`의 `adv` 줄(ref에서 만든 사진)과 `direct.csv`의 줄을 사진마다 맞대어 센다.
+- 구분선: 성공 비율 0.8 이상과 0.5 이하, 반복 비 2 이상.
+- `iters_run`은 `REFRESH`(20)걸음마다 답 길이를 확인하는 방식 때문에 20걸음 단위로만 달라진다.
+
 ## 4. 사진 목록
 
 `공통/image_list.csv`. 모든 사진은 COCO val2017이다.
@@ -310,9 +401,10 @@ dev와 pilot은 결과 CSV에 넣지 않는다. cand의 1~43번째는 v1의 eval
 - 정상 사진(`clean`): COCO JPEG을 `Image.open(...).convert("RGB").resize((S, S), Image.BICUBIC)`로 바로 리사이즈한다(자르지 않음). S는 `img_size`(SmolVLM 512, Qwen2-VL 448)다. PNG로 저장한다.
 - 노이즈 사진(`noise`): 정상 사진 배열 `arr`(int16)에 `arr + EPS × sign`을 하고 0~255로 자른 뒤 uint8 PNG로 저장한다. `sign = numpy.random.default_rng([settings.NOISE_SEED, coco_id]).choice(numpy.array([-1, 1], dtype=numpy.int16), size=arr.shape)`
 - 공격 사진(`adv`): 3단계에서 확정한 `<팀>/adv/<coco_id 12자리>.png`
+- 9단계의 공격 사진: `<팀>/adv_direct/<출발 경우>/<coco_id 12자리>.png`. 9단계에서만 쓰고, 1~7단계에는 넣지 않는다
 - 사진은 PNG만 쓴다. JPEG로 저장하면 노이즈가 지워진다.
 - 같은 JPEG라도 Pillow 버전이 다르면 정상 사진의 픽셀이 다를 수 있다(13.0.0과 11.2.1은 일부 세로 사진의 리사이즈 결과가 다르다). 그래서 각 팀은 2~7단계 내내 자기 `input-manifest.json`의 `packages.pillow` 버전을 쓴다(A 11.2.1, B 13.0.0).
-- 같은 PNG라면 공격 사진 제작 코드, 4~7단계 코드, 내부 측정 코드가 모델에 넣는 `pixel_values`가 모두 같아야 한다(차이 0).
+- 같은 PNG라면 공격 사진 제작 코드(3단계, 9-1단계), 4~7단계 코드, 내부 측정 코드, 9-2단계 코드가 모델에 넣는 `pixel_values`가 모두 같아야 한다(차이 0).
 
 ### 5.4 경우 만들기
 
@@ -359,6 +451,8 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 | 5-2 | `<팀>/results/both.csv`, `both.json` |
 | 6 | `<팀>/results/internal.csv`, `internal.json` |
 | 7 | `<팀>/results/accuracy.csv`, `accuracy.json` |
+| 9-1 | `<팀>/adv_direct/<출발 경우>/<coco_id 12자리>.png`, `<팀>/adv_direct/SHA256SUMS`, `<팀>/adv_direct/attempts.csv`, `<팀>/adv_direct/attempts.json` |
+| 9-2 | `<팀>/results/direct.csv`, `direct.json` |
 
 ### 답 CSV (4·5·5-2·7단계)
 
@@ -453,15 +547,53 @@ rtn 경우의 가중치 변화(%)다. `settings.RTN_CHANGE_PCT`에 같은 값이
 
 `<팀>/adv/attempts.json`은 `attempts.csv`의 결과 JSON이다. 위 '결과 JSON'의 항목을 적는다. 경우는 `ref` 하나이고(census, 가중치 변화 0), 입력 사진은 처리한 후보의 정상 PNG다. 여기에 이어서 돌릴 때 확인하는 제작 설정과, 5.3절 `pixel_values` 확인의 가장 큰 차이(`pixel_gap_max`)를 더한다.
 
+### 9단계 시도 기록 (9-1단계)
+
+`<팀>/adv_direct/attempts.csv`는 출발 경우의 사진마다, 시도마다 한 줄이다. 줄 순서는 출발 경우(`settings.CASES_DIRECT` 순서) → 사진(`set_order`) → 시도다. `excluded`인 사진은 `attempt`를 0으로 한 줄만 적고, 공격 사진에 관한 열(`adv_n_tokens`, `adv_hit_cap`, `linf`, `png_sha256`)은 비운다.
+
+| 열 | 뜻 |
+|---|---|
+| `source_case` | 출발 경우 이름 |
+| `set_order`, `coco_id` | 사진. attack_set의 `set_order`와 COCO id 12자리 |
+| `attempt` | 시도 번호(1부터) |
+| `status` | `excluded` / `success` / `fail` |
+| `clean_n_tokens`, `clean_hit_cap` | 출발 경우의 모델에 정상 사진을 넣은 답 |
+| `adv_n_tokens`, `adv_hit_cap` | 출발 경우의 모델에 그 시도의 공격 사진을 넣은 답 |
+| `linf` | 공격 사진과 정상 사진의 픽셀 차이 최댓값(0~255 눈금) |
+| `png_sha256` | 그 시도의 공격 PNG의 SHA-256 |
+| `init`, `init_seed`, `iters_run`, `stopped_early`, `nan_stop`, `attack_seconds` | 3단계와 같다(`이미지생성/README.md` 3장) |
+
+`<팀>/adv_direct/attempts.json`은 `attempts.csv`의 결과 JSON이다. 3단계의 `attempts.json`과 같은 항목을 적되, `cases`에는 출발 경우마다 census와 가중치 변화(`cases.build`가 돌려주는 기록)를 적는다. 9-2단계 코드는 시작할 때 이 파일의 `environment`와 `csv`(줄 수 `rows`, `sha256`)를 확인한다.
+
+`<팀>/adv_direct/SHA256SUMS`의 한 줄은 `<SHA-256>  <출발 경우>/<coco_id 12자리>.png`다.
+
+### 9단계 답 CSV와 JSON (9-2단계)
+
+`공통/run_direct.py`가 쓴다.
+
+`direct.csv`는 한 답이 한 줄이다. 줄 순서는 도착 경우(`settings.CASES_DIRECT_TARGETS` 순서) → 출발 경우(`settings.CASES_DIRECT` 순서) → 사진(`set_order`)이다. 열은 '답 CSV'의 `model` 뒤에 `source_case`를 더한 것이다: `model`, `source_case`, `case`, `image_id`, `input`, `n_tokens`, `ended_eos`, `hit_cap`, `latency_s`, `text`. `source_case`는 출발 경우, `case`는 도착 경우이고, `input`은 모두 `adv`다. 줄 수는 (출발 경우마다 `success` 사진 수를 더한 값) × 13이다.
+
+`direct.json`의 `environment`, `csv`, `runs`와 `checks`의 시작 조건 세 가지는 '답 JSON'과 같다.
+
+| 항목 | 내용 |
+|---|---|
+| `step` | `direct` |
+| `sources` | 출발 경우마다 9-1단계에서 처리한 사진 수(`photos`)와 마지막 상태별 수(`success`, `fail`, `excluded`), `set_order`가 `N_DIRECT`보다 커서 쓰지 않은 사진 수(`outside`) |
+| `cases` | 도착 경우마다 `census`, `weight_change_pct`, `rows`(줄 수), `seconds`(걸린 시간), `hit_cap`(출발 경우별로 512에 닿은 답의 수) |
+| `inputs` | 9-1단계 `attempts.csv`의 SHA-256(`attempts_csv_sha256`)과 넣은 공격 PNG의 SHA-256(`adv_sha256`, 출발 경우별) |
+| `self_check` | 출발 경우마다, 그 경우에서 만든 사진을 그 경우에 넣은 답이 모두 512에 닿았는지(`pass`, `photos`, `hit_cap`, `not_hit`) |
+| `checks` | 시작 조건 세 가지와 `direct_attempts`(9-1단계 기록의 확인. 다른 환경 항목 `environment_differs`, 끝나지 않은 사진 수 `unfinished`) |
+
 ## 8. 폴더
 
 ```
 README.md      이 문서(규칙 v2)
 공통/          settings.py · quant_rtn.py · cases.py(경우 만들기) · check_cases.py(1-3단계 점검)
-               run_answers.py(4·5·5-2·7단계 실행) · run_internal.py(6단계 실행) · image_list.csv
+               run_answers.py(4·5·5-2·7단계 실행) · run_internal.py(6단계 실행) · run_direct.py(9-2단계 실행)
+               image_list.csv
                select_attack_set.py(3단계 세트 고르기) · attack_set.csv(공격 사진 세트)
 이미지생성/     attack_smolvlm.py(SmolVLM 제작 코드) · README.md(제작 방식, 1-1단계)
-A팀/  B팀/     code/ · adv/ · results/
+A팀/  B팀/     code/ · adv/ · adv_direct/(9단계) · results/
 ```
 
 ## 9. Git

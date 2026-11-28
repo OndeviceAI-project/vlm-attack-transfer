@@ -13,6 +13,29 @@
 
 두 제작 코드에서 모델 때문에 다른 것은 사진 크기·픽셀 단위·모델 입력 모양(`B팀/code/README.md` 4장)과 PNG 저장 코드뿐이다. 그 밖의 방식(목표 문장, 손실, 노이즈 갱신, 답 길이 확인, 조기 종료, 저장할 사진, 숫자가 깨질 때)은 이 문서대로 같다.
 
+### 9-1단계 제작 코드(압축 모델에서 만들기, README 9-1단계)
+
+| 모델 | 공격 사진 한 장 | 출발 경우·사진 처리와 시도 기록 | 실행 |
+|---|---|---|---|
+| SmolVLM | `이미지생성/attack_smolvlm.py`의 `attack_one` | `A팀/code/make_direct_set.py` | `python A팀/code/make_direct_set.py` |
+| Qwen2-VL | `B팀/code/attack_qwen.py`의 `attack_one` | `B팀/code/make_direct_set.py` | `python B팀/code/make_direct_set.py` |
+
+두 `make_direct_set.py`는 그 팀의 3단계 `make_attack_set.py`와 같은 규칙으로 처리한다. 다른 것은 공격과 판정에 쓰는 모델뿐이다. 출발 경우마다 `cases.build(rt, 출발 경우, reference)`로 모델을 한 벌 올려, 그 모델로 만들고 판정한다.
+
+- 처리 순서: 출발 경우(`settings.CASES_DIRECT` 순서) → 사진(`공통/attack_set.csv`의 `set_order` 1~`N_DIRECT`) → 시도. 건너뛰지 않는다.
+- 그 모델의 정상 답이 512면 `excluded`다. 저장한 PNG를 다시 읽어 픽셀 차이 최댓값이 `EPS` 이하이고 그 모델의 답이 종료 토큰 없이 512면 `success`, 아니면 `fail`이다.
+- 시도 횟수, 시작점, `init_seed`는 이 문서 3장과 같다(3단계 코드의 `init_seed`를 그대로 부른다).
+- 4장(입력 PNG 해시)과 5장(pixel_values 1e-6)의 확인, 끊긴 기록 이어 하기, 설정·코드·실행 환경이 다르면 멈추기도 3단계와 같다. 세트 사진으로 돌릴 때는 코드에 커밋하지 않은 수정이 있어도 멈춘다.
+- 본 실행 도중 `N_DIRECT`를 줄이면(README 9단계 '순서와 고정') 끝났는지는 `set_order` 1~`N_DIRECT`만 본다. 그 밖의 사진의 기록과 PNG는 지우거나 이어 하지 않고 그대로 둔다.
+- 3단계 파일(위 표의 공격 코드, `<팀>/code/runtime.py`, `<팀>/code/make_attack_set.py`)은 고치지 않고 불러 쓴다. 두 코드에서 모델 때문에 다른 것은 3단계와 같은 공격 함수 호출·PNG 저장과, B팀 코드가 모델을 올린 뒤 가중치의 기울기를 끄는 것(3단계의 `rt.load_ref(attack=True)`와 같다)뿐이다.
+- 결과는 `<팀>/adv_direct/`에 쓴다. `<출발 경우>/<coco_id>.png`(success 시도의 PNG만), `SHA256SUMS`, `attempts.csv`, `attempts.json`이다. 시도마다 만든 PNG는 `<팀>/data/direct_attempts/`에 남고 올리지 않는다.
+
+코드 확인은 dev 사진으로만 한다(기록은 `<팀>/data/dev_direct/`).
+
+```
+python <팀>/code/make_direct_set.py --split dev --limit 2 --cases rtn-V-4,rtn-V-3,rand-V-3,bnb-V-4
+```
+
 ## 2. 시도 한 번의 설정
 
 | 항목 | 값 |

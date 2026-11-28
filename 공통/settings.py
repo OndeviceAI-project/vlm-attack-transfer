@@ -4,6 +4,7 @@
 세트(공통/attack_set.csv)를 정하기 전에 N_ATTACK_SET을 바꿀 때도 버전은 올리지 않는다(README 3단계 3번).
 4~7단계 결과가 하나도 없을 때 경우 목록에 경우를 더하는 것도 버전을 올리지 않는다(README 5-2단계). 공격 사진과 시도 기록은 경우 목록과 관계없다.
 9단계용 값(CASES_DIRECT, N_DIRECT, CASES_DIRECT_TARGETS)을 더하거나, 9-1단계 본 실행 전에 바꾸는 것도 버전을 올리지 않는다(README 9단계). 1~7단계의 값과 결과는 그대로다.
+9-1단계 본 실행을 시작한 뒤에 N_DIRECT를 줄일 때도 버전은 올리지 않는다. 이미 만든 사진과 기록은 그대로 두고 set_order 1~N_DIRECT만 쓴다(README 9단계 '순서와 고정').
 
 쓰는 법:  import sys; sys.path.insert(0, "<저장소>/공통");  import settings, quant_rtn
 """
